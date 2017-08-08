@@ -19,6 +19,7 @@
         android:text="GO"
         android:onClick="geolocate"
         android:id="@+id/btn_search" />
+
     <fragment
         android:layout_width="match_parent"
         android:layout_height="465dp"
