@@ -2,10 +2,15 @@ package com.example.iaeste.general;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,58 +20,198 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
-    private Marker marker;
-    double lat = 0.0;
-    double lng = 0.0;
-
-    private GoogleApiClient mGoogleApiClient;
-
-    public static int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    public static int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 2;
+    DatabaseHelper mDatabaseHelper;
+    EditText titleArea;
+    GoogleMap mMapView;
+    private List<LatLng> listOfLatLng = new ArrayList<>();
+    private Polygon polygon;
+    Marker marker;
+    EditText search_field;
+    // TextView Tv_result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        // Tv_result = (TextView)findViewById(R.id.TV_result);
+        mDatabaseHelper = new DatabaseHelper(this);
+
+
+        if (googleServiceAvaliable()) {
+            Toast.makeText(this, "Successful", Toast.LENGTH_LONG).show();
+            setContentView(R.layout.activity_maps);
+        }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.Menu_typeNone :
+                mMapView.setMapType(GoogleMap.MAP_TYPE_NONE);
+                break;
+            case R.id.Menu_typeNormal :
+                mMapView.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+            case R.id.Menu_typeTerrain :
+                mMapView.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+            case R.id.Menu_typeSatellite :
+                mMapView.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+            case R.id.Menu_typeHybrid:
+                mMapView.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+            case R.id.bookmark:
+                Intent bookmarkAct = new Intent(this, BookMarkActivity.class);
+                this.startActivity(bookmarkAct);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    public boolean googleServiceAvaliable() {
+        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+        int isAvaliable = api.isGooglePlayServicesAvailable(this);
+        if (isAvaliable == ConnectionResult.SUCCESS) {
+            return true;
+        } else if (api.isUserResolvableError(isAvaliable)) {
+            Dialog dialog = api.getErrorDialog(this, isAvaliable, 0);
+            dialog.show();
+        } else {
+            Toast.makeText(this, "Cannot connect to play store", Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }
+    public void geolocate(View view) throws IOException {
+
+        if(marker!=null)
+            marker.remove();
+
+        search_field = (EditText)findViewById(R.id.Tv_program);
+        String location = search_field.getText().toString();
+
+        Geocoder gc = new Geocoder(this);
+        List<Address> list = gc.getFromLocationName(location,1);
+        Address address = list.get(0);
+        String locality = address.getLocality();
+
+        // Toast.makeText(this, locality,Toast.LENGTH_LONG).show();
+        double lat = address.getLatitude();
+        double lng = address.getLongitude();
+        goToLocationZoom(lat,lng,15);
+        setMarker(lat,lng,locality);
+        //  Toast.makeText(this, "You have to clear pin before pining area",Toast.LENGTH_LONG).show();
+
+    }
+    private void setMarker(double lat, double lng, String locality) {
+        // Toast.makeText(this, locality,Toast.LENGTH_LONG).show();
+        LatLng latLng = new LatLng(lat, lng);
+        marker = mMapView.addMarker(new MarkerOptions().position(latLng).title(locality)
+                .snippet(""));
+        mMapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+    }
+
+    private void bindWidget() {
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mMapView);
         mapFragment.getMapAsync(this);
+    }
+    private void drawRealtimePolygon(LatLng latLng) {
+        listOfLatLng.add(latLng);
+        if (listOfLatLng.size() > 2) {
+            if (polygon != null) {
+                polygon.remove();
+            }
+            polygon = mMapView.addPolygon(new PolygonOptions()
+                    .addAll(listOfLatLng)
+                    .strokeColor(Color.parseColor("#3978DD"))
+                    .fillColor(Color.parseColor("#773978DD")));
+            polygon.setStrokeWidth(4);
+
+            toastAreaInPolygon(polygon.getPoints());
+            toastCenter(listOfLatLng);
+        }
+        marker = mMapView.addMarker(new MarkerOptions().position(latLng));
+    }
+
+    private void toastCenter(List<LatLng> listOfLatLng) {
+        LatLng a;
+        a = getCenterOfPolygon(listOfLatLng);
+        double lat = a.latitude;
+        double lng = a.longitude;
+        String lat1 = Double.toString(lat);
+        String lng1 = Double.toString(lng);
+        Toast.makeText(this,"Lat is "+lat1+"Lng is "+lng1,Toast.LENGTH_LONG).show();
     }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-
+    private void toastAreaInPolygon(final List<LatLng> latLngs){
+        // calculate area in polygon
+        double sizeInSquareMeters = CMMapUtil.calculatePolygonArea(polygon.getPoints());
+        DecimalFormat formatter = new DecimalFormat("#,###.00");
+        Toast.makeText(getApplicationContext(),formatter.format(sizeInSquareMeters/1000)
+                + " kilometer²", Toast.LENGTH_LONG).show();
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        mMapView = googleMap;
 
-       // LatLng dorm = new LatLng(44.813567, 20.483488);
-       // CameraUpdate update = CameraUpdateFactory.newLatLngZoom(dorm, 15.0f);
-       // mMap.moveCamera(update);
+        if( mMapView!=null){
+            mMapView.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    mMapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+                }
+            });
+            mMapView.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(LatLng latLng) {
+                    // setMarker(latLng.latitude,latLng.longitude,"");
+                    drawRealtimePolygon(latLng);
+
+                }
+            });
+        }
+
+        LatLng dorm = new LatLng(44.813567, 20.483488);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(dorm, 15.0f);
+        mMapView.moveCamera(update);
+        mMapView.getUiSettings().setZoomControlsEnabled(true);
+
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -80,118 +225,118 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMapView.setMyLocationEnabled(true);
+        mMapView.getUiSettings().setMyLocationButtonEnabled(true);
+        //   mMapView.setTrafficEnabled(true);
 
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location actualLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        mMapView.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
 
-        LatLng actualLocationLatLng = new LatLng(actualLocation.getLatitude(), actualLocation.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(actualLocationLatLng));
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0,locListener);
+            @Override
+            public View getInfoContents(Marker marker) {
+                View v = getLayoutInflater().inflate(R.layout.marker_info_content, null);
+                TextView tvTitle = (TextView) v.findViewById(R.id.tv_title);
+                if (marker.getTitle() != null && !marker.getTitle().equals("")) {
+                    tvTitle.setText(marker.getTitle());
+                    tvTitle.setVisibility(View.VISIBLE);
+                }else{
+                    tvTitle.setVisibility(View.GONE);
+                }
+                LatLng latLng = marker.getPosition();
+                TextView tvLat = (TextView) v.findViewById(R.id.tv_lat);
+                TextView tvLng = (TextView) v.findViewById(R.id.tv_lng);
+                DecimalFormat formatter = new DecimalFormat("#,###.000");
 
-/*
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location actualLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                tvLat.setText("Latitude: " + formatter.format(latLng.latitude) + "°");
+                tvLng.setText("Longtitude: " + formatter.format(latLng.longitude) + "°");
 
-        LatLng actualLocationLatLng = new LatLng(actualLocation.getLatitude(), actualLocation.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(actualLocationLatLng));
+                return v;
+            }
+        });
 
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney)); */
     }
-
-
-/*
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Do other setup activities here too, as described elsewhere in this tutorial.
-
-        // Build the Play services client for use by the Fused Location Provider and the Places API.
-        // Use the addApi() method to request the Google Places API and the Fused Location Provider.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity ,
-                        this /* OnConnectionFailedListener )
-                .addConnectionCallbacks(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .build();
-        mGoogleApiClient.connect();
-    }
-*/
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
         if(requestCode ==0){
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                mMap.setMyLocationEnabled(true);
+                mMapView.setMyLocationEnabled(true);
             }
         }
     }
-
-    private void addMarker(double lat, double lng) {
-        LatLng coord = new LatLng(lat, lng);
-        CameraUpdate miPosicion = CameraUpdateFactory.newLatLngZoom(coord, 16);
-        if (marker != null) marker.remove();
-        marker = mMap.addMarker(new MarkerOptions()
-                .position(coord)
-                .title("Someone Position")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
-        mMap.animateCamera(miPosicion);
+    private void goToLocationZoom(double lat, double lng, float zoom){
+        LatLng locate = new LatLng(lat, lng);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(locate,zoom);
+        mMapView.moveCamera(update);
     }
 
-    private void updatePosition(Location location) {
-        if (location != null) {
-            lat = location.getLatitude();
-            lng = location.getLongitude();
-            addMarker(lat, lng);
-        }
+    public void Type(View view) {
+        ForestType my_dialog = new ForestType();
+        my_dialog.show(getFragmentManager(),"MyTag");
     }
 
-    LocationListener locListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            updatePosition(location);
+    public void Clear(View view) {
+        if(marker!=null)
+            marker.remove();
+        if (polygon != null) {
+            polygon=null;
+            // polygon.remove();
+            mMapView.clear();
+            marker.remove();
+            listOfLatLng.clear();
         }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
-    };
-
-    private void myPosition() {
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        else
             return;
+    }
+    private static LatLng getCenterOfPolygon(List<LatLng> latLngList) {
+        double[] centroid = {0.0, 0.0};
+        for (int i = 0; i < latLngList.size(); i++) {
+            centroid[0] += latLngList.get(i).latitude;
+            centroid[1] += latLngList.get(i).longitude;
         }
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        updatePosition(location);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,15000,0,locListener);
+        int totalPoints = latLngList.size();
+        return new LatLng(centroid[0] / totalPoints, centroid[1] / totalPoints);
     }
 
+    public void OnClickSave(View v) {
+        if (polygon != null) {
+
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+            View mview = getLayoutInflater().inflate(R.layout.dialog_title, null);
+            titleArea = (EditText) mview.findViewById(R.id.TitleArea);
+
+            mBuilder.setPositiveButton("Summit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (!titleArea.getText().toString().isEmpty()) {
+                        Toast.makeText(MapsActivity.this, "Title : " + titleArea.getText(), Toast.LENGTH_SHORT).show();
+                        //String newEntry =  titleArea.getText().toString();
+                        //addData(newEntry);
+                        titleArea.setText("");
+                    } else
+                        Toast.makeText(MapsActivity.this, "Unsuccessful. Please fill any titles again", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            mBuilder.setView(mview);
+            AlertDialog dialog = mBuilder.create();
+            dialog.show();
+        }
+        else{
+            Toast.makeText(MapsActivity.this, "Cannot be saved, Please pin the area",Toast.LENGTH_LONG).show();
+        }
+    }
+    public void addData(String newEntry){
+        boolean insertData = mDatabaseHelper.addData(newEntry);
+        if(insertData)
+            toastMsg("Data successfully inserted");
+        else
+            toastMsg("Something went wrong");
+    }
+    private void toastMsg(String msg){
+        Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
+    }
 
 }

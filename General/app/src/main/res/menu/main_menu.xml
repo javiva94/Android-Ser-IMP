@@ -5,4 +5,23 @@
         android:id="@+id/sign_out_menu"
         android:title="@string/sign_out"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/bookmark"
+        android:title="Bookmarks"/>
+    <item
+        android:id="@+id/Menu_typeNone"
+        android:title="None" />
+    <item
+        android:id="@+id/Menu_typeNormal"
+        android:title="Normal"/>
+    <item
+        android:id="@+id/Menu_typeTerrain"
+        android:title="Terrain"/>
+    <item
+        android:id="@+id/Menu_typeSatellite"
+        android:title="Satellite"/>
+    <item
+        android:id="@+id/Menu_typeHybrid"
+        android:title="Hybrid"/>
 </menu>
