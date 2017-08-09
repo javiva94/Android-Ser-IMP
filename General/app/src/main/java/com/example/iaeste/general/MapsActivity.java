@@ -48,6 +48,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     // Value 8bit (value <256)
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
+    private List<LatLng> listLatLng = new ArrayList<>();
+    private Marker myPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +96,15 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         myMap.getUiSettings().setZoomControlsEnabled(true);
         myMap.setMyLocationEnabled(true);
+
+        myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                // TODO Auto-generated method stub
+                listLatLng.add(point);
+                myMap.addMarker(new MarkerOptions().position(point));
+            }
+        });
     }
 
 
@@ -230,8 +241,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             option.title("My Location");
             option.snippet("....");
             option.position(latLng);
-            Marker currentMarker = myMap.addMarker(option);
-            currentMarker.showInfoWindow();
+            myPosition = myMap.addMarker(option);
+            myPosition.showInfoWindow();
         } else {
             Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
             Log.i(MYTAG, "Location not found");
@@ -259,5 +270,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    public void Clear(View view) {
+        if(listLatLng!=null) {
+            myMap.clear();
+            listLatLng = new ArrayList<>();
+            showMyLocation();
+        }
     }
 }
