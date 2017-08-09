@@ -1,11 +1,7 @@
 package com.example.iaeste.general;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -14,30 +10,23 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -45,390 +34,230 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements
-        GoogleMap.OnMyLocationButtonClickListener,
-        OnMapReadyCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+public class MapsActivity extends AppCompatActivity implements LocationListener {
 
-    DatabaseHelper mDatabaseHelper;
-    EditText titleArea;
-    GoogleMap mMapView;
-    private List<LatLng> listOfLatLng = new ArrayList<>();
-    private Polygon polygon;
-    Marker marker;
-    EditText search_field;
-    // TextView Tv_result;
+    private GoogleMap myMap;
+    private ProgressDialog myProgress;
 
+    private static final String MYTAG = "MYTAG";
 
-    /**
-     * Request code for location permission request.
-     *
-     * @see #onRequestPermissionsResult(int, String[], int[])
-     */
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-
-    /**
-     * Flag indicating whether a requested permission has been denied after returning in
-     * {@link #onRequestPermissionsResult(int, String[], int[])}.
-     */
-    private boolean mPermissionDenied = false;
+    // Request Code to ask the user for permission to view their current location (***).
+    // Value 8bit (value <256)
+    public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Tv_result = (TextView)findViewById(R.id.TV_result);
-        mDatabaseHelper = new DatabaseHelper(this);
+        setContentView(R.layout.activity_maps);
 
-        if (googleServiceAvaliable()) {
-            Toast.makeText(this, "Successful", Toast.LENGTH_LONG).show();
-            setContentView(R.layout.activity_maps);
-        }
-/*
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mMapView);
-        mapFragment.getMapAsync(this);*/
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.Menu_typeNone :
-                mMapView.setMapType(GoogleMap.MAP_TYPE_NONE);
-                break;
-            case R.id.Menu_typeNormal :
-                mMapView.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                break;
-            case R.id.Menu_typeTerrain :
-                mMapView.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-                break;
-            case R.id.Menu_typeSatellite :
-                mMapView.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                break;
-            case R.id.Menu_typeHybrid:
-                mMapView.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                break;
-            case R.id.bookmark:
-                Intent bookmarkAct = new Intent(this, BookMarkActivity.class);
-                this.startActivity(bookmarkAct);
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return true;
-    }
-
-    public boolean googleServiceAvaliable() {
-        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
-        int isAvaliable = api.isGooglePlayServicesAvailable(this);
-        if (isAvaliable == ConnectionResult.SUCCESS) {
-            return true;
-        } else if (api.isUserResolvableError(isAvaliable)) {
-            Dialog dialog = api.getErrorDialog(this, isAvaliable, 0);
-            dialog.show();
-        } else {
-            Toast.makeText(this, "Cannot connect to play store", Toast.LENGTH_LONG).show();
-        }
-        return false;
-    }
-    public void geolocate(View view) throws IOException {
-
-        if(marker!=null)
-            marker.remove();
-
-        search_field = (EditText)findViewById(R.id.Tv_program);
-        String location = search_field.getText().toString();
-
-        Geocoder gc = new Geocoder(this);
-        List<Address> list = gc.getFromLocationName(location,1);
-        Address address = list.get(0);
-        String locality = address.getLocality();
-
-        // Toast.makeText(this, locality,Toast.LENGTH_LONG).show();
-        double lat = address.getLatitude();
-        double lng = address.getLongitude();
-        goToLocationZoom(lat,lng,15);
-        setMarker(lat,lng,locality);
-        //  Toast.makeText(this, "You have to clear pin before pining area",Toast.LENGTH_LONG).show();
-
-    }
-    private void setMarker(double lat, double lng, String locality) {
-        // Toast.makeText(this, locality,Toast.LENGTH_LONG).show();
-        LatLng latLng = new LatLng(lat, lng);
-        marker = mMapView.addMarker(new MarkerOptions().position(latLng).title(locality)
-                .snippet(""));
-        mMapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-    }
-
-    private void bindWidget() {
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mMapView);
-        mapFragment.getMapAsync(this);
-    }
-    private void drawRealtimePolygon(LatLng latLng) {
-        listOfLatLng.add(latLng);
-        if (listOfLatLng.size() > 2) {
-            if (polygon != null) {
-                polygon.remove();
-            }
-            polygon = mMapView.addPolygon(new PolygonOptions()
-                    .addAll(listOfLatLng)
-                    .strokeColor(Color.parseColor("#3978DD"))
-                    .fillColor(Color.parseColor("#773978DD")));
-            polygon.setStrokeWidth(4);
-
-            toastAreaInPolygon(polygon.getPoints());
-            toastCenter(listOfLatLng);
-        }
-        marker = mMapView.addMarker(new MarkerOptions().position(latLng));
-    }
-
-    private void toastCenter(List<LatLng> listOfLatLng) {
-        LatLng a;
-        a = getCenterOfPolygon(listOfLatLng);
-        double lat = a.latitude;
-        double lng = a.longitude;
-        String lat1 = Double.toString(lat);
-        String lng1 = Double.toString(lng);
-        Toast.makeText(this,"Lat is "+lat1+"Lng is "+lng1,Toast.LENGTH_LONG).show();
-    }
+        // Create Progress Bar.
+        myProgress = new ProgressDialog(this);
+        myProgress.setTitle("Map Loading ...");
+        myProgress.setMessage("Please wait...");
+        myProgress.setCancelable(true);
+        // Display Progress Bar.
+        myProgress.show();
 
 
-    private void toastAreaInPolygon(final List<LatLng> latLngs){
-        // calculate area in polygon
-        double sizeInSquareMeters = CMMapUtil.calculatePolygonArea(polygon.getPoints());
-        DecimalFormat formatter = new DecimalFormat("#,###.00");
-        Toast.makeText(getApplicationContext(),formatter.format(sizeInSquareMeters/1000)
-                + " kilometer²", Toast.LENGTH_LONG).show();
-    }
-    /*
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMapView = googleMap;
+        MapFragment mapFragment
+                = (MapFragment) getFragmentManager().findFragmentById(R.id.mMapView);
 
-        if( mMapView!=null){
-            mMapView.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(LatLng latLng) {
-                    mMapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
-                }
-            });
-            mMapView.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-                @Override
-                public void onMapLongClick(LatLng latLng) {
-                    // setMarker(latLng.latitude,latLng.longitude,"");
-                    drawRealtimePolygon(latLng);
-
-                }
-            });
-        }
-
-        LatLng dorm = new LatLng(44.813567, 20.483488);
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(dorm, 15.0f);
-        mMapView.moveCamera(update);
-        mMapView.getUiSettings().setZoomControlsEnabled(true);
-
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION},0 );
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mMapView.setMyLocationEnabled(true);
-        mMapView.getUiSettings().setMyLocationButtonEnabled(true);
-        //   mMapView.setTrafficEnabled(true);
-
-        mMapView.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-            @Override
-            public View getInfoWindow(Marker marker) {
-                return null;
-            }
+        // Set callback listener, on Google Map ready.
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
 
             @Override
-            public View getInfoContents(Marker marker) {
-                View v = getLayoutInflater().inflate(R.layout.marker_info_content, null);
-                TextView tvTitle = (TextView) v.findViewById(R.id.tv_title);
-                if (marker.getTitle() != null && !marker.getTitle().equals("")) {
-                    tvTitle.setText(marker.getTitle());
-                    tvTitle.setVisibility(View.VISIBLE);
-                }else{
-                    tvTitle.setVisibility(View.GONE);
-                }
-                LatLng latLng = marker.getPosition();
-                TextView tvLat = (TextView) v.findViewById(R.id.tv_lat);
-                TextView tvLng = (TextView) v.findViewById(R.id.tv_lng);
-                DecimalFormat formatter = new DecimalFormat("#,###.000");
-
-                tvLat.setText("Latitude: " + formatter.format(latLng.latitude) + "°");
-                tvLng.setText("Longtitude: " + formatter.format(latLng.longitude) + "°");
-
-                return v;
+            public void onMapReady(GoogleMap googleMap) {
+                onMyMapReady(googleMap);
             }
         });
 
-    }*/
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-        mMapView = map;
-
-        mMapView.setOnMyLocationButtonClickListener(this);
-        enableMyLocation();
     }
 
-    /**
-     * Enables the My Location layer if the fine location permission has been granted.
-     */
-    private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
-            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
-                    Manifest.permission.ACCESS_FINE_LOCATION, true);
-        } else if (mMapView != null) {
-            // Access to the location has been granted to the app.
-            mMapView.setMyLocationEnabled(true);
+    private void onMyMapReady(GoogleMap googleMap) {
+        // Get Google Map from Fragment.
+        myMap = googleMap;
+        // Sét OnMapLoadedCallback Listener.
+        myMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+
+            @Override
+            public void onMapLoaded() {
+                // Map loaded. Dismiss this dialog, removing it from the screen.
+                myProgress.dismiss();
+
+                askPermissionsAndShowMyLocation();
+            }
+        });
+        myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        myMap.getUiSettings().setZoomControlsEnabled(true);
+        myMap.setMyLocationEnabled(true);
+    }
+
+
+    private void askPermissionsAndShowMyLocation() {
+
+        // With API> = 23, you have to ask the user for permission to view their location.
+        if (Build.VERSION.SDK_INT >= 23) {
+            int accessCoarsePermission
+                    = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+            int accessFinePermission
+                    = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+
+
+            if (accessCoarsePermission != PackageManager.PERMISSION_GRANTED
+                    || accessFinePermission != PackageManager.PERMISSION_GRANTED) {
+                // The Permissions to ask user.
+                String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION};
+                // Show a dialog asking the user to allow the above permissions.
+                ActivityCompat.requestPermissions(this, permissions,
+                        REQUEST_ID_ACCESS_COURSE_FINE_LOCATION);
+
+                return;
+            }
         }
+
+        // Show current location on Map.
+        this.showMyLocation();
     }
 
+    // When you have the request results.
     @Override
-    public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
-        return false;
-    }
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
-            return;
-        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //
+        switch (requestCode) {
+            case REQUEST_ID_ACCESS_COURSE_FINE_LOCATION: {
 
-        if (PermissionUtils.isPermissionGranted(permissions, grantResults,
-                Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Enable the my location layer if the permission has been granted.
-            enableMyLocation();
-        } else {
-            // Display the missing permission error dialog when the fragments resume.
-            mPermissionDenied = true;
-        }
-    }
+                // Note: If request is cancelled, the result arrays are empty.
+                // Permissions granted (read/write).
+                if (grantResults.length > 1
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
-        if (mPermissionDenied) {
-            // Permission was not granted, display error dialog.
-            showMissingPermissionError();
-            mPermissionDenied = false;
-        }
-    }
+                    Toast.makeText(this, "Permission granted!", Toast.LENGTH_LONG).show();
 
-    /**
-     * Displays a dialog with error message explaining that the location permission is missing.
-     */
-    private void showMissingPermissionError() {
-        PermissionUtils.PermissionDeniedDialog
-                .newInstance(true).show(getSupportFragmentManager(), "dialog");
-    }
-
-/*
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
-        if(requestCode ==0){
-            if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                mMapView.setMyLocationEnabled(true);
+                    // Show current location on Map.
+                    this.showMyLocation();
+                }
+                // Cancelled or denied.
+                else {
+                    Toast.makeText(this, "Permission denied!", Toast.LENGTH_LONG).show();
+                }
+                break;
             }
         }
     }
-    */
-    private void goToLocationZoom(double lat, double lng, float zoom){
-        LatLng locate = new LatLng(lat, lng);
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(locate,zoom);
-        mMapView.moveCamera(update);
-    }
 
-    public void Type(View view) {
-        ForestType my_dialog = new ForestType();
-        my_dialog.show(getFragmentManager(),"MyTag");
-    }
+    // Find Location provider is openning.
+    private String getEnabledLocationProvider() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-    public void Clear(View view) {
-        if(marker!=null)
-            marker.remove();
-        if (polygon != null) {
-            polygon=null;
-            // polygon.remove();
-            mMapView.clear();
-            marker.remove();
-            listOfLatLng.clear();
+        // Criteria to find location provider.
+        Criteria criteria = new Criteria();
+
+        // Returns the name of the provider that best meets the given criteria.
+        // ==> "gps", "network",...
+        String bestProvider = locationManager.getBestProvider(criteria, true);
+
+        boolean enabled = locationManager.isProviderEnabled(bestProvider);
+
+        if (!enabled) {
+            Toast.makeText(this, "No location provider enabled!", Toast.LENGTH_LONG).show();
+            Log.i(MYTAG, "No location provider enabled!");
+            return null;
         }
-        else
+        return bestProvider;
+    }
+
+    // Call this method only when you have the permissions to view a user's location.
+    private void showMyLocation() {
+
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        String locationProvider = this.getEnabledLocationProvider();
+
+        if (locationProvider == null) {
             return;
-    }
-    private static LatLng getCenterOfPolygon(List<LatLng> latLngList) {
-        double[] centroid = {0.0, 0.0};
-        for (int i = 0; i < latLngList.size(); i++) {
-            centroid[0] += latLngList.get(i).latitude;
-            centroid[1] += latLngList.get(i).longitude;
         }
-        int totalPoints = latLngList.size();
-        return new LatLng(centroid[0] / totalPoints, centroid[1] / totalPoints);
-    }
 
-    public void OnClickSave(View v) {
-        if (polygon != null) {
+        // Millisecond
+        final long MIN_TIME_BW_UPDATES = 1000;
+        // Met
+        final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
 
-            AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
-            View mview = getLayoutInflater().inflate(R.layout.dialog_title, null);
-            titleArea = (EditText) mview.findViewById(R.id.TitleArea);
-
-            mBuilder.setPositiveButton("Summit", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (!titleArea.getText().toString().isEmpty()) {
-                        Toast.makeText(MapsActivity.this, "Title : " + titleArea.getText(), Toast.LENGTH_SHORT).show();
-                        //String newEntry =  titleArea.getText().toString();
-                        //addData(newEntry);
-                        titleArea.setText("");
-                    } else
-                        Toast.makeText(MapsActivity.this, "Unsuccessful. Please fill any titles again", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            mBuilder.setView(mview);
-            AlertDialog dialog = mBuilder.create();
-            dialog.show();
+        Location myLocation = null;
+        try {
+            // This code need permissions (Asked above ***)
+            locationManager.requestLocationUpdates(
+                    locationProvider,
+                    MIN_TIME_BW_UPDATES,
+                    MIN_DISTANCE_CHANGE_FOR_UPDATES, (LocationListener) this);
+            // Getting Location.
+            // Lấy ra vị trí.
+            myLocation = locationManager
+                    .getLastKnownLocation(locationProvider);
         }
-        else{
-            Toast.makeText(MapsActivity.this, "Cannot be saved, Please pin the area",Toast.LENGTH_LONG).show();
+        // With Android API >= 23, need to catch SecurityException.
+        catch (SecurityException e) {
+            Toast.makeText(this, "Show My Location Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.e(MYTAG, "Show My Location Error:" + e.getMessage());
+            e.printStackTrace();
+            return;
         }
-    }
-    public void addData(String newEntry){
-        boolean insertData = mDatabaseHelper.addData(newEntry);
-        if(insertData)
-            toastMsg("Data successfully inserted");
-        else
-            toastMsg("Something went wrong");
-    }
-    private void toastMsg(String msg){
-        Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
+
+        if (myLocation != null) {
+
+            LatLng latLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(latLng)             // Sets the center of the map to location user
+                    .zoom(15)                   // Sets the zoom
+                    .bearing(90)                // Sets the orientation of the camera to east
+                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                    .build();                   // Creates a CameraPosition from the builder
+            myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+            // Add Marker to Map
+            MarkerOptions option = new MarkerOptions();
+            option.title("My Location");
+            option.snippet("....");
+            option.position(latLng);
+            Marker currentMarker = myMap.addMarker(option);
+            currentMarker.showInfoWindow();
+        } else {
+            Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
+            Log.i(MYTAG, "Location not found");
+        }
+
+
     }
 
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }

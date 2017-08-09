@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     class="com.google.android.gms.maps.SupportMapFragment"
-    tools:context="com.example.iaeste.general.MapsActivity">
+    tools:context="com.example.iaeste.general.MapsActivityKrich">
 
     <EditText
         android:paddingTop="12dp"
@@ -21,9 +21,9 @@
         android:id="@+id/btn_search" />
 
     <fragment
+        android:id="@+id/mMapView"
         android:layout_width="match_parent"
         android:layout_height="465dp"
-        android:id="@+id/mMapView"
         android:layout_below="@id/Tv_program"
         android:name="com.google.android.gms.maps.MapFragment"
         />
