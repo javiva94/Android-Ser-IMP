@@ -16,8 +16,8 @@ import java.util.List;
  * Created by iaeste on 07/08/2017.
  */
 
-public class GridViewAdapter extends ArrayAdapter<product> {
-    public GridViewAdapter(Context context,int resource,List<product> objects) {
+public class GridViewAdapter extends ArrayAdapter<Task> {
+    public GridViewAdapter(Context context,int resource,List<Task> objects) {
         super(context, resource, objects);
     }
     @NonNull
@@ -28,14 +28,13 @@ public class GridViewAdapter extends ArrayAdapter<product> {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inflater.inflate(R.layout.grid_item, null);
         }
-        product product = getItem(position);
+        Task task = getItem(position);
         ImageView img = (ImageView) v.findViewById(R.id.imageView);
         TextView txtTitle = (TextView) v.findViewById(R.id.txtTitle);
         TextView txtDescription = (TextView) v.findViewById(R.id.txtDescription);
 
-        img.setImageResource(product.getImageId());
-        txtTitle.setText(product.getTitle());
-        txtDescription.setText(product.getDescription());
+        txtTitle.setText(task.getTitle());
+        txtDescription.setText(task.getDescription());
 
         return v;
     }

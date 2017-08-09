@@ -1,7 +1,9 @@
 package com.example.iaeste.general;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -317,4 +319,5 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             showMyLocation();
         }
     }
+
 }

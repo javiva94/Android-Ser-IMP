@@ -11,8 +11,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -33,25 +32,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
-        <!-- Enter your GoogleMap Android API Key -->
-   <!--     <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="@string/google_maps_key" /> -->
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <activity
-            android:name=".MapsActivityKrich"
-            android:label="@string/title_activity_maps">
-            </activity>
-
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
-        </activity>
 
         <activity
             android:name=".MainActivity"
@@ -63,6 +46,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps"></activity>
+        <activity
+            android:name=".BookMarkActivity"
+            android:label="BookMarkActivity"></activity>
+        <activity android:name=".AddTask"></activity>
     </application>
 
 </manifest>

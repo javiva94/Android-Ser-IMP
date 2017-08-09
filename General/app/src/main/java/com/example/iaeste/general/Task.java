@@ -1,26 +1,25 @@
 package com.example.iaeste.general;
 
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 /**
- * Created by iaeste on 03/08/2017.
+ * Created by franc on 9/8/2017.
  */
 
-public class product {
-    private int imageId;
+public class Task {
+
+    private List<Marker> markerList;
     private String title;
     private String description;
 
-    public product(int imageId, String title, String description){
-        this.imageId = imageId;
+    public Task(String title, String description){
+        markerList = new ArrayList<Marker>();
         this.title = title;
         this.description= description;
-    }
-
-    public int getImageId() {
-        return imageId;
-    }
-
-    public void setImageId(int imageId) {
-        this.imageId = imageId;
     }
 
     public String getTitle() {
@@ -38,4 +37,6 @@ public class product {
     public void setDescription(String description) {
         this.description = description;
     }
+
+
 }

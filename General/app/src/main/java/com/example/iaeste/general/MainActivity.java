@@ -1,5 +1,8 @@
 package com.example.iaeste.general;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
@@ -18,6 +21,8 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.*;
 import com.google.firebase.auth.*;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 
@@ -30,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class MainActivity extends AppCompatActivity {
     private ViewStub stubGrid;
     private ViewStub stubList;
@@ -37,17 +43,18 @@ public class MainActivity extends AppCompatActivity {
     private GridView gridView;
     private ListViewAdapter listViewAdapter;
     private GridViewAdapter gridViewAdapter;
-    private List<product> productList;
+    private List<Task> taskList;
     private int currentViewMode;
 
     static final int VIEW_MODE_LISTVIEW = 0;
     static final int VIEW_MODE_GRIDVIEW = 1;
 
-
     public static final int RC_SIGN_IN = 1;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mTaskDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,36 +64,30 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.showMapBtn);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton floatingMapButton = (FloatingActionButton) findViewById(R.id.showMapBtn);
+        floatingMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, MapsActivity.class));
             }
         });
 
-        stubGrid = (ViewStub) findViewById(R.id.stub_grid);
-        stubList = (ViewStub) findViewById(R.id.stub_list);
+        FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
+        floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, AddTask.class));
+            }
+        });
 
-        //inflate viewstub before get view
-        stubList.inflate();
-        stubGrid.inflate();
+        taskList = new ArrayList<Task>();
+        taskListViewInitialization();
 
-        listView = (ListView) findViewById(R.id.myListview);
-        gridView = (GridView) findViewById(R.id.mygridview);
+        firebaseAuthenticationInit();
+      //  firebaseDatabaseInit();
+    }
 
-        //get list of product
-        getproductList();
-
-        //get current view mode in share reference
-        SharedPreferences sharedPreference = getSharedPreferences("viewMode", MODE_PRIVATE);
-        currentViewMode = sharedPreference.getInt("currentViewMode",VIEW_MODE_LISTVIEW);
-        //register item click
-        listView.setOnItemClickListener(onItemClick);
-        gridView.setOnItemClickListener(onItemClick);
-
-        switchView();
-
+    private void firebaseAuthenticationInit(){
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -109,6 +110,33 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private void firebaseDatabaseInit(){
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+    }
+
+    private void taskListViewInitialization(){
+        stubGrid = (ViewStub) findViewById(R.id.stub_grid);
+        stubList = (ViewStub) findViewById(R.id.stub_list);
+
+        //inflate viewstub before get view
+        stubList.inflate();
+        stubGrid.inflate();
+
+        listView = (ListView) findViewById(R.id.myListview);
+        gridView = (GridView) findViewById(R.id.mygridview);
+
+        getTaskList();
+
+        //get current view mode in share reference
+        SharedPreferences sharedPreference = getSharedPreferences("viewMode", MODE_PRIVATE);
+        currentViewMode = sharedPreference.getInt("currentViewMode",VIEW_MODE_LISTVIEW);
+        //register item click
+        listView.setOnItemClickListener(onItemClick);
+        gridView.setOnItemClickListener(onItemClick);
+
+        switchView();
     }
 
     @Override
@@ -160,35 +188,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAdapters() {
         if (VIEW_MODE_LISTVIEW == currentViewMode){
-            listViewAdapter  = new ListViewAdapter(this,R.layout.list_item, productList);
+            listViewAdapter  = new ListViewAdapter(this,R.layout.list_item, taskList);
             listView.setAdapter(listViewAdapter);
     }else{
-        gridViewAdapter  = new GridViewAdapter(this,R.layout.grid_item, productList);
+        gridViewAdapter  = new GridViewAdapter(this,R.layout.grid_item, taskList);
         gridView.setAdapter(gridViewAdapter);
         }
     }
 
-    public List<product> getproductList() {
-        //pseudo code to get product, replace your code to get real product here
-        productList = new ArrayList<>();
-        productList.add(new product(R.drawable.world,"Title 1","This is description 1"));
-        productList.add(new product(R.drawable.world,"Title 2","This is description 2"));
-        productList.add(new product(R.drawable.world,"Title 3","This is description 3"));
-        productList.add(new product(R.drawable.world,"Title 4","This is description 4"));
-        productList.add(new product(R.drawable.world,"Title 5","This is description 5"));
-        productList.add(new product(R.drawable.world,"Title 6","This is description 6"));
-        productList.add(new product(R.drawable.world,"Title 7","This is description 7"));
-        productList.add(new product(R.drawable.world,"Title 8","This is description 8"));
-        productList.add(new product(R.drawable.world,"Title 9","This is description 9"));
-        productList.add(new product(R.drawable.world,"Title 10","This is description 10"));
+    public List<Task> getTaskList() {
+        taskList.add(new Task("Title 1","This is description 1"));
+        taskList.add(new Task("Title 2","This is description 2"));
+        taskList.add(new Task("Title 3","This is description 3"));
 
-        return productList;
+        return taskList;
     }
     AdapterView.OnItemClickListener onItemClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // do any thing hen user click to item
-            Toast.makeText(getApplicationContext(),productList.get(position).getTitle()+" pendejo " + productList.get(position).getDescription(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),taskList.get(position).getTitle()+" pendejo " + taskList.get(position).getDescription(), Toast.LENGTH_SHORT).show();
         }
     };
 

@@ -17,8 +17,8 @@ import java.util.List;
  * Created by iaeste on 03/08/2017.
  */
 
-public class ListViewAdapter extends ArrayAdapter<product> {
-    public ListViewAdapter( Context context, int resource, List<product> objects) {
+public class ListViewAdapter extends ArrayAdapter<Task> {
+    public ListViewAdapter( Context context, int resource, List<Task> objects) {
         super(context, resource, objects);
     }
 
@@ -30,14 +30,13 @@ public class ListViewAdapter extends ArrayAdapter<product> {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inflater.inflate(R.layout.list_item, null);
         }
-        product product = getItem(position);
+        Task task = getItem(position);
         ImageView img = (ImageView) v.findViewById(R.id.imageView);
         TextView txtTitle = (TextView) v.findViewById(R.id.txtTitle);
         TextView txtDescription = (TextView) v.findViewById(R.id.txtDescription);
 
-        img.setImageResource(product.getImageId());
-        txtTitle.setText(product.getTitle());
-        txtDescription.setText(product.getDescription());
+        txtTitle.setText(task.getTitle());
+        txtDescription.setText(task.getDescription());
 
         return v;
     }
