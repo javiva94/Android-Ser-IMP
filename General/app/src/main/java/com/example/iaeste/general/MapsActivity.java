@@ -2,6 +2,7 @@ package com.example.iaeste.general;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -16,6 +17,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -95,7 +99,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         myMap.getUiSettings().setZoomControlsEnabled(true);
-        myMap.setMyLocationEnabled(true);
 
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -249,6 +252,41 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         }
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.map_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.Menu_typeNone :
+                myMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+                break;
+            case R.id.Menu_typeNormal :
+                myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+            case R.id.Menu_typeTerrain :
+                myMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+            case R.id.Menu_typeSatellite :
+                myMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+            case R.id.Menu_typeHybrid:
+                myMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+            case R.id.bookmark:
+                Intent bookmarkAct = new Intent(this, BookMarkActivity.class);
+                this.startActivity(bookmarkAct);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
 

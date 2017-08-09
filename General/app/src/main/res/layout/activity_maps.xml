@@ -6,6 +6,7 @@
     class="com.google.android.gms.maps.SupportMapFragment"
     tools:context="com.example.iaeste.general.MapsActivityKrich">
 
+
     <EditText
         android:paddingTop="12dp"
         android:layout_width="250dp"
