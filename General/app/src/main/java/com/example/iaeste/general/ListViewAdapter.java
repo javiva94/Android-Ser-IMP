@@ -1,7 +1,6 @@
 package com.example.iaeste.general;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -10,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.iaeste.general.Model.Task;
 
 import java.util.List;
 
@@ -41,4 +42,8 @@ public class ListViewAdapter extends ArrayAdapter<Task> {
         return v;
     }
 
+    @Override
+    public void add(@Nullable Task object) {
+        super.add(object);
+    }
 }

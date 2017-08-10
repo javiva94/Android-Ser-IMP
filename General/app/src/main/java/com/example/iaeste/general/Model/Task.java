@@ -1,25 +1,27 @@
-package com.example.iaeste.general;
+package com.example.iaeste.general.Model;
 
 import com.google.android.gms.maps.model.Marker;
+import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by franc on 9/8/2017.
- */
-
+@IgnoreExtraProperties
 public class Task {
 
+    private int taskId;
     private List<Marker> markerList;
     private String title;
     private String description;
 
-    public Task(String title, String description){
+    public Task(){
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
+
+    public Task(String title){
         markerList = new ArrayList<Marker>();
         this.title = title;
-        this.description= description;
     }
 
     public String getTitle() {

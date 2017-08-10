@@ -38,6 +38,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,6 +58,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private List<LatLng> listLatLng = new ArrayList<>();
     private Marker myPosition;
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mTaskDatabaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +88,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
+        firebaseDatabaseInit();
+    }
+
+    private void firebaseDatabaseInit(){
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+      //  mTaskDatabaseReference = mFirebaseDatabase.getReference("point");
+
     }
 
     private void onMyMapReady(GoogleMap googleMap) {
@@ -107,7 +119,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onMapClick(LatLng point) {
                 // TODO Auto-generated method stub
                 listLatLng.add(point);
+                mTaskDatabaseReference.setValue(point.latitude, point.longitude);
                 myMap.addMarker(new MarkerOptions().position(point));
+
             }
         });
     }
