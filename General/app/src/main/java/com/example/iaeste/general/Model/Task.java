@@ -10,8 +10,8 @@ import java.util.List;
 @IgnoreExtraProperties
 public class Task {
 
-    private int taskId;
-    private List<Marker> markerList;
+    private String taskId;
+    private List<MapObject> mapObjectsList;
     private String title;
     private String description;
 
@@ -19,10 +19,14 @@ public class Task {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Task(String title){
-        markerList = new ArrayList<Marker>();
+    public Task(String taskId, String title){
+        this.taskId = taskId;
+        mapObjectsList = new ArrayList<MapObject>();
         this.title = title;
     }
+    public void setTaskId(String id){ taskId = id; }
+
+    public String getTaskId() { return taskId; }
 
     public String getTitle() {
         return title;

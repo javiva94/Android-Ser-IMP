@@ -89,6 +89,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
 
         firebaseDatabaseInit();
+
+        Intent intent = getIntent(); // gets the previously created intent
+        String id = intent.getStringExtra("id");
+
+        Toast.makeText(this, "id: "+id,Toast.LENGTH_LONG).show();
     }
 
     private void firebaseDatabaseInit(){
@@ -119,7 +124,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onMapClick(LatLng point) {
                 // TODO Auto-generated method stub
                 listLatLng.add(point);
-                mTaskDatabaseReference.setValue(point.latitude, point.longitude);
+               // mTaskDatabaseReference.setValue(point.latitude, point.longitude);
                 myMap.addMarker(new MarkerOptions().position(point));
 
             }

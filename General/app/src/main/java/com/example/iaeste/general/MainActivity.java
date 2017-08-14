@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 
 import android.view.MenuInflater;
@@ -18,6 +17,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.iaeste.general.Model.Task;
+import com.example.iaeste.general.View.GridViewAdapter;
+import com.example.iaeste.general.View.ListViewAdapter;
+import com.example.iaeste.general.View.TaskViewAdapter;
 import com.firebase.ui.auth.*;
 import com.google.firebase.auth.*;
 import com.google.firebase.database.*;
@@ -30,9 +32,7 @@ import android.widget.GridView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
-import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -40,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewStub stubList;
     private ListView listView;
     private GridView gridView;
-    private ListViewAdapter listViewAdapter;
-    private GridViewAdapter gridViewAdapter;
+    private TaskViewAdapter taskViewAdapter;
     private List<Task> taskList;
     private int currentViewMode;
 
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, AddTask.class));
+                startActivity(new Intent(MainActivity.this, AddTaskActivity.class));
             }
         });
 
@@ -121,7 +120,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Task newTask = dataSnapshot.getValue(Task.class);
-                listViewAdapter.add(newTask);
+                newTask.setTaskId(dataSnapshot.getKey());
+                taskViewAdapter.add(newTask);
             }
 
             @Override
@@ -167,6 +167,17 @@ public class MainActivity extends AppCompatActivity {
 
         switchView();
     }
+
+    AdapterView.OnItemClickListener onItemClick = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // do any thing hen user click to item
+            Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+            Task task = (Task) parent.getItemAtPosition(position);
+            intent.putExtra("id", task.getTaskId());
+            startActivity(intent);
+        }
+    };
 
     @Override
     protected void onPause() {
@@ -217,43 +228,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAdapters() {
         if (VIEW_MODE_LISTVIEW == currentViewMode){
-            listViewAdapter  = new ListViewAdapter(this,R.layout.list_item, taskList);
-            listView.setAdapter(listViewAdapter);
+            taskViewAdapter  = new ListViewAdapter(this,R.layout.list_item, taskList);
+            listView.setAdapter(taskViewAdapter);
     }else{
-        gridViewAdapter  = new GridViewAdapter(this,R.layout.grid_item, taskList);
-        gridView.setAdapter(gridViewAdapter);
+        taskViewAdapter  = new GridViewAdapter(this,R.layout.grid_item, taskList);
+        gridView.setAdapter(taskViewAdapter);
         }
     }
 
-    public List<Task> getTaskList() {
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
-
-        mTaskDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    Task task = postSnapshot.getValue(Task.class);
-                    taskList.add(task);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("The read failed: " ,databaseError.getMessage());
-            }
-        });
-        return taskList;
-    }
-
-
-    AdapterView.OnItemClickListener onItemClick = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // do any thing hen user click to item
-            Toast.makeText(getApplicationContext(),taskList.get(position).getTitle()+" - " + taskList.get(position).getDescription(), Toast.LENGTH_SHORT).show();
-        }
-    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

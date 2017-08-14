@@ -11,7 +11,7 @@ import com.example.iaeste.general.Model.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class AddTask extends AppCompatActivity {
+public class AddTaskActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mTaskDatabaseReference;
@@ -27,7 +27,8 @@ public class AddTask extends AppCompatActivity {
 
     public void addTask(View view){
         EditText taskTitle = (EditText) findViewById(R.id.taskTitle);
-        Task newTask = new Task(taskTitle.getText().toString());
+        String id = mTaskDatabaseReference.getKey();
+        Task newTask = new Task(id, taskTitle.getText().toString());
         mTaskDatabaseReference.push().setValue(newTask);
         finish();
     }
