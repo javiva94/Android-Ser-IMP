@@ -26,6 +26,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.iaeste.general.Model.MapObject;
+import com.example.iaeste.general.Model.Point;
+import com.example.iaeste.general.Model.Task;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,12 +41,18 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 public class MapsActivity extends AppCompatActivity implements LocationListener {
 
@@ -56,11 +65,15 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     // Value 8bit (value <256)
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
+    private Task task;
+   // private String idTask;
+
     private List<LatLng> listLatLng = new ArrayList<>();
     private Marker myPosition;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mTaskDatabaseReference;
+    private ChildEventListener mChildEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,19 +101,58 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-        firebaseDatabaseInit();
+       // firebaseDatabaseInit();
 
         Intent intent = getIntent(); // gets the previously created intent
-        String id = intent.getStringExtra("id");
 
-        Toast.makeText(this, "id: "+id,Toast.LENGTH_LONG).show();
+       // idTask = intent.getStringExtra("taskId");
+        task = (Task) intent.getSerializableExtra("task");
+
+        Toast.makeText(this, "id: "+task.getTaskKey(),Toast.LENGTH_LONG).show();
     }
 
-    private void firebaseDatabaseInit(){
+   /* private void firebaseDatabaseInit(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-      //  mTaskDatabaseReference = mFirebaseDatabase.getReference("point");
+        mTaskDatabaseReference = mFirebaseDatabase.getReference();
 
+        mChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                task = dataSnapshot.getValue(Task.class);
+                addMapObjects();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mTaskDatabaseReference.addChildEventListener(mChildEventListener);
     }
+*/
+    private void addMapObjects(){
+        myMap.clear();
+        for (ListIterator<MapObject> i = task.getMapObjectsList().listIterator(); i.hasNext();) {
+            MapObject mapObject= i.next();
+            myMap.addMarker(new MarkerOptions().position(mapObject.getLatLng()));
+        }
+    }
+
 
     private void onMyMapReady(GoogleMap googleMap) {
         // Get Google Map from Fragment.
@@ -112,7 +164,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onMapLoaded() {
                 // Map loaded. Dismiss this dialog, removing it from the screen.
                 myProgress.dismiss();
-
                 askPermissionsAndShowMyLocation();
             }
         });
@@ -126,9 +177,21 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 listLatLng.add(point);
                // mTaskDatabaseReference.setValue(point.latitude, point.longitude);
                 myMap.addMarker(new MarkerOptions().position(point));
-
+                task.addMapObjectToTask(new Point(point));
+                updateFirebaseDB();
             }
         });
+    }
+
+    private void updateFirebaseDB(){
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mTaskDatabaseReference = mFirebaseDatabase.getReference();
+
+        Map<String, Object> taskValues = task.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/task/" + task.getTaskKey(), taskValues);
+
+        mTaskDatabaseReference.updateChildren(childUpdates);
     }
 
 

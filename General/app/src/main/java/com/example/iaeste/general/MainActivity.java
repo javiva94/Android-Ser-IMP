@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Task newTask = dataSnapshot.getValue(Task.class);
-                newTask.setTaskId(dataSnapshot.getKey());
+                newTask.setTaskKey(dataSnapshot.getKey());
                 taskViewAdapter.add(newTask);
             }
 
@@ -174,7 +174,8 @@ public class MainActivity extends AppCompatActivity {
             // do any thing hen user click to item
             Intent intent = new Intent(MainActivity.this, MapsActivity.class);
             Task task = (Task) parent.getItemAtPosition(position);
-            intent.putExtra("id", task.getTaskId());
+           // intent.putExtra("id", task.getTaskId());
+            intent.putExtra("task", task);
             startActivity(intent);
         }
     };

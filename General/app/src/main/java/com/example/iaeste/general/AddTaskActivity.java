@@ -6,6 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.iaeste.general.Model.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -27,9 +28,10 @@ public class AddTaskActivity extends AppCompatActivity {
 
     public void addTask(View view){
         EditText taskTitle = (EditText) findViewById(R.id.taskTitle);
-        String id = mTaskDatabaseReference.getKey();
-        Task newTask = new Task(id, taskTitle.getText().toString());
-        mTaskDatabaseReference.push().setValue(newTask);
+        Task newTask = new Task(taskTitle.getText().toString());
+        String key = mTaskDatabaseReference.push().getKey();
+        newTask.setTaskKey(key);
+        mTaskDatabaseReference.child(key).setValue(newTask);
         finish();
     }
 }
