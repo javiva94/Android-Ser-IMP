@@ -89,6 +89,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myProgress.show();
 
 
+        Intent intent = getIntent(); // gets the previously created intent
+
+        // idTask = intent.getStringExtra("taskId");
+        task = (Task) intent.getSerializableExtra("task");
+
+        Toast.makeText(this, "id: "+task.getTaskKey(),Toast.LENGTH_LONG).show();
+
         MapFragment mapFragment
                 = (MapFragment) getFragmentManager().findFragmentById(R.id.mMapView);
 
@@ -101,19 +108,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-       // firebaseDatabaseInit();
-
-        Intent intent = getIntent(); // gets the previously created intent
-
-       // idTask = intent.getStringExtra("taskId");
-        task = (Task) intent.getSerializableExtra("task");
-
-        Toast.makeText(this, "id: "+task.getTaskKey(),Toast.LENGTH_LONG).show();
+        firebaseDatabaseInit();
     }
 
-   /* private void firebaseDatabaseInit(){
+    private void firebaseDatabaseInit(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mTaskDatabaseReference = mFirebaseDatabase.getReference();
+        mTaskDatabaseReference = mFirebaseDatabase.getReference(task.getTaskKey());
 
         mChildEventListener = new ChildEventListener() {
             @Override
@@ -144,7 +144,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         };
         mTaskDatabaseReference.addChildEventListener(mChildEventListener);
     }
-*/
+
     private void addMapObjects(){
         myMap.clear();
         for (ListIterator<MapObject> i = task.getMapObjectsList().listIterator(); i.hasNext();) {
