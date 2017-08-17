@@ -69,38 +69,38 @@
         app:layout_constraintVertical_bias="0.0" />
 
 
-
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/showMapBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_dialog_map"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="@+id/addTaskBtn"
-        tools:layout_constraintLeft_creator="1"
         android:layout_marginBottom="16dp"
-        app:layout_constraintLeft_toLeftOf="@+id/addTaskBtn" />
+        app:backgroundTint="@color/fui_bgTwitter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/addTaskBtn"
+        app:layout_constraintRight_toRightOf="@+id/addTaskBtn"
+        app:srcCompat="@android:drawable/ic_dialog_map"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addTaskBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
         android:adjustViewBounds="false"
         android:baselineAlignBottom="false"
+        app:backgroundTint="@color/fui_bgTwitter"
         app:elevation="0dp"
         app:layout_anchor="@id/showMapBtn"
         app:layout_anchorGravity="top|right"
-        app:srcCompat="@android:drawable/ic_menu_add"
-        android:layout_marginEnd="16dp"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toTopOf="@+id/showMapBtn"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="8dp" />
+        app:srcCompat="@android:drawable/ic_menu_add"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintRight_creator="1" />
 
 </android.support.constraint.ConstraintLayout>
