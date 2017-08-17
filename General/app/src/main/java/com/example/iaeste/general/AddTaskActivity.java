@@ -1,9 +1,11 @@
 package com.example.iaeste.general;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +35,11 @@ public class AddTaskActivity extends AppCompatActivity {
         newTask.setTitle(taskTitle.getText().toString());
         mTaskDatabaseReference.child(key).setValue(newTask);
         newTask.setKey(key);
+
+        Button btn = (Button)findViewById(R.id.addTask);
+        Intent intent = new Intent(AddTaskActivity.this , MapsActivity.class);
+        intent.putExtra("task", newTask);
+        startActivity(intent);
         finish();
     }
 }

@@ -15,6 +15,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +25,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -36,6 +40,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -60,8 +66,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private GoogleMap myMap;
     private ProgressDialog myProgress;
-
     private static final String MYTAG = "MYTAG";
+    FloatingActionButton addObj_3,addObj_2,addObj_1,addObj;
+    Animation FabOpen,FabClose,FabClockWise,Fabanticlockwise;
+    boolean isOpen = false;
+
 
     // Request Code to ask the user for permission to view their current location (***).
     // Value 8bit (value <256)
@@ -80,7 +89,43 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        addObj = (FloatingActionButton) findViewById(R.id.addObj);
+        addObj_1 = (FloatingActionButton) findViewById(R.id.addObj_1);
+        addObj_2 = (FloatingActionButton) findViewById(R.id.addObj_2);
+        addObj_3 = (FloatingActionButton) findViewById(R.id.addObj_3);
+        FabOpen = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
+        FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+        FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
+        Fabanticlockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlockwise);
+        addObj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                if (isOpen)
+                {
+                    addObj_1.startAnimation(FabClose);
+                    addObj_2.startAnimation(FabClose);
+                    addObj_3.startAnimation(FabClose);
+                    addObj.startAnimation(Fabanticlockwise);
+                    addObj_1.setClickable(false);
+                    addObj_2.setClickable(false);
+                    addObj_3.setClickable(false);
+                    isOpen=false;
+                }
+                    else
+                {
+                    addObj_1.startAnimation(FabOpen);
+                    addObj_2.startAnimation(FabOpen);
+                    addObj_3.startAnimation(FabOpen);
+                    addObj.startAnimation(FabClockWise);
+                    addObj_1.setClickable(true);
+                    addObj_2.setClickable(true);
+                    addObj_3.setClickable(true);
+                    isOpen=true;
+
+                }
+            }
+        });
         // Create Progress Bar.
         myProgress = new ProgressDialog(this);
         myProgress.setTitle("Map Loading ...");
@@ -273,6 +318,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         return bestProvider;
     }
 
+   // Circle circle;
     // Call this method only when you have the permissions to view a user's location.
     private void showMyLocation() {
 
@@ -330,13 +376,26 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             option.position(latLng);
             myPosition = myMap.addMarker(option);
             myPosition.showInfoWindow();
+
+           // circle = drawCircle(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
         } else {
             Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
             Log.i(MYTAG, "Location not found");
         }
 
-
     }
+/*
+    private Circle drawCircle(LatLng latLng) {
+
+        CircleOptions options = new CircleOptions()
+                .center(latLng)
+                .radius(100)
+                .fillColor(0x20ff0100)
+                .strokeWidth(2);
+
+        return myMap.addCircle(options);
+    }
+*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
