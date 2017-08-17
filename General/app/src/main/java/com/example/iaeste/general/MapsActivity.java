@@ -50,9 +50,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 
 public class MapsActivity extends AppCompatActivity implements LocationListener {
 
@@ -66,7 +68,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
     private Task task;
-   // private String idTask;
 
     private List<LatLng> listLatLng = new ArrayList<>();
     private Marker myPosition;
@@ -90,11 +91,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
 
         Intent intent = getIntent(); // gets the previously created intent
+        task = (Task) intent.getParcelableExtra("task");
 
-        // idTask = intent.getStringExtra("taskId");
-        task = (Task) intent.getSerializableExtra("task");
-
-        Toast.makeText(this, "id: "+task.getTaskKey(),Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "id: "+task.getKey(),Toast.LENGTH_LONG).show();
 
         MapFragment mapFragment
                 = (MapFragment) getFragmentManager().findFragmentById(R.id.mMapView);
@@ -105,6 +104,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 onMyMapReady(googleMap);
+                addMapObjects();
             }
         });
 
@@ -113,13 +113,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private void firebaseDatabaseInit(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mTaskDatabaseReference = mFirebaseDatabase.getReference(task.getTaskKey());
+        mTaskDatabaseReference = mFirebaseDatabase.getReference(task.getKey());
 
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                task = dataSnapshot.getValue(Task.class);
-                addMapObjects();
+                Point newPoint = dataSnapshot.getValue(Point.class);
+                task.getMapObjects().add(newPoint);
             }
 
             @Override
@@ -146,15 +146,15 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void addMapObjects(){
-        myMap.clear();
-        for (ListIterator<MapObject> i = task.getMapObjectsList().listIterator(); i.hasNext();) {
-            MapObject mapObject= i.next();
+        for(Iterator<MapObject> i= task.getMapObjects().iterator(); i.hasNext();){
+            MapObject mapObject = i.next();
             myMap.addMarker(new MarkerOptions().position(mapObject.getLatLng()));
+
         }
     }
 
 
-    private void onMyMapReady(GoogleMap googleMap) {
+    private void onMyMapReady(final GoogleMap googleMap) {
         // Get Google Map from Fragment.
         myMap = googleMap;
         // Sét OnMapLoadedCallback Listener.
@@ -174,10 +174,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onMapClick(LatLng point) {
                 // TODO Auto-generated method stub
-                listLatLng.add(point);
-               // mTaskDatabaseReference.setValue(point.latitude, point.longitude);
+               // listLatLng.add(point);
+                Point newPointObject = new Point(point);
                 myMap.addMarker(new MarkerOptions().position(point));
-                task.addMapObjectToTask(new Point(point));
+                task.getMapObjects().add(newPointObject);
                 updateFirebaseDB();
             }
         });
@@ -189,7 +189,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         Map<String, Object> taskValues = task.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/task/" + task.getTaskKey(), taskValues);
+        childUpdates.put("/task/" + task.getKey(), taskValues);
 
         mTaskDatabaseReference.updateChildren(childUpdates);
     }

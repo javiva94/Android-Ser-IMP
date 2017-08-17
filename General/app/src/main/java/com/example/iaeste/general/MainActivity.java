@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import android.content.SharedPreferences;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -16,11 +17,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.iaeste.general.Model.MapObject;
+import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.GridViewAdapter;
 import com.example.iaeste.general.View.ListViewAdapter;
 import com.example.iaeste.general.View.TaskViewAdapter;
 import com.firebase.ui.auth.*;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.*;
 import com.google.firebase.database.*;
 
@@ -32,6 +36,7 @@ import android.widget.GridView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -119,8 +124,17 @@ public class MainActivity extends AppCompatActivity {
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Task newTask = dataSnapshot.getValue(Task.class);
-                newTask.setTaskKey(dataSnapshot.getKey());
+                Task newTask = new Task();
+                 newTask.setTitle((String) dataSnapshot.child("title").getValue());
+                 newTask.setKey(dataSnapshot.getKey());
+
+                 for(DataSnapshot mapObjectsChild : dataSnapshot.child("mapObjects").getChildren()) {
+                    HashMap<String, MapObject> mapObjects = (HashMap<String, MapObject>) mapObjectsChild.getValue();
+                    double latitude = (double) ((HashMap)mapObjects.values().toArray()[0]).get("latitude");
+                    double longitude = (double) ((HashMap)mapObjects.values().toArray()[0]).get("longitude");
+                    Point newPoint = new Point(new LatLng(latitude,longitude));
+                    newTask.getMapObjects().add(newPoint);
+                }
                 taskViewAdapter.add(newTask);
             }
 
@@ -173,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // do any thing hen user click to item
             Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-            Task task = (Task) parent.getItemAtPosition(position);
+            Task task = taskViewAdapter.getItem(position);
            // intent.putExtra("id", task.getTaskId());
             intent.putExtra("task", task);
             startActivity(intent);

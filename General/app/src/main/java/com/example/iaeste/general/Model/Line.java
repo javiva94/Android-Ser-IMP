@@ -1,5 +1,7 @@
 package com.example.iaeste.general.Model;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 
 /**

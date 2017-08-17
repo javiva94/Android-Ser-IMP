@@ -1,9 +1,12 @@
 package com.example.iaeste.general.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.io.Serializable;
@@ -16,20 +19,37 @@ import java.util.ListIterator;
 import java.util.Map;
 
 @IgnoreExtraProperties
-public class Task implements Serializable {
+public class Task implements Parcelable {
 
-    private String taskKey;
-    private List<MapObject> mapObjectsList = new ArrayList<>();
+    @Exclude
+    private String key;
+
+    private List<MapObject> mapObjects = new ArrayList<>();
     private String title;
     private String description;
+
 
     public Task(){
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Task(String title){
-        this.title = title;
+    protected Task(Parcel in) {
+        key = in.readString();
+        title = in.readString();
+        in.readList(mapObjects, getClass().getClassLoader());
     }
+
+    public static final Creator<Task> CREATOR = new Creator<Task>() {
+        @Override
+        public Task createFromParcel(Parcel in) {
+            return new Task(in);
+        }
+
+        @Override
+        public Task[] newArray(int size) {
+            return new Task[size];
+        }
+    };
 
     @Exclude
     public Map<String, Object> toMap() {
@@ -37,14 +57,18 @@ public class Task implements Serializable {
         //result.put("uid", uid);
         //result.put("author", author);
         result.put("title", title);
-        result.put("mapObjects", mapObjectsList);
+        result.put("mapObjects", mapObjects);
 
         return result;
     }
 
-    public void setTaskKey(String id){ taskKey = id; }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-    public String getTaskKey() { return taskKey; }
+    public String getKey() {
+        return key;
+    }
 
     public String getTitle() {
         return title;
@@ -62,21 +86,23 @@ public class Task implements Serializable {
         return description;
     }
 
-    public List<MapObject> getMapObjectsList() {
-        return mapObjectsList;
+    public List<MapObject> getMapObjects() {
+        return mapObjects;
     }
 
-    public void setMapObjectsList(List<MapObject> mapObjectsList) {
-        this.mapObjectsList = mapObjectsList;
+    public void setMapObjects(List<MapObject> mapObjects) {
+        this.mapObjects = mapObjects;
     }
 
-    public void addMapObjectToTask(MapObject mapObject){
-        mapObjectsList.add(mapObject);
+    @Override
+    public int describeContents() {
+        return 0;
     }
-/*
-    public ListIterator<MapObject> getMapObjectsFromTask(){
-       return mapObjectsList.listIterator();
-    }
-*/
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(key);
+        dest.writeString(title);
+        dest.writeList(mapObjects);
+    }
 }

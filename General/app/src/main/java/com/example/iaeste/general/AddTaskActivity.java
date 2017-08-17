@@ -28,10 +28,11 @@ public class AddTaskActivity extends AppCompatActivity {
 
     public void addTask(View view){
         EditText taskTitle = (EditText) findViewById(R.id.taskTitle);
-        Task newTask = new Task(taskTitle.getText().toString());
         String key = mTaskDatabaseReference.push().getKey();
-        newTask.setTaskKey(key);
+        Task newTask = new Task();
+        newTask.setTitle(taskTitle.getText().toString());
         mTaskDatabaseReference.child(key).setValue(newTask);
+        newTask.setKey(key);
         finish();
     }
 }

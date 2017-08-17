@@ -48,6 +48,12 @@ public abstract class TaskViewAdapter extends ArrayAdapter<Task> {
         return v;
     }
 
+    @Nullable
+    @Override
+    public Task getItem(int position) {
+        return super.getItem(position);
+    }
+
     @Override
     public void add(@Nullable Task object) {
         super.add(object);
