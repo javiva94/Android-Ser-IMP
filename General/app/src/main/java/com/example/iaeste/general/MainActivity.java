@@ -1,5 +1,6 @@
 package com.example.iaeste.general;
 
+import android.app.Activity;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
@@ -9,7 +10,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.Menu;
 
 import android.view.MenuInflater;
@@ -145,7 +148,16 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                String key = dataSnapshot.getKey();
+                boolean find = false;
+                int i = 0;
+                while (!find){
+                    if(taskList.get(i).getKey().equals(key)){
+                        taskViewAdapter.remove(taskList.get(i));
+                        find = true;
+                    }
+                    i++;
+                }
             }
 
             @Override
@@ -179,6 +191,9 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(onItemClick);
         gridView.setOnItemClickListener(onItemClick);
 
+        listView.setOnItemLongClickListener(onItemLongClickListener);
+        gridView.setOnItemLongClickListener(onItemLongClickListener);
+
         switchView();
     }
 
@@ -188,11 +203,39 @@ public class MainActivity extends AppCompatActivity {
             // do any thing hen user click to item
             Intent intent = new Intent(MainActivity.this, MapsActivity.class);
             Task task = taskViewAdapter.getItem(position);
-           // intent.putExtra("id", task.getTaskId());
             intent.putExtra("task", task);
             startActivity(intent);
         }
     };
+
+    AdapterView.OnItemLongClickListener onItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            showPopup(view, position);
+            return true;
+        }
+    };
+
+    public void showPopup(final View view, final int position){
+        final PopupMenu popup = new PopupMenu(MainActivity.this, view);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.popup_task_menu, popup.getMenu());
+        popup.show();
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                deleteTask(position);
+                Toast.makeText(MainActivity.this, "Delete task: "+position, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+    }
+
+    private void deleteTask(int position){
+        Task taskToRemove = taskViewAdapter.getItem(position);
+        mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
+        mTaskDatabaseReference.child(taskToRemove.getKey()).removeValue();
+    }
 
     @Override
     protected void onPause() {

@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 public class MapsActivity extends AppCompatActivity implements LocationListener {
 
@@ -78,7 +79,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private Task task;
 
-    private List<LatLng> listLatLng = new ArrayList<>();
+    private List<Marker> listMarkers = new ArrayList<>();
     private Marker myPosition;
 
     private FirebaseDatabase mFirebaseDatabase;
@@ -89,6 +90,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        Intent intent = getIntent(); // gets the previously created intent
+        task = (Task) intent.getParcelableExtra("task");
+
+        Toast.makeText(this, "id: "+task.getKey(),Toast.LENGTH_LONG).show();
+
         addObj = (FloatingActionButton) findViewById(R.id.addObj);
         addObj_1 = (FloatingActionButton) findViewById(R.id.addObj_1);
         addObj_2 = (FloatingActionButton) findViewById(R.id.addObj_2);
@@ -134,12 +141,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         // Display Progress Bar.
         myProgress.show();
 
-
-        Intent intent = getIntent(); // gets the previously created intent
-        task = (Task) intent.getParcelableExtra("task");
-
-        Toast.makeText(this, "id: "+task.getKey(),Toast.LENGTH_LONG).show();
-
         MapFragment mapFragment
                 = (MapFragment) getFragmentManager().findFragmentById(R.id.mMapView);
 
@@ -149,7 +150,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 onMyMapReady(googleMap);
-                addMapObjects();
+               // addMapObjects();
             }
         });
 
@@ -165,6 +166,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Point newPoint = dataSnapshot.getValue(Point.class);
                 task.getMapObjects().add(newPoint);
+                Marker newMarker = myMap.addMarker(new MarkerOptions().position(newPoint.getLatLng()));
+                listMarkers.add(newMarker);
             }
 
             @Override
@@ -174,7 +177,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                Point newPoint = dataSnapshot.getValue(Point.class);
+                task.getMapObjects().remove(newPoint);
+                Marker markerToRemove = listMarkers.get(0);
+                markerToRemove.remove();
+                listMarkers.remove(markerToRemove);
             }
 
             @Override
@@ -214,6 +221,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         myMap.getUiSettings().setZoomControlsEnabled(true);
+
+        addMapObjects();
 
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -454,9 +463,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     public void Clear(View view) {
-        if(listLatLng!=null) {
+        if(listMarkers!=null) {
             myMap.clear();
-            listLatLng = new ArrayList<>();
+            listMarkers = new ArrayList<>();
             showMyLocation();
         }
     }

@@ -48,11 +48,11 @@
         </activity>
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
         <activity
             android:name=".BookMarkActivity"
-            android:label="BookMarkActivity"></activity>
-        <activity android:name=".AddTaskActivity"></activity>
+            android:label="BookMarkActivity" />
+        <activity android:name=".AddTaskActivity" />
     </application>
 
 </manifest>
