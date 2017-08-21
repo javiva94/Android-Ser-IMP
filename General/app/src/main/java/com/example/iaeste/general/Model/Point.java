@@ -1,36 +1,34 @@
 package com.example.iaeste.general.Model;
 
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by franc on 14/8/2017.
- */
 
 @IgnoreExtraProperties
 public class Point extends MapObject implements Parcelable {
 
-    private LatLng point;
+    private String id;
+    private LatLng position;
 
     public Point(){
 
     }
 
-    public Point(LatLng point){
-        this.point = point;
+    public Point(String id, LatLng position){
+        this.id = id;
+        this.position = position;
     }
 
+
     protected Point(Parcel in) {
-        point = in.readParcelable(LatLng.class.getClassLoader());
+        id = in.readString();
+        position = in.readParcelable(LatLng.class.getClassLoader());
     }
 
     public static final Creator<Point> CREATOR = new Creator<Point>() {
@@ -50,18 +48,27 @@ public class Point extends MapObject implements Parcelable {
         HashMap<String, Object> result = new HashMap<>();
         //result.put("uid", uid);
         //result.put("author", author);
-        result.put("point", point);
+        result.put("id", id);
+        result.put("position", position);
 
         return result;
     }
 
-    @Override
-    public LatLng getLatLng() {
-        return point;
+
+    public String getId() {
+        return id;
     }
 
-    public void setPoint(LatLng point) {
-        this.point = point;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public LatLng getPosition() {
+        return position;
+    }
+
+    public void setPosition(LatLng position) {
+        this.position = position;
     }
 
     @Override
@@ -71,6 +78,13 @@ public class Point extends MapObject implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(this.point, flags);
+        dest.writeString(id);
+        dest.writeParcelable(this.position, flags);
+    }
+
+
+    @Override
+    public String toString() {
+        return "Key: "+id+" - Latitude: "+position.getLatitude()+" Longitude: "+position.getLongitude();
     }
 }

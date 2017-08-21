@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.iaeste.general.Model.MapObject;
-import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.GridViewAdapter;
 import com.example.iaeste.general.View.ListViewAdapter;
@@ -130,14 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 Task newTask = new Task();
                  newTask.setTitle((String) dataSnapshot.child("title").getValue());
                  newTask.setKey(dataSnapshot.getKey());
-
-                 for(DataSnapshot mapObjectsChild : dataSnapshot.child("mapObjects").getChildren()) {
-                    HashMap<String, MapObject> mapObjects = (HashMap<String, MapObject>) mapObjectsChild.getValue();
-                    double latitude = (double) ((HashMap)mapObjects.values().toArray()[0]).get("latitude");
-                    double longitude = (double) ((HashMap)mapObjects.values().toArray()[0]).get("longitude");
-                    Point newPoint = new Point(new LatLng(latitude,longitude));
-                    newTask.getMapObjects().add(newPoint);
-                }
                 taskViewAdapter.add(newTask);
             }
 

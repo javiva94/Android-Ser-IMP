@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.IgnoreExtraProperties;
@@ -24,7 +23,8 @@ public class Task implements Parcelable {
     @Exclude
     private String key;
 
-    private List<MapObject> mapObjects = new ArrayList<>();
+  //  private List<MapObject> mapObjects = new ArrayList<>();
+    private List<Point> pointList = new ArrayList<>();
     private String title;
     private String description;
 
@@ -36,7 +36,7 @@ public class Task implements Parcelable {
     protected Task(Parcel in) {
         key = in.readString();
         title = in.readString();
-        in.readList(mapObjects, getClass().getClassLoader());
+        in.readList(pointList, getClass().getClassLoader());
     }
 
     public static final Creator<Task> CREATOR = new Creator<Task>() {
@@ -57,7 +57,7 @@ public class Task implements Parcelable {
         //result.put("uid", uid);
         //result.put("author", author);
         result.put("title", title);
-        result.put("mapObjects", mapObjects);
+        result.put("pointList", pointList);
 
         return result;
     }
@@ -86,12 +86,12 @@ public class Task implements Parcelable {
         return description;
     }
 
-    public List<MapObject> getMapObjects() {
-        return mapObjects;
+    public List<Point> getPointList() {
+        return pointList;
     }
 
-    public void setMapObjects(List<MapObject> mapObjects) {
-        this.mapObjects = mapObjects;
+    public void setPointList(List<Point> pointList) {
+        this.pointList = pointList;
     }
 
     @Override
@@ -103,6 +103,7 @@ public class Task implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(key);
         dest.writeString(title);
-        dest.writeList(mapObjects);
+        dest.writeList(pointList);
     }
+
 }

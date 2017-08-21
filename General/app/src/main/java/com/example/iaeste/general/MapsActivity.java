@@ -15,10 +15,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.DebugUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -79,11 +81,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private Task task;
 
-    private List<Marker> listMarkers = new ArrayList<>();
+    private HashMap<String, Marker> markerHashMap = new HashMap<>();
     private Marker myPosition;
 
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mTaskDatabaseReference;
+    private DatabaseReference mMapObjectsDatabaseReference;
     private ChildEventListener mChildEventListener;
 
     @Override
@@ -159,15 +161,18 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private void firebaseDatabaseInit(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mTaskDatabaseReference = mFirebaseDatabase.getReference(task.getKey());
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey());
 
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Point newPoint = dataSnapshot.getValue(Point.class);
-                task.getMapObjects().add(newPoint);
-                Marker newMarker = myMap.addMarker(new MarkerOptions().position(newPoint.getLatLng()));
-                listMarkers.add(newMarker);
+                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                    Point newPoint = markerChild.child("Point").getValue(Point.class);
+                    Marker newMarker = myMap.addMarker(
+                            new MarkerOptions().position(new LatLng(newPoint.getPosition().getLatitude(), newPoint.getPosition().getLongitude())));
+                    markerHashMap.put(newPoint.getId(), newMarker);
+                    task.getPointList().add(newPoint);
+                    }
             }
 
             @Override
@@ -177,11 +182,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Point newPoint = dataSnapshot.getValue(Point.class);
-                task.getMapObjects().remove(newPoint);
-                Marker markerToRemove = listMarkers.get(0);
-                markerToRemove.remove();
-                listMarkers.remove(markerToRemove);
+                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                    Point pointToRemove = markerChild.child("Point").getValue(Point.class);
+                    Marker markerToRemove = markerHashMap.get(pointToRemove.getId());
+                    markerToRemove.remove();
+                    markerHashMap.remove(markerToRemove);
+                    task.getPointList().remove(pointToRemove);
+                }
+                Toast.makeText(MapsActivity.this, "Se ha borrado un marcador.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -194,15 +202,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
             }
         };
-        mTaskDatabaseReference.addChildEventListener(mChildEventListener);
-    }
-
-    private void addMapObjects(){
-        for(Iterator<MapObject> i= task.getMapObjects().iterator(); i.hasNext();){
-            MapObject mapObject = i.next();
-            myMap.addMarker(new MarkerOptions().position(mapObject.getLatLng()));
-
-        }
+        mMapObjectsDatabaseReference.addChildEventListener(mChildEventListener);
     }
 
 
@@ -222,30 +222,45 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         myMap.getUiSettings().setZoomControlsEnabled(true);
 
-        addMapObjects();
+        myMap.setOnMarkerClickListener(onMarkerClickListener);
 
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
                 // TODO Auto-generated method stub
-               // listLatLng.add(point);
-                Point newPointObject = new Point(point);
-                myMap.addMarker(new MarkerOptions().position(point));
-                task.getMapObjects().add(newPointObject);
-                updateFirebaseDB();
+                mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey());
+                String key = mMapObjectsDatabaseReference.push().getKey();
+                Point newPoint = new Point(key,
+                        new com.example.iaeste.general.Model.LatLng(point.latitude, point.longitude));
+                mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
             }
         });
     }
 
+    GoogleMap.OnMarkerClickListener onMarkerClickListener = new GoogleMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            Toast.makeText(MapsActivity.this, "tag: "+marker.getTag(), Toast.LENGTH_SHORT).show();
+            deleteMarker(marker);
+            marker.remove();
+            return false;
+        }
+    };
+
+    private void deleteMarker(Marker marker){
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference(task.getKey());
+      //  mTaskDatabaseReference.child("mapObjects").child(marker.getTag().toString()).removeValue();
+    }
+
     private void updateFirebaseDB(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mTaskDatabaseReference = mFirebaseDatabase.getReference();
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference();
 
         Map<String, Object> taskValues = task.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/task/" + task.getKey(), taskValues);
 
-        mTaskDatabaseReference.updateChildren(childUpdates);
+        mMapObjectsDatabaseReference.updateChildren(childUpdates);
     }
 
 
@@ -461,13 +476,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     public void onProviderDisabled(String provider) {
 
     }
-
+/*
     public void Clear(View view) {
-        if(listMarkers!=null) {
+        if(!=null) {
             myMap.clear();
             listMarkers = new ArrayList<>();
             showMyLocation();
         }
     }
-
+*/
 }
