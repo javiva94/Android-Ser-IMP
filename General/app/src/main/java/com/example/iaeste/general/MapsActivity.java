@@ -268,7 +268,41 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
     }
-    
+
+    /*
+    public void Polygon (View view) {
+        listLatLng.clear();
+        myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+
+                // TODO Auto-generated method stub
+                // listLatLng.add(point);
+                Point newPointObject = new Point(point);
+                myMap.addMarker(new MarkerOptions().position(point));
+                task.getMapObjects().add(newPointObject);
+
+                Polygon polygon1 = myMap.addPolygon(new PolygonOptions()
+                        .clickable(true)
+                        .add(
+                                new LatLng(-27.457, 153.040),
+                                new LatLng(-33.852, 151.211),
+                                new LatLng(-37.813, 144.962),
+                                new LatLng(-34.928, 138.599)));
+// Store a data object with the polygon, used here to indicate an arbitrary type.
+                polygon1.setTag("alpha");
+
+            PolygonOptions polygonOptions = new PolygonOptions();
+            polygonOptions.addAll(listLatLng);
+            polygonOptions.strokeColor(Color.DKGRAY);
+            polygonOptions.strokeWidth(7);
+            polygonOptions.fillColor(Color.GREEN);
+            Polygon polygon = myMap.addPolygon(polygonOptions);
+            updateFirebaseDB();
+            }
+        });
+    }
+*/
 
     private void updateFirebaseDB(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
