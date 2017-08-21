@@ -47,6 +47,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -79,6 +80,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private Task task;
 
     private List<LatLng> listLatLng = new ArrayList<>();
+    PolylineOptions polylineOptions;
     private Marker myPosition;
 
     private FirebaseDatabase mFirebaseDatabase;
@@ -226,7 +228,47 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 updateFirebaseDB();
             }
         });
+
     }
+
+    public void Dot (View view) {
+        myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                // TODO Auto-generated method stub
+                // listLatLng.add(point);
+                Point newPointObject = new Point(point);
+                myMap.addMarker(new MarkerOptions().position(point));
+                task.getMapObjects().add(newPointObject);
+                updateFirebaseDB();
+            }
+
+        });
+    }
+
+    public void Multiline (View view) {
+        listLatLng.clear();
+        myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+
+                // TODO Auto-generated method stub
+                // listLatLng.add(point);
+                Point newPointObject = new Point(point);
+                myMap.addMarker(new MarkerOptions().position(point));
+                task.getMapObjects().add(newPointObject);
+
+                polylineOptions = new PolylineOptions();
+                polylineOptions.color(Color.RED);
+                polylineOptions.width(5);
+                listLatLng.add(point);
+                polylineOptions.addAll(listLatLng);
+                myMap.addPolyline(polylineOptions);
+                updateFirebaseDB();
+            }
+        });
+    }
+    
 
     private void updateFirebaseDB(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();

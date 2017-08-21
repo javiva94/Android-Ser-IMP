@@ -4,8 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    class="com.google.android.gms.maps.SupportMapFragment"
-    tools:context="com.example.iaeste.general.MapsActivityKrich">
+    class="com.google.android.gms.maps.SupportMapFragment">
+    <!---tools:context="com.example.iaeste.general.MapsActivity"-->
+
 
 
     <EditText
@@ -69,6 +70,7 @@
         android:backgroundTint="@color/fui_bgTwitter"
         android:elevation="5dp"
         android:visibility="invisible"
+        android:onClick="Polygon"
         app:pressedTranslationZ="12dp"
         map:backgroundTint="@color/fui_bgTwitter"
         map:srcCompat="?android:attr/listChoiceIndicatorMultiple" />
@@ -85,6 +87,7 @@
         android:backgroundTint="@color/fui_bgTwitter"
         android:elevation="5dp"
         android:visibility="invisible"
+        android:onClick="Multiline"
         app:pressedTranslationZ="12dp"
         map:backgroundTint="@color/fui_bgTwitter"
         map:srcCompat="@android:drawable/status_bar_item_background" />
@@ -101,6 +104,7 @@
         android:backgroundTint="@color/fui_bgTwitter"
         android:elevation="5dp"
         android:visibility="invisible"
+        android:onClick="Dot"
         app:pressedTranslationZ="12dp"
         map:backgroundTint="@color/fui_bgTwitter"
         map:srcCompat="?android:attr/listChoiceIndicatorSingle" />
