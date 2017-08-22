@@ -72,13 +72,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton floatingMapButton = (FloatingActionButton) findViewById(R.id.showMapBtn);
+       /* FloatingActionButton floatingMapButton = (FloatingActionButton) findViewById(R.id.showMapBtn);
         floatingMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, MapsActivity.class));
             }
-        });
+        });*/
 
         FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
         floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {

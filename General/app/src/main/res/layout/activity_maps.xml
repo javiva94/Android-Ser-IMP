@@ -1,123 +1,107 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     class="com.google.android.gms.maps.SupportMapFragment"
-    tools:context="com.example.iaeste.general.MapsActivityKrich">
+    tools:context="com.example.iaeste.general.MapsActivity">
 
-
-    <EditText
-        android:paddingTop="12dp"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/Tv_program"
-        android:hint="Where do you want to select"/>
-    <Button
-        android:layout_width="100dp"
-        android:layout_alignParentRight="true"
-        android:layout_height="wrap_content"
-        android:text="GO"
-        android:onClick="geolocate"
-        android:id="@+id/btn_search" />
 
     <fragment
         android:id="@+id/mMapView"
-        android:layout_width="match_parent"
-        android:layout_height="465dp"
-        android:layout_below="@id/Tv_program"
         android:name="com.google.android.gms.maps.MapFragment"
-        />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintHorizontal_bias="0.0"
+        map:layout_constraintLeft_toLeftOf="parent"
+        map:layout_constraintRight_toRightOf="parent"
+        map:layout_constraintTop_toTopOf="parent"
+        map:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:id="@+id/save"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@id/mMapView"
-        android:layout_below="@id/mMapView"
-        android:onClick="OnClickSave"
-        android:text="Save" />
-
-    <Button
-        android:id="@+id/Clear"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/mMapView"
-        android:layout_below="@id/mMapView"
-        android:onClick="Clear"
-        android:text="Clear" />
-    <Button
-        android:text="Forest-Type"
+        android:id="@+id/type"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:id="@+id/type"
-        android:onClick="Type"
         android:layout_below="@id/mMapView"
         android:layout_centerHorizontal="true"
-        />
+        android:onClick="Type"
+        android:text="Forest-Type"
+        map:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/save"
         android:layout_alignParentEnd="true"
         android:layout_gravity="end"
-        android:layout_marginBottom="300dp"
-        android:layout_marginRight="@dimen/fab_margin"
         android:backgroundTint="@color/fui_bgTwitter"
         android:elevation="5dp"
         android:visibility="invisible"
         app:pressedTranslationZ="12dp"
         map:backgroundTint="@color/fui_bgTwitter"
-        map:srcCompat="?android:attr/listChoiceIndicatorMultiple" />
+        map:srcCompat="?android:attr/listChoiceIndicatorMultiple"
+        android:layout_marginBottom="8dp"
+        map:layout_constraintBottom_toTopOf="@+id/addObj_2"
+        android:layout_marginRight="8dp"
+        map:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="8dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/save"
         android:layout_alignParentEnd="true"
         android:layout_gravity="end"
-        android:layout_marginBottom="250dp"
-        android:layout_marginRight="@dimen/fab_margin"
         android:backgroundTint="@color/fui_bgTwitter"
         android:elevation="5dp"
+        android:onClick="Multiline"
         android:visibility="invisible"
         app:pressedTranslationZ="12dp"
         map:backgroundTint="@color/fui_bgTwitter"
-        map:srcCompat="@android:drawable/status_bar_item_background" />
+        map:srcCompat="@android:drawable/status_bar_item_background"
+        android:layout_marginBottom="8dp"
+        map:layout_constraintBottom_toTopOf="@+id/addObj_1"
+        android:layout_marginRight="8dp"
+        map:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="8dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/save"
         android:layout_alignParentEnd="true"
         android:layout_gravity="end"
-        android:layout_marginBottom="200dp"
-        android:layout_marginRight="@dimen/fab_margin"
         android:backgroundTint="@color/fui_bgTwitter"
         android:elevation="5dp"
+        android:onClick="Dot"
         android:visibility="invisible"
         app:pressedTranslationZ="12dp"
         map:backgroundTint="@color/fui_bgTwitter"
-        map:srcCompat="?android:attr/listChoiceIndicatorSingle" />
+        map:srcCompat="?android:attr/listChoiceIndicatorSingle"
+        android:layout_marginBottom="8dp"
+        map:layout_constraintBottom_toTopOf="@+id/addObj"
+        android:layout_marginRight="8dp"
+        map:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="8dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/save"
         android:layout_alignParentEnd="true"
         android:layout_gravity="end"
-        android:layout_marginBottom="130dp"
-        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="8dp"
         android:backgroundTint="@color/fui_bgTwitter"
         android:visibility="visible"
         app:pressedTranslationZ="12dp"
         map:backgroundTint="@color/fui_bgTwitter"
-        map:srcCompat="?android:attr/actionModeWebSearchDrawable" />
+        map:layout_constraintBottom_toBottomOf="@+id/mMapView"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="?android:attr/actionModeWebSearchDrawable"
+        android:layout_marginEnd="8dp" />
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

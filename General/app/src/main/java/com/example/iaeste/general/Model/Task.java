@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.maps.model.Polyline;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.IgnoreExtraProperties;
@@ -25,6 +26,7 @@ public class Task implements Parcelable {
 
   //  private List<MapObject> mapObjects = new ArrayList<>();
     private List<Point> pointList = new ArrayList<>();
+    private List<Line> lineList = new ArrayList<>();
     private String title;
     private String description;
 
@@ -92,6 +94,14 @@ public class Task implements Parcelable {
 
     public void setPointList(List<Point> pointList) {
         this.pointList = pointList;
+    }
+
+    public List<Line> getLineList() {
+        return lineList;
+    }
+
+    public void setLineList(List<Line> lineList) {
+        this.lineList = lineList;
     }
 
     @Override

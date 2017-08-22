@@ -32,6 +32,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.iaeste.general.Model.Line;
 import com.example.iaeste.general.Model.MapObject;
 import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
@@ -49,6 +50,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -80,8 +83,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
     private Task task;
+    private List<LatLng> listPointsForLine = new ArrayList<>();
 
     private HashMap<String, Marker> markerHashMap = new HashMap<>();
+    private HashMap<String, Polyline> polylineHashMap = new HashMap<>();
+
+    PolylineOptions polylineOptions;
+
     private Marker myPosition;
 
     private FirebaseDatabase mFirebaseDatabase;
@@ -159,52 +167,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         firebaseDatabaseInit();
     }
 
-    private void firebaseDatabaseInit(){
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey());
-
-        mChildEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
-                    Point newPoint = markerChild.child("Point").getValue(Point.class);
-                    Marker newMarker = myMap.addMarker(
-                            new MarkerOptions().position(new LatLng(newPoint.getPosition().getLatitude(), newPoint.getPosition().getLongitude())));
-                    markerHashMap.put(newPoint.getId(), newMarker);
-                    task.getPointList().add(newPoint);
-                    }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
-                    Point pointToRemove = markerChild.child("Point").getValue(Point.class);
-                    Marker markerToRemove = markerHashMap.get(pointToRemove.getId());
-                    markerToRemove.remove();
-                    markerHashMap.remove(markerToRemove);
-                    task.getPointList().remove(pointToRemove);
-                }
-                Toast.makeText(MapsActivity.this, "Se ha borrado un marcador.", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        mMapObjectsDatabaseReference.addChildEventListener(mChildEventListener);
-    }
-
 
     private void onMyMapReady(final GoogleMap googleMap) {
         // Get Google Map from Fragment.
@@ -220,37 +182,226 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        myMap.getUiSettings().setZoomControlsEnabled(true);
+        myMap.getUiSettings().setZoomControlsEnabled(false);
 
-        myMap.setOnMarkerClickListener(onMarkerClickListener);
+        myMap.setOnMarkerClickListener( new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if(marker.getTag().equals("MyLocation")) {
+                    return true;
+                }else {
+                    deletePointFromFirebase(marker);
+                    return false;
+                }
+            }
+        });
 
+        myMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+            @Override
+            public void onPolylineClick(Polyline polyline) {
+                deleteLineFromFirebase(polyline);
+            }
+        });
+
+    }
+
+    private void deletePointFromFirebase(Marker marker){
+        String key = (String) marker.getTag();
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
+        mMapObjectsDatabaseReference.child(key).removeValue();
+    }
+
+    private void deleteLineFromFirebase(Polyline polyline){
+        String key = (String) polyline.getTag();
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
+        mMapObjectsDatabaseReference.child(key).removeValue();
+    }
+
+    private void firebaseDatabaseInit(){
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
+
+        mChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                    Log.e("New element", markerChild.toString());
+                    //Punto
+                    if (markerChild.getKey().equals("Point")) {
+                        Point newPoint = markerChild.getValue(Point.class);
+                        addPoint(newPoint);
+                    }
+
+                    //Linea
+                    if (markerChild.getKey().equals("Line")){
+                        Line newLine = markerChild.getValue(Line.class);
+                        addLine(newLine);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                    Log.e("Element modified", markerChild.toString());
+                }
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                    Log.e("Element to delete", markerChild.toString());
+
+                    //Punto
+                    if (markerChild.getKey().equals("Point")) {
+                        Point pointToRemove = markerChild.getValue(Point.class);
+                        removePoint(pointToRemove);
+                        Toast.makeText(MapsActivity.this, "Se ha eliminado un punto de interes.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    //Linea
+                    if(markerChild.getKey().equals("Line")){
+                        Line lineToRemove = markerChild.getValue(Line.class);
+                        removeLine(lineToRemove);
+                        Toast.makeText(MapsActivity.this, "Se ha eliminado una linea.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                    Log.e("Element moved", markerChild.toString());
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("DB ERROR message", databaseError.getMessage());
+                Log.e("DB ERROR details", databaseError.getDetails());
+            }
+        };
+        mMapObjectsDatabaseReference.addChildEventListener(mChildEventListener);
+    }
+
+    private void addPoint(Point point){
+        Marker newMarker = myMap.addMarker(
+                new MarkerOptions().position(new LatLng(point.getPosition().getLatitude(),point.getPosition().getLongitude())));
+        newMarker.setTag(point.getId());
+        markerHashMap.put(point.getId(), newMarker);
+        task.getPointList().add(point);
+    }
+
+    private void removePoint(Point point){
+        Marker markerToRemove = markerHashMap.get(point.getId());
+        markerToRemove.remove();
+        markerHashMap.remove(markerToRemove);
+        task.getPointList().remove(point);
+    }
+
+    private void addLine (Line line){
+        polylineOptions = new PolylineOptions();
+        polylineOptions.color(Color.RED);
+        polylineOptions.width(5);
+
+        LatLng latLngInitialPoint = new LatLng(line.getInitialPoint().getLatitude(), line.getInitialPoint().getLongitude());
+        LatLng latLngFinalPoint = new LatLng(line.getFinalPoint().getLatitude(), line.getFinalPoint().getLongitude());
+        polylineOptions.add(latLngInitialPoint, latLngFinalPoint);
+
+        Polyline newPolyline = myMap.addPolyline(polylineOptions);
+        newPolyline.setClickable(true);
+        newPolyline.setTag(line.getId());
+        polylineHashMap.put(line.getId(), newPolyline);
+        task.getLineList().add(line);
+    }
+
+    private void removeLine(Line line){
+        Polyline polylineToRemove = polylineHashMap.get(line.getId());
+        polylineToRemove.remove();
+        polylineHashMap.remove(polylineToRemove);
+        task.getLineList().remove(polylineToRemove);
+    }
+
+
+    public void Dot (View view) {
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                // TODO Auto-generated method stub
                 mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey());
                 String key = mMapObjectsDatabaseReference.push().getKey();
                 Point newPoint = new Point(key,
                         new com.example.iaeste.general.Model.LatLng(point.latitude, point.longitude));
                 mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
             }
+
         });
     }
 
-    GoogleMap.OnMarkerClickListener onMarkerClickListener = new GoogleMap.OnMarkerClickListener() {
-        @Override
-        public boolean onMarkerClick(Marker marker) {
-            Toast.makeText(MapsActivity.this, "tag: "+marker.getTag(), Toast.LENGTH_SHORT).show();
-            deleteMarker(marker);
-            marker.remove();
-            return false;
-        }
-    };
+    public void Multiline (View view) {
+        myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
 
-    private void deleteMarker(Marker marker){
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference(task.getKey());
-      //  mTaskDatabaseReference.child("mapObjects").child(marker.getTag().toString()).removeValue();
+                //Punto inicial
+                if(listPointsForLine.size()==0){
+                    listPointsForLine.add(point);
+                }else{
+                    //Punto final
+                    if(listPointsForLine.size()==1) {
+                        //Si ya se seleccionaron 2 puntos los envío a firebase y vacío la lista
+                        listPointsForLine.add(point);
+
+                        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
+                        String key = mMapObjectsDatabaseReference.push().getKey();
+                        Line newLine = new Line(key,
+                                new com.example.iaeste.general.Model.LatLng(listPointsForLine.get(0).latitude, listPointsForLine.get(0).longitude),
+                                new com.example.iaeste.general.Model.LatLng(listPointsForLine.get(1).latitude, listPointsForLine.get(1).longitude));
+                        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Line").setValue(newLine);
+
+                        listPointsForLine.clear();
+                    }
+                }
+            }
+        });
     }
+
+    /*
+    public void Polygon (View view) {
+        listLatLng.clear();
+        myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+
+                // TODO Auto-generated method stub
+                // listLatLng.add(point);
+                Point newPointObject = new Point(point);
+                myMap.addMarker(new MarkerOptions().position(point));
+                task.getMapObjects().add(newPointObject);
+
+                Polygon polygon1 = myMap.addPolygon(new PolygonOptions()
+                        .clickable(true)
+                        .add(
+                                new LatLng(-27.457, 153.040),
+                                new LatLng(-33.852, 151.211),
+                                new LatLng(-37.813, 144.962),
+                                new LatLng(-34.928, 138.599)));
+// Store a data object with the polygon, used here to indicate an arbitrary type.
+                polygon1.setTag("alpha");
+
+            PolygonOptions polygonOptions = new PolygonOptions();
+            polygonOptions.addAll(listLatLng);
+            polygonOptions.strokeColor(Color.DKGRAY);
+            polygonOptions.strokeWidth(7);
+            polygonOptions.fillColor(Color.GREEN);
+            Polygon polygon = myMap.addPolygon(polygonOptions);
+            updateFirebaseDB();
+            }
+        });
+    }
+*/
+
 
     private void updateFirebaseDB(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -399,6 +550,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             option.snippet("....");
             option.position(latLng);
             myPosition = myMap.addMarker(option);
+            myPosition.setTag("MyLocation");
             myPosition.showInfoWindow();
 
            // circle = drawCircle(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
@@ -476,13 +628,4 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     public void onProviderDisabled(String provider) {
 
     }
-/*
-    public void Clear(View view) {
-        if(!=null) {
-            myMap.clear();
-            listMarkers = new ArrayList<>();
-            showMyLocation();
-        }
-    }
-*/
 }

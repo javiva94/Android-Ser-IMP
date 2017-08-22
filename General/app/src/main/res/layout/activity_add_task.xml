@@ -15,7 +15,7 @@
         android:layout_marginBottom="10sp"
         android:layout_marginLeft="10sp"
         android:layout_marginRight="10sp"
-        android:layout_marginTop="200sp"
+        android:layout_marginTop="100sp"
         android:backgroundTint="@color/fui_bgTwitter"
         android:hint="Title"
         android:padding="20dp"
@@ -26,17 +26,15 @@
 
     <Button
         android:id="@+id/addTask"
+        style="@style/FirebaseUI.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="100sp"
-        android:background="@drawable/redondo"
+        android:layout_marginTop="50sp"
         android:onClick="addTask"
-        android:text="Acept"
 
-
-        android:textColor="@color/fui_bgTwitter"
-        android:textColorLink="@color/fui_bgTwitter" />
+        android:text="ADD TASK"
+        android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
 
 </LinearLayout>
