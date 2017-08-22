@@ -27,6 +27,7 @@ public class Task implements Parcelable {
   //  private List<MapObject> mapObjects = new ArrayList<>();
     private List<Point> pointList = new ArrayList<>();
     private List<Line> lineList = new ArrayList<>();
+    private List<MyPolygon> polygonList = new ArrayList<>();
     private String title;
     private String description;
 
@@ -102,6 +103,14 @@ public class Task implements Parcelable {
 
     public void setLineList(List<Line> lineList) {
         this.lineList = lineList;
+    }
+
+    public List<MyPolygon> getPolygonList() {
+        return polygonList;
+    }
+
+    public void setPolygonList(List<MyPolygon> polygonList) {
+        this.polygonList = polygonList;
     }
 
     @Override

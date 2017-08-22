@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.example.iaeste.general.Model.Line;
 import com.example.iaeste.general.Model.MapObject;
+import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
 import com.google.android.gms.maps.CameraUpdate;
@@ -84,11 +85,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private Task task;
     private List<LatLng> listPointsForLine = new ArrayList<>();
+    private List<LatLng> listPointForPolygon = new ArrayList<>();
 
     private HashMap<String, Marker> markerHashMap = new HashMap<>();
     private HashMap<String, Polyline> polylineHashMap = new HashMap<>();
-
-    PolylineOptions polylineOptions;
+    private HashMap<String, Polygon> polygonHashMap = new HashMap<>();
 
     private Marker myPosition;
 
@@ -237,6 +238,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                         Line newLine = markerChild.getValue(Line.class);
                         addLine(newLine);
                     }
+
+                    //Poligono
+                    if (markerChild.getKey().equals("Polygon")){
+                        MyPolygon newPolygon = markerChild.getValue(MyPolygon.class);
+                        addPolygon(newPolygon);
+                    }
                 }
             }
 
@@ -302,7 +309,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void addLine (Line line){
-        polylineOptions = new PolylineOptions();
+        PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.color(Color.RED);
         polylineOptions.width(5);
 
@@ -324,6 +331,23 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         task.getLineList().remove(polylineToRemove);
     }
 
+    private void addPolygon(MyPolygon myPolygon){
+        PolygonOptions polygonOptions = new PolygonOptions();
+
+        List<LatLng> latLngList = new ArrayList<>();
+        for(com.example.iaeste.general.Model.LatLng latLng : myPolygon.getVertices()){
+            latLngList.add(new LatLng(latLng.getLatitude(), latLng.getLongitude()));
+        }
+        polygonOptions.addAll(latLngList);
+
+        Polygon newPolygon = myMap.addPolygon(polygonOptions);
+        newPolygon.setClickable(true);
+        newPolygon.setTag(myPolygon.getId());
+        polygonHashMap.put(myPolygon.getId(), newPolygon);
+        task.getPolygonList().add(myPolygon);
+
+    }
+
 
     public void Dot (View view) {
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -340,6 +364,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     public void Multiline (View view) {
+        listPointsForLine.clear();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
@@ -367,40 +392,36 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
-    /*
+
     public void Polygon (View view) {
-        listLatLng.clear();
+        listPointForPolygon.clear();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
 
-                // TODO Auto-generated method stub
-                // listLatLng.add(point);
-                Point newPointObject = new Point(point);
-                myMap.addMarker(new MarkerOptions().position(point));
-                task.getMapObjects().add(newPointObject);
+                if(listPointForPolygon.size()<3){
+                    listPointForPolygon.add(point);
+                }else {
+                    if(listPointForPolygon.size()==3){
+                        listPointForPolygon.add(point);
+                        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
+                        String key = mMapObjectsDatabaseReference.push().getKey();
 
-                Polygon polygon1 = myMap.addPolygon(new PolygonOptions()
-                        .clickable(true)
-                        .add(
-                                new LatLng(-27.457, 153.040),
-                                new LatLng(-33.852, 151.211),
-                                new LatLng(-37.813, 144.962),
-                                new LatLng(-34.928, 138.599)));
-// Store a data object with the polygon, used here to indicate an arbitrary type.
-                polygon1.setTag("alpha");
+                        List<com.example.iaeste.general.Model.LatLng> latLngList = new ArrayList<>();
+                        for(LatLng latLng : listPointForPolygon){
+                            latLngList.add(new com.example.iaeste.general.Model.LatLng(latLng.latitude, latLng.longitude));
+                        }
 
-            PolygonOptions polygonOptions = new PolygonOptions();
-            polygonOptions.addAll(listLatLng);
-            polygonOptions.strokeColor(Color.DKGRAY);
-            polygonOptions.strokeWidth(7);
-            polygonOptions.fillColor(Color.GREEN);
-            Polygon polygon = myMap.addPolygon(polygonOptions);
-            updateFirebaseDB();
+                        MyPolygon myPolygon = new MyPolygon(key, latLngList);
+                        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
+
+                        listPointForPolygon.clear();
+                    }
+                }
             }
         });
     }
-*/
+
 
 
     private void updateFirebaseDB(){

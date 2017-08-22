@@ -7,16 +7,16 @@ import java.util.List;
  * Created by franc on 14/8/2017.
  */
 
-public class Polygon extends MapObject {
+public class MyPolygon extends MapObject {
 
     private String id;
     private List<LatLng> vertices = new ArrayList<>();
 
-    public Polygon(){
+    public MyPolygon(){
 
     }
 
-    public Polygon(String id, List<LatLng> vertices){
+    public MyPolygon(String id, List<LatLng> vertices){
         this.id = id;
         this.vertices = vertices;
     }

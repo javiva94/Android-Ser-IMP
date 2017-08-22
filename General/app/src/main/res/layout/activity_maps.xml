@@ -39,6 +39,7 @@
         android:layout_gravity="end"
         android:backgroundTint="@color/fui_bgTwitter"
         android:elevation="5dp"
+        android:onClick="Polygon"
         android:visibility="invisible"
         app:pressedTranslationZ="12dp"
         map:backgroundTint="@color/fui_bgTwitter"
