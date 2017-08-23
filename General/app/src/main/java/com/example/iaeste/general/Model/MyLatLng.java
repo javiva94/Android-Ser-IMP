@@ -9,34 +9,34 @@ import com.google.firebase.database.IgnoreExtraProperties;
  * Created by franc on 21/8/2017.
  */
 @IgnoreExtraProperties
-public class LatLng implements Parcelable {
+public class MyLatLng implements Parcelable {
 
     private double latitude;
     private double longitude;
 
-    public LatLng(){
+    public MyLatLng(){
 
     }
 
-    public LatLng(double latitude, double longitude){
+    public MyLatLng(double latitude, double longitude){
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    protected LatLng(Parcel in) {
+    protected MyLatLng(Parcel in) {
         latitude = in.readDouble();
         longitude = in.readDouble();
     }
 
-    public static final Creator<LatLng> CREATOR = new Creator<LatLng>() {
+    public static final Creator<MyLatLng> CREATOR = new Creator<MyLatLng>() {
         @Override
-        public LatLng createFromParcel(Parcel in) {
-            return new LatLng(in);
+        public MyLatLng createFromParcel(Parcel in) {
+            return new MyLatLng(in);
         }
 
         @Override
-        public LatLng[] newArray(int size) {
-            return new LatLng[size];
+        public MyLatLng[] newArray(int size) {
+            return new MyLatLng[size];
         }
     };
 

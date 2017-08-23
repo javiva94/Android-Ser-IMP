@@ -7,14 +7,14 @@ package com.example.iaeste.general.Model;
 public class Line extends MapObject {
 
     private String id;
-    private LatLng initialPoint;
-    private LatLng finalPoint;
+    private MyLatLng initialPoint;
+    private MyLatLng finalPoint;
 
     public Line(){
 
     }
 
-    public Line(String id, LatLng initialPoint, LatLng finalPoint){
+    public Line(String id, MyLatLng initialPoint, MyLatLng finalPoint){
         this.id = id;
         this.initialPoint = initialPoint;
         this.finalPoint = finalPoint;
@@ -24,11 +24,11 @@ public class Line extends MapObject {
         return id;
     }
 
-    public LatLng getInitialPoint() {
+    public MyLatLng getInitialPoint() {
         return initialPoint;
     }
 
-    public LatLng getFinalPoint() {
+    public MyLatLng getFinalPoint() {
         return finalPoint;
     }
 
@@ -36,11 +36,11 @@ public class Line extends MapObject {
         this.id = id;
     }
 
-    public void setInitialPoint(LatLng initialPoint) {
+    public void setInitialPoint(MyLatLng initialPoint) {
         this.initialPoint = initialPoint;
     }
 
-    public void setFinalPoint(LatLng finalPoint) {
+    public void setFinalPoint(MyLatLng finalPoint) {
         this.finalPoint = finalPoint;
     }
 }

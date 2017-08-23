@@ -1,26 +1,19 @@
 package com.example.iaeste.general;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Address;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.DebugUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -29,23 +22,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.iaeste.general.Model.Line;
-import com.example.iaeste.general.Model.MapObject;
+import com.example.iaeste.general.Model.MyLatLng;
 import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -59,15 +47,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
 
 public class MapsActivity extends AppCompatActivity implements LocationListener {
 
@@ -204,6 +187,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
+        myMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
+            @Override
+            public void onPolygonClick(Polygon polygon) {
+                deletePolygonFromFirebase(polygon);
+            }
+        });
+
     }
 
     private void deletePointFromFirebase(Marker marker){
@@ -214,6 +204,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private void deleteLineFromFirebase(Polyline polyline){
         String key = (String) polyline.getTag();
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
+        mMapObjectsDatabaseReference.child(key).removeValue();
+    }
+
+    private void deletePolygonFromFirebase(Polygon polygon){
+        String key = (String) polygon.getTag();
         mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
         mMapObjectsDatabaseReference.child(key).removeValue();
     }
@@ -272,6 +268,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                         Line lineToRemove = markerChild.getValue(Line.class);
                         removeLine(lineToRemove);
                         Toast.makeText(MapsActivity.this, "Se ha eliminado una linea.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    //Poligono
+                    if (markerChild.getKey().equals("Polygon")){
+                        MyPolygon polygonToRemove = markerChild.getValue(MyPolygon.class);
+                        removePolygon(polygonToRemove);
+                        Toast.makeText(MapsActivity.this, "Se ha eliminado un polígono.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -335,8 +338,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         PolygonOptions polygonOptions = new PolygonOptions();
 
         List<LatLng> latLngList = new ArrayList<>();
-        for(com.example.iaeste.general.Model.LatLng latLng : myPolygon.getVertices()){
-            latLngList.add(new LatLng(latLng.getLatitude(), latLng.getLongitude()));
+        for(MyLatLng myLatLng : myPolygon.getVertices()){
+            latLngList.add(new LatLng(myLatLng.getLatitude(), myLatLng.getLongitude()));
         }
         polygonOptions.addAll(latLngList);
 
@@ -345,7 +348,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         newPolygon.setTag(myPolygon.getId());
         polygonHashMap.put(myPolygon.getId(), newPolygon);
         task.getPolygonList().add(myPolygon);
+    }
 
+    private void removePolygon(MyPolygon myPolygon){
+        Polygon polygonToRemove = polygonHashMap.get(myPolygon.getId());
+        polygonToRemove.remove();
+        polygonHashMap.remove(polygonToRemove);
+        task.getPolygonList().remove(polygonToRemove);
     }
 
 
@@ -356,7 +365,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey());
                 String key = mMapObjectsDatabaseReference.push().getKey();
                 Point newPoint = new Point(key,
-                        new com.example.iaeste.general.Model.LatLng(point.latitude, point.longitude));
+                        new MyLatLng(point.latitude, point.longitude));
                 mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
             }
 
@@ -381,8 +390,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                         mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
                         String key = mMapObjectsDatabaseReference.push().getKey();
                         Line newLine = new Line(key,
-                                new com.example.iaeste.general.Model.LatLng(listPointsForLine.get(0).latitude, listPointsForLine.get(0).longitude),
-                                new com.example.iaeste.general.Model.LatLng(listPointsForLine.get(1).latitude, listPointsForLine.get(1).longitude));
+                                new MyLatLng(listPointsForLine.get(0).latitude, listPointsForLine.get(0).longitude),
+                                new MyLatLng(listPointsForLine.get(1).latitude, listPointsForLine.get(1).longitude));
                         mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Line").setValue(newLine);
 
                         listPointsForLine.clear();
@@ -407,12 +416,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                         mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
                         String key = mMapObjectsDatabaseReference.push().getKey();
 
-                        List<com.example.iaeste.general.Model.LatLng> latLngList = new ArrayList<>();
+                        List<MyLatLng> myLatLngList = new ArrayList<>();
                         for(LatLng latLng : listPointForPolygon){
-                            latLngList.add(new com.example.iaeste.general.Model.LatLng(latLng.latitude, latLng.longitude));
+                            myLatLngList.add(new MyLatLng(latLng.latitude, latLng.longitude));
                         }
 
-                        MyPolygon myPolygon = new MyPolygon(key, latLngList);
+                        MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
                         mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
 
                         listPointForPolygon.clear();
@@ -574,7 +583,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             myPosition.setTag("MyLocation");
             myPosition.showInfoWindow();
 
-           // circle = drawCircle(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+           // circle = drawCircle(new MyLatLng(myLocation.getLatitude(), myLocation.getLongitude()));
         } else {
             Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
             Log.i(MYTAG, "Location not found");
@@ -582,7 +591,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     }
 /*
-    private Circle drawCircle(LatLng latLng) {
+    private Circle drawCircle(MyLatLng latLng) {
 
         CircleOptions options = new CircleOptions()
                 .center(latLng)

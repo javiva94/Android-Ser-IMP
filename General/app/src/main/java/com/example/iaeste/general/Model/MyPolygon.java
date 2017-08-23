@@ -10,13 +10,13 @@ import java.util.List;
 public class MyPolygon extends MapObject {
 
     private String id;
-    private List<LatLng> vertices = new ArrayList<>();
+    private List<MyLatLng> vertices = new ArrayList<>();
 
     public MyPolygon(){
 
     }
 
-    public MyPolygon(String id, List<LatLng> vertices){
+    public MyPolygon(String id, List<MyLatLng> vertices){
         this.id = id;
         this.vertices = vertices;
     }
@@ -25,7 +25,7 @@ public class MyPolygon extends MapObject {
         return id;
     }
 
-    public List<LatLng> getVertices() {
+    public List<MyLatLng> getVertices() {
         return vertices;
     }
 
@@ -33,7 +33,7 @@ public class MyPolygon extends MapObject {
         this.id = id;
     }
 
-    public void setVertices(List<LatLng> vertices) {
+    public void setVertices(List<MyLatLng> vertices) {
         this.vertices = vertices;
     }
 }

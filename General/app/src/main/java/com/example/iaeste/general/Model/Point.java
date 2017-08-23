@@ -14,13 +14,13 @@ import java.util.Map;
 public class Point extends MapObject implements Parcelable {
 
     private String id;
-    private LatLng position;
+    private MyLatLng position;
 
     public Point(){
 
     }
 
-    public Point(String id, LatLng position){
+    public Point(String id, MyLatLng position){
         this.id = id;
         this.position = position;
     }
@@ -28,7 +28,7 @@ public class Point extends MapObject implements Parcelable {
 
     protected Point(Parcel in) {
         id = in.readString();
-        position = in.readParcelable(LatLng.class.getClassLoader());
+        position = in.readParcelable(MyLatLng.class.getClassLoader());
     }
 
     public static final Creator<Point> CREATOR = new Creator<Point>() {
@@ -63,11 +63,11 @@ public class Point extends MapObject implements Parcelable {
         this.id = id;
     }
 
-    public LatLng getPosition() {
+    public MyLatLng getPosition() {
         return position;
     }
 
-    public void setPosition(LatLng position) {
+    public void setPosition(MyLatLng position) {
         this.position = position;
     }
 
