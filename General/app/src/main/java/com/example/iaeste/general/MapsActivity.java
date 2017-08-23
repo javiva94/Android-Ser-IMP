@@ -11,10 +11,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.iaeste.general.Model.Line;
@@ -127,6 +132,29 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         });
+
+        final Button finishButton = (Button) findViewById(R.id.finishButton);
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(listPointForPolygon.size()>=3) {
+                    mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
+                    String key = mMapObjectsDatabaseReference.push().getKey();
+
+                    List<MyLatLng> myLatLngList = new ArrayList<>();
+                    for (LatLng latLng : listPointForPolygon) {
+                        myLatLngList.add(new MyLatLng(latLng.latitude, latLng.longitude));
+                    }
+
+                    MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
+                    mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
+
+                    listPointForPolygon.clear();
+                    finishButton.setVisibility(View.GONE);
+                }
+            }
+        });
+
         // Create Progress Bar.
         myProgress = new ProgressDialog(this);
         myProgress.setTitle("Map Loading ...");
@@ -404,28 +432,16 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     public void Polygon (View view) {
         listPointForPolygon.clear();
+
+
+
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-
-                if(listPointForPolygon.size()<3){
-                    listPointForPolygon.add(point);
-                }else {
-                    if(listPointForPolygon.size()==3){
-                        listPointForPolygon.add(point);
-                        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
-                        String key = mMapObjectsDatabaseReference.push().getKey();
-
-                        List<MyLatLng> myLatLngList = new ArrayList<>();
-                        for(LatLng latLng : listPointForPolygon){
-                            myLatLngList.add(new MyLatLng(latLng.latitude, latLng.longitude));
-                        }
-
-                        MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
-                        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
-
-                        listPointForPolygon.clear();
-                    }
+                listPointForPolygon.add(point);
+                if(listPointForPolygon.size()==3) {
+                    Button finishButton = (Button) findViewById(R.id.finishButton);
+                    finishButton.setVisibility(View.VISIBLE);
                 }
             }
         });
