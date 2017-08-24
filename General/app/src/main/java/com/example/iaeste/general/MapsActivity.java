@@ -42,6 +42,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -74,10 +75,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private Task task;
     private List<LatLng> listPointsForLine = new ArrayList<>();
     private List<LatLng> listPointForPolygon = new ArrayList<>();
+    private List<LatLng> auxPoligonPointsToShow = new ArrayList<>();
 
     private HashMap<String, Marker> markerHashMap = new HashMap<>();
     private HashMap<String, Polyline> polylineHashMap = new HashMap<>();
     private HashMap<String, Polygon> polygonHashMap = new HashMap<>();
+    private Polygon auxPolygonToShow;
 
     private Marker myPosition;
 
@@ -149,6 +152,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
                     mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
 
+                    auxPolygonToShow.remove();
+
                     listPointForPolygon.clear();
                     finishButton.setVisibility(View.GONE);
                 }
@@ -172,7 +177,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 onMyMapReady(googleMap);
-               // addMapObjects();
             }
         });
 
@@ -432,13 +436,17 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     public void Polygon (View view) {
         listPointForPolygon.clear();
-
-
-
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
                 listPointForPolygon.add(point);
+                if(auxPolygonToShow != null) {
+                    auxPolygonToShow.remove();
+                }
+                PolygonOptions polygonOptions= new PolygonOptions();
+                polygonOptions.addAll(listPointForPolygon);
+                auxPolygonToShow = myMap.addPolygon(polygonOptions);
+
                 if(listPointForPolygon.size()==3) {
                     Button finishButton = (Button) findViewById(R.id.finishButton);
                     finishButton.setVisibility(View.VISIBLE);
