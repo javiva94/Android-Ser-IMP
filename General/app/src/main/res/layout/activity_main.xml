@@ -68,6 +68,40 @@
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
         app:layout_constraintVertical_bias="0.0" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/trashBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:adjustViewBounds="false"
+        android:baselineAlignBottom="false"
+        app:elevation="0dp"
+        app:layout_anchorGravity="top|right"
+        app:layout_constraintBottom_toTopOf="@+id/editBtn"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_delete"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintRight_creator="1" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/editBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:adjustViewBounds="false"
+        android:baselineAlignBottom="false"
+        app:elevation="0dp"
+        app:layout_anchorGravity="top|right"
+        app:layout_constraintBottom_toTopOf="@+id/addTaskBtn"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintRight_creator="1" />
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/showMapBtn"
