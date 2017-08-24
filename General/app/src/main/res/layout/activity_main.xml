@@ -75,7 +75,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="16dp"
-        app:backgroundTint="@color/fui_bgTwitter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@+id/addTaskBtn"
         app:layout_constraintRight_toRightOf="@+id/addTaskBtn"
@@ -93,13 +92,12 @@
         android:layout_marginEnd="16dp"
         android:adjustViewBounds="false"
         android:baselineAlignBottom="false"
-        app:backgroundTint="@color/fui_bgTwitter"
         app:elevation="0dp"
         app:layout_anchor="@id/showMapBtn"
         app:layout_anchorGravity="top|right"
         app:layout_constraintBottom_toTopOf="@+id/showMapBtn"
         app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_add"
+        app:srcCompat="@drawable/ic_add_icon_light"
         tools:layout_constraintBottom_creator="1"
         tools:layout_constraintRight_creator="1" />
 

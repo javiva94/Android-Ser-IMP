@@ -16,12 +16,9 @@
         android:layout_marginLeft="10sp"
         android:layout_marginRight="10sp"
         android:layout_marginTop="100sp"
-        android:backgroundTint="@color/fui_bgTwitter"
         android:hint="Title"
         android:padding="20dp"
         android:textAllCaps="false"
-        android:textColorLink="@color/fui_bgTwitter"
-        android:textCursorDrawable="@color/fui_bgTwitter"
         tools:textAlignment="center" />
 
     <Button
