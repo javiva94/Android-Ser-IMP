@@ -75,7 +75,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private Task task;
     private List<LatLng> listPointsForLine = new ArrayList<>();
     private List<LatLng> listPointForPolygon = new ArrayList<>();
-    private List<LatLng> auxPoligonPointsToShow = new ArrayList<>();
 
     private HashMap<String, Marker> markerHashMap = new HashMap<>();
     private HashMap<String, Polyline> polylineHashMap = new HashMap<>();
@@ -212,33 +211,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             return;
         }
         myMap.setMyLocationEnabled(true);
-
-        myMap.setOnMarkerClickListener( new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                if(marker.getTag().equals("MyLocation")) {
-                    return true;
-                }else {
-                    deletePointFromFirebase(marker);
-                    return false;
-                }
-            }
-        });
-
-        myMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
-            @Override
-            public void onPolylineClick(Polyline polyline) {
-                deleteLineFromFirebase(polyline);
-            }
-        });
-
-        myMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
-            @Override
-            public void onPolygonClick(Polygon polygon) {
-                deletePolygonFromFirebase(polygon);
-            }
-        });
-
     }
 
     private void deletePointFromFirebase(Marker marker){
@@ -446,7 +418,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
-
     public void Polygon (View view) {
         listPointForPolygon.clear();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -464,6 +435,37 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     Button finishButton = (Button) findViewById(R.id.finishButton);
                     finishButton.setVisibility(View.VISIBLE);
                 }
+            }
+        });
+    }
+
+    private void remove (View view){
+        myMap.setOnMarkerClickListener( new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if(marker.getTag().equals("MyLocation")) {
+                    return true;
+                }else {
+                    deletePointFromFirebase(marker);
+                    myMap.setOnMarkerClickListener(null);
+                    return false;
+                }
+            }
+        });
+
+        myMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+            @Override
+            public void onPolylineClick(Polyline polyline) {
+                deleteLineFromFirebase(polyline);
+                myMap.setOnPolylineClickListener(null);
+            }
+        });
+
+        myMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
+            @Override
+            public void onPolygonClick(Polygon polygon) {
+                deletePolygonFromFirebase(polygon);
+                myMap.setOnPolygonClickListener(null);
             }
         });
     }
