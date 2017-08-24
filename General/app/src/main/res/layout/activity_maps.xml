@@ -41,15 +41,13 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:backgroundTint="@color/fui_bgTwitter"
         android:elevation="5dp"
         android:onClick="remove"
         android:visibility="visible"
         app:pressedTranslationZ="12dp"
-        map:backgroundTint="@color/fui_bgTwitter"
         map:layout_constraintBottom_toTopOf="@+id/addObj"
         map:layout_constraintRight_toRightOf="parent"
-        map:srcCompat="@android:drawable/ic_menu_delete" />
+        map:srcCompat="@drawable/ic_delete_light" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj_3"
@@ -57,16 +55,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:elevation="5dp"
         android:onClick="Polygon"
         android:visibility="invisible"
         app:pressedTranslationZ="12dp"
-        map:srcCompat="?android:attr/listChoiceIndicatorMultiple"
-        android:layout_marginBottom="8dp"
         map:layout_constraintBottom_toTopOf="@+id/addObj_2"
-        android:layout_marginRight="8dp"
         map:layout_constraintRight_toRightOf="parent"
-        android:layout_marginEnd="8dp" />
+        map:srcCompat="@drawable/ic_polygon_light" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj_2"
@@ -74,16 +72,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:elevation="5dp"
         android:onClick="Multiline"
         android:visibility="invisible"
         app:pressedTranslationZ="12dp"
-        map:srcCompat="@android:drawable/status_bar_item_background"
-        android:layout_marginBottom="8dp"
         map:layout_constraintBottom_toTopOf="@+id/addObj_1"
-        android:layout_marginRight="8dp"
         map:layout_constraintRight_toRightOf="parent"
-        android:layout_marginEnd="8dp" />
+        map:srcCompat="@drawable/ic_line_light" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj_1"
@@ -100,7 +98,7 @@
         app:pressedTranslationZ="12dp"
         map:layout_constraintBottom_toTopOf="@+id/addObj"
         map:layout_constraintRight_toRightOf="parent"
-        map:srcCompat="@drawable/ic_add_location_black_24dp" />
+        map:srcCompat="@drawable/ic_addmarker_light" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj"
@@ -122,10 +120,11 @@
         style="@style/FirebaseUI.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:text="Finish"
         android:visibility="gone"
+        map:layout_constraintLeft_toLeftOf="parent"
         map:layout_constraintRight_toRightOf="parent"
         map:layout_constraintTop_toTopOf="parent" />
 

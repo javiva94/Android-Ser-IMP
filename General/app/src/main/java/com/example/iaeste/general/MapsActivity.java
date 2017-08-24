@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -97,69 +98,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         Toast.makeText(this, "id: " + task.getKey(), Toast.LENGTH_LONG).show();
 
-        addObj = (FloatingActionButton) findViewById(R.id.addObj);
-        addObj_1 = (FloatingActionButton) findViewById(R.id.addObj_1);
-        addObj_2 = (FloatingActionButton) findViewById(R.id.addObj_2);
-        addObj_3 = (FloatingActionButton) findViewById(R.id.addObj_3);
-        trash = (FloatingActionButton) findViewById(R.id.trash);
-        FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
-        FabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
-        FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
-        Fabanticlockwise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_anticlockwise);
-        addObj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
-                if (isOpen) {
-                    addObj_1.startAnimation(FabClose);
-                    addObj_2.startAnimation(FabClose);
-                    addObj_3.startAnimation(FabClose);
-                    trash.startAnimation(FabOpen);
-                    addObj.startAnimation(Fabanticlockwise);
-                    addObj_1.setClickable(false);
-                    addObj_2.setClickable(false);
-                    addObj_3.setClickable(false);
-                    trash.setClickable(true);
-                    isOpen = false;
-                } else {
-                    addObj_1.startAnimation(FabOpen);
-                    addObj_2.startAnimation(FabOpen);
-                    addObj_3.startAnimation(FabOpen);
-                    trash.startAnimation(FabClose);
-                    addObj.startAnimation(FabClockWise);
-                    addObj_1.setClickable(true);
-                    addObj_2.setClickable(true);
-                    addObj_3.setClickable(true);
-                    trash.setClickable(false);
-                    isOpen = true;
-
-                }
-            }
-        });
-
-        final Button finishButton = (Button) findViewById(R.id.finishButton);
-        finishButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listPointForPolygon.size() >= 3) {
-                    mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
-                    String key = mMapObjectsDatabaseReference.push().getKey();
-
-                    List<MyLatLng> myLatLngList = new ArrayList<>();
-                    for (LatLng latLng : listPointForPolygon) {
-                        myLatLngList.add(new MyLatLng(latLng.latitude, latLng.longitude));
-                    }
-
-                    MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
-                    mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
-
-                    auxPolygonToShow.remove();
-
-                    listPointForPolygon.clear();
-                    finishButton.setVisibility(View.GONE);
-                }
-            }
-        });
+        setFloatingButtons();
 
         // Create Progress Bar.
         myProgress = new ProgressDialog(this);
@@ -200,6 +144,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         myMap.getUiSettings().setZoomControlsEnabled(false);
+        myMap.getUiSettings().setMapToolbarEnabled(false);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -432,24 +377,20 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 auxPolygonToShow = myMap.addPolygon(polygonOptions);
 
                 if(listPointForPolygon.size()==3) {
-                    Button finishButton = (Button) findViewById(R.id.finishButton);
-                    finishButton.setVisibility(View.VISIBLE);
+                    setFinishPolygonButton();
                 }
             }
         });
     }
 
-    private void remove (View view){
+    public void remove (View view){
+        myMap.setOnMapClickListener(null);
+        setFinishDeleteAction();
         myMap.setOnMarkerClickListener( new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                if(marker.getTag().equals("MyLocation")) {
-                    return true;
-                }else {
-                    deletePointFromFirebase(marker);
-                    myMap.setOnMarkerClickListener(null);
-                    return false;
-                }
+                deletePointFromFirebase(marker);
+                return false;
             }
         });
 
@@ -457,7 +398,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onPolylineClick(Polyline polyline) {
                 deleteLineFromFirebase(polyline);
-                myMap.setOnPolylineClickListener(null);
             }
         });
 
@@ -465,7 +405,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onPolygonClick(Polygon polygon) {
                 deletePolygonFromFirebase(polygon);
-                myMap.setOnPolygonClickListener(null);
             }
         });
     }
@@ -679,6 +618,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
 
     @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
+    }
+
+
+    @Override
     public void onLocationChanged(Location location) {
 
     }
@@ -696,5 +642,87 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    private void setFloatingButtons(){
+        addObj = (FloatingActionButton) findViewById(R.id.addObj);
+        addObj_1 = (FloatingActionButton) findViewById(R.id.addObj_1);
+        addObj_2 = (FloatingActionButton) findViewById(R.id.addObj_2);
+        addObj_3 = (FloatingActionButton) findViewById(R.id.addObj_3);
+        trash = (FloatingActionButton) findViewById(R.id.trash);
+        FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        FabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
+        Fabanticlockwise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_anticlockwise);
+        addObj.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (isOpen) {
+                    addObj_1.startAnimation(FabClose);
+                    addObj_2.startAnimation(FabClose);
+                    addObj_3.startAnimation(FabClose);
+                    addObj.startAnimation(Fabanticlockwise);
+                    addObj_1.setClickable(false);
+                    addObj_2.setClickable(false);
+                    addObj_3.setClickable(false);
+                    trash.setVisibility(View.VISIBLE);
+                    isOpen = false;
+                } else {
+                    addObj_1.startAnimation(FabOpen);
+                    addObj_2.startAnimation(FabOpen);
+                    addObj_3.startAnimation(FabOpen);
+                    addObj.startAnimation(FabClockWise);
+                    addObj_1.setClickable(true);
+                    addObj_2.setClickable(true);
+                    addObj_3.setClickable(true);
+                    trash.setVisibility(View.GONE);
+                    isOpen = true;
+                }
+            }
+        });
+    }
+
+    private void setFinishPolygonButton(){
+        final Button finishButton = (Button) findViewById(R.id.finishButton);
+        finishButton.setText("Finish Polygon");
+        finishButton.setVisibility(View.VISIBLE);
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listPointForPolygon.size() >= 3) {
+                    mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
+                    String key = mMapObjectsDatabaseReference.push().getKey();
+
+                    List<MyLatLng> myLatLngList = new ArrayList<>();
+                    for (LatLng latLng : listPointForPolygon) {
+                        myLatLngList.add(new MyLatLng(latLng.latitude, latLng.longitude));
+                    }
+
+                    MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
+                    mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
+
+                    auxPolygonToShow.remove();
+
+                    listPointForPolygon.clear();
+                    finishButton.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void setFinishDeleteAction() {
+        final Button finishButton = (Button) findViewById(R.id.finishButton);
+        finishButton.setText("Finish Delete");
+        finishButton.setVisibility(View.VISIBLE);
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myMap.setOnMarkerClickListener(null);
+                myMap.setOnPolylineClickListener(null);
+                myMap.setOnPolygonClickListener(null);
+                finishButton.setVisibility(View.GONE);
+            }
+        });
     }
 }

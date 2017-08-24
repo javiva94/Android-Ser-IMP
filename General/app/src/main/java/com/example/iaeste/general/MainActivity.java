@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         taskList = new ArrayList<Task>();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Tasks");
         setSupportActionBar(toolbar);
 
        /* FloatingActionButton floatingMapButton = (FloatingActionButton) findViewById(R.id.showMapBtn);
