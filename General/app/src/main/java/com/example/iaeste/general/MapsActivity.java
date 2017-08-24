@@ -63,8 +63,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private static final String MYTAG = "MYTAG";
-    FloatingActionButton addObj_3,addObj_2,addObj_1,addObj,trash;
-    Animation FabOpen,FabClose,FabClockWise,Fabanticlockwise;
+    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash;
+    Animation FabOpen, FabClose, FabClockWise, Fabanticlockwise;
     boolean isOpen = false;
 
 
@@ -96,23 +96,22 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         Intent intent = getIntent(); // gets the previously created intent
         task = (Task) intent.getParcelableExtra("task");
 
-        Toast.makeText(this, "id: "+task.getKey(),Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "id: " + task.getKey(), Toast.LENGTH_LONG).show();
 
         addObj = (FloatingActionButton) findViewById(R.id.addObj);
         addObj_1 = (FloatingActionButton) findViewById(R.id.addObj_1);
         addObj_2 = (FloatingActionButton) findViewById(R.id.addObj_2);
         addObj_3 = (FloatingActionButton) findViewById(R.id.addObj_3);
         trash = (FloatingActionButton) findViewById(R.id.trash);
-        FabOpen = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
-        FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
-        FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
-        Fabanticlockwise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlockwise);
+        FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        FabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
+        Fabanticlockwise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_anticlockwise);
         addObj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (isOpen)
-                {
+                if (isOpen) {
                     addObj_1.startAnimation(FabClose);
                     addObj_2.startAnimation(FabClose);
                     addObj_3.startAnimation(FabClose);
@@ -122,10 +121,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_2.setClickable(false);
                     addObj_3.setClickable(false);
                     trash.setClickable(false);
-                    isOpen=false;
-                }
-                    else
-                {
+                    isOpen = false;
+                } else {
                     addObj_1.startAnimation(FabOpen);
                     addObj_2.startAnimation(FabOpen);
                     addObj_3.startAnimation(FabOpen);
@@ -135,7 +132,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_2.setClickable(true);
                     addObj_3.setClickable(true);
                     trash.setClickable(true);
-                    isOpen=true;
+                    isOpen = true;
 
                 }
             }
@@ -145,7 +142,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(listPointForPolygon.size()>=3) {
+                if (listPointForPolygon.size() >= 3) {
                     mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
                     String key = mMapObjectsDatabaseReference.push().getKey();
 
@@ -204,6 +201,17 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
         myMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         myMap.getUiSettings().setZoomControlsEnabled(false);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        myMap.setMyLocationEnabled(true);
 
         myMap.setOnMarkerClickListener( new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -604,13 +612,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
 
             // Add Marker to Map
-            MarkerOptions option = new MarkerOptions();
+          /*  MarkerOptions option = new MarkerOptions();
             option.title("My Location");
             option.snippet("....");
             option.position(latLng);
             myPosition = myMap.addMarker(option);
             myPosition.setTag("MyLocation");
-            myPosition.showInfoWindow();
+            myPosition.showInfoWindow();*/
 
            // circle = drawCircle(new MyLatLng(myLocation.getLatitude(), myLocation.getLongitude()));
         } else {
