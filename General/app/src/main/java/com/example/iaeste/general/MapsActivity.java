@@ -114,23 +114,23 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_1.startAnimation(FabClose);
                     addObj_2.startAnimation(FabClose);
                     addObj_3.startAnimation(FabClose);
-                    trash.startAnimation(FabClose);
+                    trash.startAnimation(FabOpen);
                     addObj.startAnimation(Fabanticlockwise);
                     addObj_1.setClickable(false);
                     addObj_2.setClickable(false);
                     addObj_3.setClickable(false);
-                    trash.setClickable(false);
+                    trash.setClickable(true);
                     isOpen = false;
                 } else {
                     addObj_1.startAnimation(FabOpen);
                     addObj_2.startAnimation(FabOpen);
                     addObj_3.startAnimation(FabOpen);
-                    trash.startAnimation(FabOpen);
+                    trash.startAnimation(FabClose);
                     addObj.startAnimation(FabClockWise);
                     addObj_1.setClickable(true);
                     addObj_2.setClickable(true);
                     addObj_3.setClickable(true);
-                    trash.setClickable(true);
+                    trash.setClickable(false);
                     isOpen = true;
 
                 }
