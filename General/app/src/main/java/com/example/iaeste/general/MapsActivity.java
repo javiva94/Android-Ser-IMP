@@ -63,7 +63,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private static final String MYTAG = "MYTAG";
-    FloatingActionButton addObj_3,addObj_2,addObj_1,addObj;
+    FloatingActionButton addObj_3,addObj_2,addObj_1,addObj,trash;
     Animation FabOpen,FabClose,FabClockWise,Fabanticlockwise;
     boolean isOpen = false;
 
@@ -102,6 +102,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         addObj_1 = (FloatingActionButton) findViewById(R.id.addObj_1);
         addObj_2 = (FloatingActionButton) findViewById(R.id.addObj_2);
         addObj_3 = (FloatingActionButton) findViewById(R.id.addObj_3);
+        trash = (FloatingActionButton) findViewById(R.id.trash);
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_open);
         FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
         FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
@@ -115,10 +116,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_1.startAnimation(FabClose);
                     addObj_2.startAnimation(FabClose);
                     addObj_3.startAnimation(FabClose);
+                    trash.startAnimation(FabClose);
                     addObj.startAnimation(Fabanticlockwise);
                     addObj_1.setClickable(false);
                     addObj_2.setClickable(false);
                     addObj_3.setClickable(false);
+                    trash.setClickable(false);
                     isOpen=false;
                 }
                     else
@@ -126,10 +129,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_1.startAnimation(FabOpen);
                     addObj_2.startAnimation(FabOpen);
                     addObj_3.startAnimation(FabOpen);
+                    trash.startAnimation(FabOpen);
                     addObj.startAnimation(FabClockWise);
                     addObj_1.setClickable(true);
                     addObj_2.setClickable(true);
                     addObj_3.setClickable(true);
+                    trash.setClickable(true);
                     isOpen=true;
 
                 }

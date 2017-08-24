@@ -33,6 +33,25 @@
         tools:layout_editor_absoluteX="0dp" />
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/trash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:backgroundTint="@color/fui_bgTwitter"
+        android:elevation="5dp"
+        android:onClick="remove"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:backgroundTint="@color/fui_bgTwitter"
+        map:layout_constraintBottom_toTopOf="@+id/addObj_3"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@android:drawable/ic_menu_delete" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
