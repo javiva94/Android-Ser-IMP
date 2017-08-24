@@ -2,20 +2,13 @@ package com.example.iaeste.general.Model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
-import com.google.android.gms.maps.model.Polyline;
 import com.google.firebase.database.Exclude;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 @IgnoreExtraProperties
@@ -26,7 +19,7 @@ public class Task implements Parcelable {
 
   //  private List<MapObject> mapObjects = new ArrayList<>();
     private List<Point> pointList = new ArrayList<>();
-    private List<Line> lineList = new ArrayList<>();
+    private List<MyPolyline> myPolylineList = new ArrayList<>();
     private List<MyPolygon> polygonList = new ArrayList<>();
     private String title;
     private String description;
@@ -97,12 +90,12 @@ public class Task implements Parcelable {
         this.pointList = pointList;
     }
 
-    public List<Line> getLineList() {
-        return lineList;
+    public List<MyPolyline> getMyPolylineList() {
+        return myPolylineList;
     }
 
-    public void setLineList(List<Line> lineList) {
-        this.lineList = lineList;
+    public void setMyPolylineList(List<MyPolyline> myPolylineList) {
+        this.myPolylineList = myPolylineList;
     }
 
     public List<MyPolygon> getPolygonList() {

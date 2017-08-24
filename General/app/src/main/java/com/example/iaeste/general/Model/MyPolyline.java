@@ -1,23 +1,31 @@
 package com.example.iaeste.general.Model;
 
+import java.util.List;
+
 /**
  * Created by franc on 14/8/2017.
  */
 
-public class Line extends MapObject {
+public class MyPolyline extends MapObject {
 
     private String id;
+    private List<MyLatLng> points;
     private MyLatLng initialPoint;
     private MyLatLng finalPoint;
 
-    public Line(){
+    public MyPolyline(){
 
     }
 
-    public Line(String id, MyLatLng initialPoint, MyLatLng finalPoint){
+    public MyPolyline(String id, MyLatLng initialPoint, MyLatLng finalPoint){
         this.id = id;
         this.initialPoint = initialPoint;
         this.finalPoint = finalPoint;
+    }
+
+    public MyPolyline(String id, List<MyLatLng> points){
+        this.id = id;
+        this.points = points;
     }
 
     public String getId() {
@@ -42,5 +50,13 @@ public class Line extends MapObject {
 
     public void setFinalPoint(MyLatLng finalPoint) {
         this.finalPoint = finalPoint;
+    }
+
+    public List<MyLatLng> getPoints() {
+        return points;
+    }
+
+    public void setPoints(List<MyLatLng> points) {
+        this.points = points;
     }
 }

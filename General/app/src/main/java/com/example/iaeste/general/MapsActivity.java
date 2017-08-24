@@ -11,14 +11,10 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,10 +23,9 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.iaeste.general.Model.Line;
+import com.example.iaeste.general.Model.MyPolyline;
 import com.example.iaeste.general.Model.MyLatLng;
 import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.Point;
@@ -43,7 +38,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -74,13 +68,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
     private Task task;
-    private List<LatLng> listPointsForLine = new ArrayList<>();
-    private List<LatLng> listPointForPolygon = new ArrayList<>();
+    private List<LatLng> listPointsForPolyline = new ArrayList<>();
+    private List<LatLng> listPointsForPolygon = new ArrayList<>();
 
     private HashMap<String, Marker> markerHashMap = new HashMap<>();
     private HashMap<String, Polyline> polylineHashMap = new HashMap<>();
     private HashMap<String, Polygon> polygonHashMap = new HashMap<>();
     private Polygon auxPolygonToShow;
+    private Polyline auxPolylineToShow;
 
     private Marker myPosition;
 
@@ -192,9 +187,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     }
 
                     //Linea
-                    if (markerChild.getKey().equals("Line")){
-                        Line newLine = markerChild.getValue(Line.class);
-                        addLine(newLine);
+                    if (markerChild.getKey().equals("Polyline")){
+                        MyPolyline newMyPolyline = markerChild.getValue(MyPolyline.class);
+                        addPolyline(newMyPolyline);
                     }
 
                     //Poligono
@@ -226,10 +221,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     }
 
                     //Linea
-                    if(markerChild.getKey().equals("Line")){
-                        Line lineToRemove = markerChild.getValue(Line.class);
-                        removeLine(lineToRemove);
-                        Toast.makeText(MapsActivity.this, "Se ha eliminado una linea.", Toast.LENGTH_SHORT).show();
+                    if(markerChild.getKey().equals("Polyline")){
+                        MyPolyline myPolylineToRemove = markerChild.getValue(MyPolyline.class);
+                        removePolyline(myPolylineToRemove);
+                        Toast.makeText(MapsActivity.this, "Se ha eliminado una polilinea.", Toast.LENGTH_SHORT).show();
                     }
 
                     //Poligono
@@ -273,41 +268,33 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         task.getPointList().remove(point);
     }
 
-    private void addLine (Line line){
+    private void addPolyline (MyPolyline myPolyline){
         PolylineOptions polylineOptions = new PolylineOptions();
-        polylineOptions.color(Color.RED);
-        polylineOptions.width(5);
-
-        LatLng latLngInitialPoint = new LatLng(line.getInitialPoint().getLatitude(), line.getInitialPoint().getLongitude());
-        LatLng latLngFinalPoint = new LatLng(line.getFinalPoint().getLatitude(), line.getFinalPoint().getLongitude());
-        polylineOptions.add(latLngInitialPoint, latLngFinalPoint);
+        polylineOptions.addAll(convertMyLatLngToLatLng(myPolyline.getPoints()));
 
         Polyline newPolyline = myMap.addPolyline(polylineOptions);
         newPolyline.setClickable(true);
-        newPolyline.setTag(line.getId());
-        polylineHashMap.put(line.getId(), newPolyline);
-        task.getLineList().add(line);
+        newPolyline.setTag(myPolyline.getId());
+
+        polylineHashMap.put(myPolyline.getId(), newPolyline);
+        task.getMyPolylineList().add(myPolyline);
     }
 
-    private void removeLine(Line line){
-        Polyline polylineToRemove = polylineHashMap.get(line.getId());
+    private void removePolyline(MyPolyline myPolyline){
+        Polyline polylineToRemove = polylineHashMap.get(myPolyline.getId());
         polylineToRemove.remove();
         polylineHashMap.remove(polylineToRemove);
-        task.getLineList().remove(polylineToRemove);
+        task.getMyPolylineList().remove(polylineToRemove);
     }
 
     private void addPolygon(MyPolygon myPolygon){
         PolygonOptions polygonOptions = new PolygonOptions();
-
-        List<LatLng> latLngList = new ArrayList<>();
-        for(MyLatLng myLatLng : myPolygon.getVertices()){
-            latLngList.add(new LatLng(myLatLng.getLatitude(), myLatLng.getLongitude()));
-        }
-        polygonOptions.addAll(latLngList);
+        polygonOptions.addAll(convertMyLatLngToLatLng(myPolygon.getVertices()));
 
         Polygon newPolygon = myMap.addPolygon(polygonOptions);
         newPolygon.setClickable(true);
         newPolygon.setTag(myPolygon.getId());
+
         polygonHashMap.put(myPolygon.getId(), newPolygon);
         task.getPolygonList().add(myPolygon);
     }
@@ -321,6 +308,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
 
     public void Dot (View view) {
+        cancelPreviousIncompleteActions();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
@@ -335,48 +323,41 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     public void Multiline (View view) {
-        listPointsForLine.clear();
+        cancelPreviousIncompleteActions();
+        listPointsForPolyline.clear();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
+                listPointsForPolyline.add(point);
+                if(auxPolylineToShow != null) {
+                    auxPolylineToShow.remove();
+                }
+                PolylineOptions polylineOptions= new PolylineOptions();
+                polylineOptions.addAll(listPointsForPolyline);
+                auxPolylineToShow = myMap.addPolyline(polylineOptions);
 
-                //Punto inicial
-                if(listPointsForLine.size()==0){
-                    listPointsForLine.add(point);
-                }else{
-                    //Punto final
-                    if(listPointsForLine.size()==1) {
-                        //Si ya se seleccionaron 2 puntos los envío a firebase y vacío la lista
-                        listPointsForLine.add(point);
-
-                        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
-                        String key = mMapObjectsDatabaseReference.push().getKey();
-                        Line newLine = new Line(key,
-                                new MyLatLng(listPointsForLine.get(0).latitude, listPointsForLine.get(0).longitude),
-                                new MyLatLng(listPointsForLine.get(1).latitude, listPointsForLine.get(1).longitude));
-                        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Line").setValue(newLine);
-
-                        listPointsForLine.clear();
-                    }
+                if(listPointsForPolyline.size()==2) {
+                    setFinishPolylineButton();
                 }
             }
         });
     }
 
     public void Polygon (View view) {
-        listPointForPolygon.clear();
+        cancelPreviousIncompleteActions();
+        listPointsForPolygon.clear();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                listPointForPolygon.add(point);
+                listPointsForPolygon.add(point);
                 if(auxPolygonToShow != null) {
                     auxPolygonToShow.remove();
                 }
                 PolygonOptions polygonOptions= new PolygonOptions();
-                polygonOptions.addAll(listPointForPolygon);
+                polygonOptions.addAll(listPointsForPolygon);
                 auxPolygonToShow = myMap.addPolygon(polygonOptions);
 
-                if(listPointForPolygon.size()==3) {
+                if(listPointsForPolygon.size()==3) {
                     setFinishPolygonButton();
                 }
             }
@@ -385,7 +366,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     public void remove (View view){
         myMap.setOnMapClickListener(null);
-        setFinishDeleteAction();
+        setFinishDeleteButton();
         myMap.setOnMarkerClickListener( new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -690,12 +671,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (listPointForPolygon.size() >= 3) {
+                if (listPointsForPolygon.size() >= 3) {
                     mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
                     String key = mMapObjectsDatabaseReference.push().getKey();
 
                     List<MyLatLng> myLatLngList = new ArrayList<>();
-                    for (LatLng latLng : listPointForPolygon) {
+                    for (LatLng latLng : listPointsForPolygon) {
                         myLatLngList.add(new MyLatLng(latLng.latitude, latLng.longitude));
                     }
 
@@ -704,14 +685,42 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
                     auxPolygonToShow.remove();
 
-                    listPointForPolygon.clear();
+                    listPointsForPolygon.clear();
                     finishButton.setVisibility(View.GONE);
                 }
             }
         });
     }
 
-    private void setFinishDeleteAction() {
+    private void setFinishPolylineButton(){
+        final Button finishButton = (Button) findViewById(R.id.finishButton);
+        finishButton.setText("Finish Polyline");
+        finishButton.setVisibility(View.VISIBLE);
+        finishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listPointsForPolyline.size() >= 2) {
+                    mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
+                    String key = mMapObjectsDatabaseReference.push().getKey();
+
+                    List<MyLatLng> myLatLngList = new ArrayList<>();
+                    for (LatLng latLng : listPointsForPolyline) {
+                        myLatLngList.add(new MyLatLng(latLng.latitude, latLng.longitude));
+                    }
+
+                    MyPolyline myPolyline = new MyPolyline(key, myLatLngList);
+                    mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polyline").setValue(myPolyline);
+
+                    auxPolylineToShow.remove();
+
+                    listPointsForPolyline.clear();
+                    finishButton.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void setFinishDeleteButton() {
         final Button finishButton = (Button) findViewById(R.id.finishButton);
         finishButton.setText("Finish Delete");
         finishButton.setVisibility(View.VISIBLE);
@@ -724,5 +733,31 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 finishButton.setVisibility(View.GONE);
             }
         });
+    }
+
+    private List<LatLng> convertMyLatLngToLatLng(List<MyLatLng> myLatLngList){
+        List<LatLng> latLngListToReturn = new ArrayList<>();
+        for(MyLatLng myLatLng : myLatLngList){
+            latLngListToReturn.add(new LatLng(myLatLng.getLatitude(), myLatLng.getLongitude()));
+        }
+        return latLngListToReturn;
+    }
+
+    private void cancelPreviousIncompleteActions(){
+        myMap.setOnMarkerClickListener(null);
+        myMap.setOnPolygonClickListener(null);
+        myMap.setOnPolylineClickListener(null);
+
+        final Button finishButton = (Button) findViewById(R.id.finishButton);
+        finishButton.setVisibility(View.GONE);
+
+        if(auxPolygonToShow!=null){
+            auxPolygonToShow.remove();
+            auxPolygonToShow=null;
+        }
+        if(auxPolylineToShow!=null){
+            auxPolylineToShow.remove();
+            auxPolylineToShow=null;
+        }
     }
 }
