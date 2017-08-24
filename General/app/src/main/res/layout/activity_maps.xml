@@ -21,17 +21,6 @@
         map:layout_constraintTop_toTopOf="parent"
         map:layout_constraintVertical_bias="0.0" />
 
-    <Button
-        android:id="@+id/type"
-        android:layout_width="130dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/mMapView"
-        android:layout_centerHorizontal="true"
-        android:onClick="Type"
-        android:text="Forest-Type"
-        map:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/trash"
         android:layout_width="wrap_content"

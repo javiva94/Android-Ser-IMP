@@ -587,10 +587,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             case R.id.Menu_typeHybrid:
                 myMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                 break;
-            case R.id.bookmark:
-                Intent bookmarkAct = new Intent(this, BookMarkActivity.class);
-                this.startActivity(bookmarkAct);
-                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
