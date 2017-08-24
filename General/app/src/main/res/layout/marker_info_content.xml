@@ -16,13 +16,13 @@
             android:text="address title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#333333" />
+   />
 
 
         <TextView
             android:id="@+id/tv_lat"
             android:text="latitude"
-            android:textColor="#3575E0"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -30,7 +30,7 @@
         <TextView
             android:id="@+id/tv_lng"
             android:text="longtitude"
-            android:textColor="#3575E0"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
