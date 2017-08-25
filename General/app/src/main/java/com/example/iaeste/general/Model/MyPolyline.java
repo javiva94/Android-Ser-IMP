@@ -1,26 +1,21 @@
 package com.example.iaeste.general.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
 /**
  * Created by franc on 14/8/2017.
  */
 
-public class MyPolyline extends MapObject {
+public class MyPolyline extends MapObject implements Parcelable{
 
     private String id;
     private List<MyLatLng> points;
-    private MyLatLng initialPoint;
-    private MyLatLng finalPoint;
 
     public MyPolyline(){
 
-    }
-
-    public MyPolyline(String id, MyLatLng initialPoint, MyLatLng finalPoint){
-        this.id = id;
-        this.initialPoint = initialPoint;
-        this.finalPoint = finalPoint;
     }
 
     public MyPolyline(String id, List<MyLatLng> points){
@@ -28,28 +23,30 @@ public class MyPolyline extends MapObject {
         this.points = points;
     }
 
+    protected MyPolyline(Parcel in) {
+        id = in.readString();
+        points = in.createTypedArrayList(MyLatLng.CREATOR);
+    }
+
+    public static final Creator<MyPolyline> CREATOR = new Creator<MyPolyline>() {
+        @Override
+        public MyPolyline createFromParcel(Parcel in) {
+            return new MyPolyline(in);
+        }
+
+        @Override
+        public MyPolyline[] newArray(int size) {
+            return new MyPolyline[size];
+        }
+    };
+
+    @Override
     public String getId() {
         return id;
     }
 
-    public MyLatLng getInitialPoint() {
-        return initialPoint;
-    }
-
-    public MyLatLng getFinalPoint() {
-        return finalPoint;
-    }
-
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setInitialPoint(MyLatLng initialPoint) {
-        this.initialPoint = initialPoint;
-    }
-
-    public void setFinalPoint(MyLatLng finalPoint) {
-        this.finalPoint = finalPoint;
     }
 
     public List<MyLatLng> getPoints() {
@@ -58,5 +55,16 @@ public class MyPolyline extends MapObject {
 
     public void setPoints(List<MyLatLng> points) {
         this.points = points;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeTypedList(points);
     }
 }

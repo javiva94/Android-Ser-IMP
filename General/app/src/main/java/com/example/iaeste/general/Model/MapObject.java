@@ -11,5 +11,6 @@ import java.util.HashMap;
  */
 public abstract class MapObject {
 
+    public abstract String getId();
 
 }

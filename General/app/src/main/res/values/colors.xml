@@ -8,6 +8,8 @@
         <color name="colorPrimaryDark">#0288D1</color>
         <color name="colorPrimaryLight">#B3E5FC</color>
         <color name="colorAccent">#03A9F4</color>
+        <color name="buttonPressedDelete">#D0021B</color>
+        <color name="buttonPressedEdit">#00c853</color>
     <!--    <color name="colorAccent">#536DFE</color>-->
         <color name="colorPrimaryText">#212121</color>
         <color name="colorSecondaryText">#757575</color>

@@ -22,6 +22,19 @@
         map:layout_constraintVertical_bias="0.0" />
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:clickable="true"
+        android:onClick="edit"
+        app:srcCompat="@drawable/ic_edit_light"
+        map:fabSize="normal"
+        map:layout_constraintBottom_toTopOf="@+id/addObj"
+        map:layout_constraintRight_toRightOf="parent" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/trash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,7 +47,7 @@
         android:onClick="remove"
         android:visibility="visible"
         app:pressedTranslationZ="12dp"
-        map:layout_constraintBottom_toTopOf="@+id/addObj"
+        map:layout_constraintBottom_toTopOf="@+id/edit"
         map:layout_constraintRight_toRightOf="parent"
         map:srcCompat="@drawable/ic_delete_light" />
 
@@ -85,9 +98,9 @@
         android:onClick="Dot"
         android:visibility="invisible"
         app:pressedTranslationZ="12dp"
-        map:layout_constraintBottom_toTopOf="@+id/addObj"
         map:layout_constraintRight_toRightOf="parent"
-        map:srcCompat="@drawable/ic_addmarker_light" />
+        map:srcCompat="@drawable/ic_addmarker_light"
+        map:layout_constraintBottom_toBottomOf="@+id/trash" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj"
@@ -109,12 +122,10 @@
         style="@style/FirebaseUI.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
         android:visibility="gone"
         map:layout_constraintLeft_toLeftOf="parent"
         map:layout_constraintRight_toRightOf="parent"
         map:layout_constraintTop_toTopOf="parent" />
+
 
 </android.support.constraint.ConstraintLayout>

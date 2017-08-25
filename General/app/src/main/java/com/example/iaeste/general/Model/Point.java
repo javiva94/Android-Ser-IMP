@@ -31,6 +31,15 @@ public class Point extends MapObject implements Parcelable {
         position = in.readParcelable(MyLatLng.class.getClassLoader());
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public static final Creator<Point> CREATOR = new Creator<Point>() {
         @Override
         public Point createFromParcel(Parcel in) {
@@ -52,15 +61,6 @@ public class Point extends MapObject implements Parcelable {
         result.put("position", position);
 
         return result;
-    }
-
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public MyLatLng getPosition() {

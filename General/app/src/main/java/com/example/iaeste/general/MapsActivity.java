@@ -1,10 +1,14 @@
 package com.example.iaeste.general;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.res.ColorStateList;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -24,7 +28,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
-
+import android.support.v4.app.Fragment;
 import com.example.iaeste.general.Model.MyPolyline;
 import com.example.iaeste.general.Model.MyLatLng;
 import com.example.iaeste.general.Model.MyPolygon;
@@ -58,7 +62,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private static final String MYTAG = "MYTAG";
-    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash;
+    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash, edit;
     Animation FabOpen, FabClose, FabClockWise, Fabanticlockwise;
     boolean isOpen = false;
 
@@ -277,14 +281,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         newPolyline.setTag(myPolyline.getId());
 
         polylineHashMap.put(myPolyline.getId(), newPolyline);
-        task.getMyPolylineList().add(myPolyline);
+        task.getPolylineList().add(myPolyline);
     }
 
     private void removePolyline(MyPolyline myPolyline){
         Polyline polylineToRemove = polylineHashMap.get(myPolyline.getId());
         polylineToRemove.remove();
         polylineHashMap.remove(polylineToRemove);
-        task.getMyPolylineList().remove(polylineToRemove);
+        task.getPolylineList().remove(polylineToRemove);
     }
 
     private void addPolygon(MyPolygon myPolygon){
@@ -390,7 +394,44 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
+    public void edit (View view){
+        myMap.setOnMapClickListener(null);
+        edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.buttonPressedEdit)}));
 
+        myMap.setOnMarkerClickListener( new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+                Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
+                intent.putExtra("task", task);
+                intent.putExtra("mapObject", task.getPointById((String) marker.getTag()));
+                startActivity(intent);
+                return false;
+            }
+        });
+
+        myMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+            @Override
+            public void onPolylineClick(Polyline polyline) {
+                edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+                Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
+                intent.putExtra("task", task);
+                intent.putExtra("mapObject", task.getPolylineById((String) polyline.getTag()));
+                startActivity(intent);
+            }
+        });
+
+        myMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
+            @Override
+            public void onPolygonClick(Polygon polygon) {
+                edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+                Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
+                intent.putExtra("task", task);
+                intent.putExtra("mapObject", task.getPolygonById((String) polygon.getTag()));
+                startActivity(intent);
+            }
+        });
+    }
 
     private void updateFirebaseDB(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -627,6 +668,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         addObj_2 = (FloatingActionButton) findViewById(R.id.addObj_2);
         addObj_3 = (FloatingActionButton) findViewById(R.id.addObj_3);
         trash = (FloatingActionButton) findViewById(R.id.trash);
+        edit = (FloatingActionButton) findViewById(R.id.edit);
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         FabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
@@ -644,6 +686,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_2.setClickable(false);
                     addObj_3.setClickable(false);
                     trash.setVisibility(View.VISIBLE);
+                    edit.setVisibility(View.VISIBLE);
                     isOpen = false;
                 } else {
                     addObj_1.startAnimation(FabOpen);
@@ -654,6 +697,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_2.setClickable(true);
                     addObj_3.setClickable(true);
                     trash.setVisibility(View.GONE);
+                    edit.setVisibility(View.GONE);
                     isOpen = true;
                 }
             }
@@ -717,6 +761,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void setFinishDeleteButton() {
+        edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+        trash.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.buttonPressedDelete)}));
         final Button finishButton = (Button) findViewById(R.id.finishButton);
         finishButton.setText("Finish Delete");
         finishButton.setVisibility(View.VISIBLE);
@@ -727,6 +773,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 myMap.setOnPolylineClickListener(null);
                 myMap.setOnPolygonClickListener(null);
                 finishButton.setVisibility(View.GONE);
+                trash.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
             }
         });
     }
@@ -746,6 +793,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         final Button finishButton = (Button) findViewById(R.id.finishButton);
         finishButton.setVisibility(View.GONE);
+
+        edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+        trash.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
 
         if(auxPolygonToShow!=null){
             auxPolygonToShow.remove();

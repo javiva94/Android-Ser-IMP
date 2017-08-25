@@ -19,7 +19,7 @@ public class Task implements Parcelable {
 
   //  private List<MapObject> mapObjects = new ArrayList<>();
     private List<Point> pointList = new ArrayList<>();
-    private List<MyPolyline> myPolylineList = new ArrayList<>();
+    private List<MyPolyline> polylineList = new ArrayList<>();
     private List<MyPolygon> polygonList = new ArrayList<>();
     private String title;
     private String description;
@@ -90,12 +90,12 @@ public class Task implements Parcelable {
         this.pointList = pointList;
     }
 
-    public List<MyPolyline> getMyPolylineList() {
-        return myPolylineList;
+    public List<MyPolyline> getPolylineList() {
+        return polylineList;
     }
 
-    public void setMyPolylineList(List<MyPolyline> myPolylineList) {
-        this.myPolylineList = myPolylineList;
+    public void setPolylineList(List<MyPolyline> polylineList) {
+        this.polylineList = polylineList;
     }
 
     public List<MyPolygon> getPolygonList() {
@@ -116,6 +116,39 @@ public class Task implements Parcelable {
         dest.writeString(key);
         dest.writeString(title);
         dest.writeList(pointList);
+    }
+
+    public Point getPointById(String id){
+        boolean find = false;
+        int i=0;
+        while(!find){
+            if (pointList.get(i).getId().equals(id)) {
+                return pointList.get(i);
+            }i++;
+        }
+        return null;
+    }
+
+    public MyPolyline getPolylineById(String id){
+        boolean find = false;
+        int i=0;
+        while(!find){
+            if (polylineList.get(i).getId().equals(id)) {
+                return polylineList.get(i);
+            }i++;
+        }
+        return null;
+    }
+
+    public MyPolygon getPolygonById(String id){
+        boolean find = false;
+        int i=0;
+        while(!find){
+            if (polygonList.get(i).getId().equals(id)) {
+                return polygonList.get(i);
+            }i++;
+        }
+        return null;
     }
 
 }
