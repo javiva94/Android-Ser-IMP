@@ -3,8 +3,12 @@ package com.example.iaeste.general.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by franc on 14/8/2017.
@@ -13,8 +17,10 @@ import java.util.List;
 public class MyPolygon extends MapObject implements Parcelable{
 
     private String id;
-
     private List<MyLatLng> vertices = new ArrayList<>();
+    private String title;
+    private String description;
+    private String author;
 
     public MyPolygon(){
 
@@ -28,6 +34,9 @@ public class MyPolygon extends MapObject implements Parcelable{
     protected MyPolygon(Parcel in) {
         id = in.readString();
         vertices = in.createTypedArrayList(MyLatLng.CREATOR);
+        title = in.readString();
+        description = in.readString();
+        author = in.readString();
     }
 
     public static final Creator<MyPolygon> CREATOR = new Creator<MyPolygon>() {
@@ -41,6 +50,18 @@ public class MyPolygon extends MapObject implements Parcelable{
             return new MyPolygon[size];
         }
     };
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", id);
+        result.put("points", vertices);
+        result.put("title", title);
+        result.put("description", description);
+        result.put("author", author);
+
+        return result;
+    }
 
     @Override
     public String getId() {
@@ -59,6 +80,30 @@ public class MyPolygon extends MapObject implements Parcelable{
         this.vertices = vertices;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -68,5 +113,8 @@ public class MyPolygon extends MapObject implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeTypedList(vertices);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(author);
     }
 }

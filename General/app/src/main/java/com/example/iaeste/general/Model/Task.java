@@ -53,7 +53,6 @@ public class Task implements Parcelable {
         //result.put("uid", uid);
         //result.put("author", author);
         result.put("title", title);
-        result.put("pointList", pointList);
 
         return result;
     }

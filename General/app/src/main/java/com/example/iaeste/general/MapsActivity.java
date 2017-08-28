@@ -34,6 +34,7 @@ import com.example.iaeste.general.Model.MyLatLng;
 import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
+import com.example.iaeste.general.View.MyInfoWindow;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,6 +55,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +88,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private Marker myPosition;
 
     private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mMapObjectsDatabaseReference;
     private ChildEventListener mChildEventListener;
 
@@ -124,6 +129,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
+        mFirebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabaseInit();
     }
 
@@ -155,6 +161,15 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             return;
         }
         myMap.setMyLocationEnabled(true);
+
+        myMap.setInfoWindowAdapter(new MyInfoWindow(getLayoutInflater()));
+        myMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                Toast.makeText(MapsActivity.this, marker.getTitle(), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     private void deletePointFromFirebase(Marker marker){
@@ -208,6 +223,26 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("Element modified", markerChild.toString());
+                    //Punto
+                    if (markerChild.getKey().equals("Point")) {
+                        Point pointModified = markerChild.getValue(Point.class);
+                        removePoint(pointModified);
+                        addPoint(pointModified);
+                    }
+
+                    //Linea
+                    if (markerChild.getKey().equals("Polyline")){
+                        MyPolyline myPolylineModified = markerChild.getValue(MyPolyline.class);
+                        removePolyline(myPolylineModified);
+                        addPolyline(myPolylineModified);
+                    }
+
+                    //Poligono
+                    if (markerChild.getKey().equals("Polygon")){
+                        MyPolygon myPolygonModified = markerChild.getValue(MyPolygon.class);
+                        removePolygon(myPolygonModified);
+                        addPolygon(myPolygonModified);
+                    }
                 }
 
             }
@@ -259,7 +294,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private void addPoint(Point point){
         Marker newMarker = myMap.addMarker(
-                new MarkerOptions().position(new LatLng(point.getPosition().getLatitude(),point.getPosition().getLongitude())));
+                new MarkerOptions()
+                        .position(new LatLng(point.getPosition().getLatitude(),point.getPosition().getLongitude()))
+                        .title(point.getTitle())
+                        .snippet("Author: "+point.getAuthor()+"/n"+
+                        "Description: "+point.getDescription())
+        );
         newMarker.setTag(point.getId());
         markerHashMap.put(point.getId(), newMarker);
         task.getPointList().add(point);
@@ -320,6 +360,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 String key = mMapObjectsDatabaseReference.push().getKey();
                 Point newPoint = new Point(key,
                         new MyLatLng(point.latitude, point.longitude));
+                newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
                 mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
             }
 
@@ -432,18 +473,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
     }
-
-    private void updateFirebaseDB(){
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference();
-
-        Map<String, Object> taskValues = task.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/task/" + task.getKey(), taskValues);
-
-        mMapObjectsDatabaseReference.updateChildren(childUpdates);
-    }
-
 
     private void askPermissionsAndShowMyLocation() {
 
@@ -721,6 +750,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     }
 
                     MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
+                    myPolygon.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
                     mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
 
                     auxPolygonToShow.remove();
@@ -749,6 +779,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     }
 
                     MyPolyline myPolyline = new MyPolyline(key, myLatLngList);
+                    myPolyline.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
                     mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polyline").setValue(myPolyline);
 
                     auxPolylineToShow.remove();
@@ -806,4 +837,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             auxPolylineToShow=null;
         }
     }
+
+
 }

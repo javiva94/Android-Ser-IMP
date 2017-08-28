@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +16,9 @@ public class Point extends MapObject implements Parcelable {
 
     private String id;
     private MyLatLng position;
+    private String title;
+    private String description;
+    private String author;
 
     public Point(){
 
@@ -23,12 +27,29 @@ public class Point extends MapObject implements Parcelable {
     public Point(String id, MyLatLng position){
         this.id = id;
         this.position = position;
+        this.title = "";
+        this.description = "";
     }
 
 
     protected Point(Parcel in) {
         id = in.readString();
         position = in.readParcelable(MyLatLng.class.getClassLoader());
+        title = in.readString();
+        description = in.readString();
+        author = in.readString();
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", id);
+        result.put("position", position);
+        result.put("title", title);
+        result.put("description", description);
+        result.put("author", author);
+
+        return result;
     }
 
     @Override
@@ -52,23 +73,36 @@ public class Point extends MapObject implements Parcelable {
         }
     };
 
-    @Exclude
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        //result.put("uid", uid);
-        //result.put("author", author);
-        result.put("id", id);
-        result.put("position", position);
-
-        return result;
-    }
-
     public MyLatLng getPosition() {
         return position;
     }
 
     public void setPosition(MyLatLng position) {
         this.position = position;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     @Override
@@ -80,6 +114,9 @@ public class Point extends MapObject implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeParcelable(this.position, flags);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(author);
     }
 
 
