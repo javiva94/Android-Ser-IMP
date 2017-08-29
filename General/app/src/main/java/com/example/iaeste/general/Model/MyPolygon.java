@@ -55,7 +55,7 @@ public class MyPolygon extends MapObject implements Parcelable{
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("id", id);
-        result.put("points", vertices);
+        result.put("vertices", vertices);
         result.put("title", title);
         result.put("description", description);
         result.put("author", author);

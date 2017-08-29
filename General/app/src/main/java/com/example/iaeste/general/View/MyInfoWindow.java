@@ -1,6 +1,7 @@
 package com.example.iaeste.general.View;
 
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.iaeste.general.R;
@@ -55,15 +56,16 @@ public class MyInfoWindow implements InfoWindowAdapter {
         tv.setText(marker.getTitle());
 
         //Snippet parameters
-        String snippet[] = marker.getSnippet().split("/n");
+        String snippet[] = marker.getSnippet().split("/&");
         String author = snippet[0];
-        String description = snippet[1];
-
         tv=(TextView)popup.findViewById(R.id.author);
-        tv.setText(author);
+        tv.setText("Author: "+author);
 
-        tv=(TextView)popup.findViewById(R.id.description);
-        tv.setText(description);
+        if(snippet.length>1) {
+            String description = snippet[1];
+            tv=(TextView)popup.findViewById(R.id.description);
+            tv.setText("Description: "+description);
+        }
 
         return(popup);
     }

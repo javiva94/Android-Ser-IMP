@@ -35,6 +35,7 @@ import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.MyInfoWindow;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -92,6 +93,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private DatabaseReference mMapObjectsDatabaseReference;
     private ChildEventListener mChildEventListener;
 
+    InfoWindowFragment infoWindowFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,6 +111,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         }
 
         setFloatingButtons();
+
+        infoWindowFragment = new InfoWindowFragment();
 
         // Create Progress Bar.
         myProgress = new ProgressDialog(this);
@@ -169,6 +174,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 Toast.makeText(MapsActivity.this, marker.getTitle(), Toast.LENGTH_LONG).show();
             }
         });
+
+        setInfoWindowFragmentListeners();
 
     }
 
@@ -297,8 +304,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 new MarkerOptions()
                         .position(new LatLng(point.getPosition().getLatitude(),point.getPosition().getLongitude()))
                         .title(point.getTitle())
-                        .snippet("Author: "+point.getAuthor()+"/n"+
-                        "Description: "+point.getDescription())
+                        .snippet(point.getAuthor()+"/&"+ point.getDescription())
         );
         newMarker.setTag(point.getId());
         markerHashMap.put(point.getId(), newMarker);
@@ -443,6 +449,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public boolean onMarkerClick(Marker marker) {
                 edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+                myMap.setOnMarkerClickListener(null);
                 Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
                 intent.putExtra("task", task);
                 intent.putExtra("mapObject", task.getPointById((String) marker.getTag()));
@@ -455,6 +462,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onPolylineClick(Polyline polyline) {
                 edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+                myMap.setOnPolylineClickListener(null);
                 Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
                 intent.putExtra("task", task);
                 intent.putExtra("mapObject", task.getPolylineById((String) polyline.getTag()));
@@ -466,6 +474,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onPolygonClick(Polygon polygon) {
                 edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+                myMap.setOnPolygonClickListener(null);
                 Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
                 intent.putExtra("task", task);
                 intent.putExtra("mapObject", task.getPolygonById((String) polygon.getTag()));
@@ -836,6 +845,48 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             auxPolylineToShow.remove();
             auxPolylineToShow=null;
         }
+    }
+
+    private void  setInfoWindowFragmentListeners(){
+        myMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+            @Override
+            public void onPolylineClick(Polyline polyline) {
+                if(!infoWindowFragment.isAdded()) {
+                    infoWindowFragment = new InfoWindowFragment();
+
+                    Bundle args = new Bundle();
+                    args.putParcelable("MyPolyline", task.getPolylineById((String) polyline.getTag()));
+                    infoWindowFragment.setArguments(args);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.mMapView, infoWindowFragment)
+                            .addToBackStack(null)
+                            .commit();
+                }else{
+                    getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
+                }
+            }
+        });
+
+        myMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
+            @Override
+            public void onPolygonClick(Polygon polygon) {
+                if(!infoWindowFragment.isAdded()) {
+                    infoWindowFragment = new InfoWindowFragment();
+
+                    Bundle args = new Bundle();
+                    args.putParcelable("MyPolygon", task.getPolygonById((String) polygon.getTag()));
+                    infoWindowFragment.setArguments(args);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.mMapView, infoWindowFragment)
+                            .addToBackStack(null)
+                            .commit();
+                }else{
+                    getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
+                }
+            }
+        });
     }
 
 
