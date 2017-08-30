@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,6 +97,9 @@ public class InfoWindowFragment extends Fragment {
 
         TextView description = (TextView) view.findViewById(R.id.description);
         description.setText("Description: " + myPolyline.getDescription());
+
+        TextView geometryInfo = (TextView) view.findViewById(R.id.geometry_info);
+        geometryInfo.setText("Length: "+String.format("%.2f",myPolyline.getLength())+" m");
     }
 
     private void inflatePolygonInfoWindowFragment(View view){
@@ -107,6 +111,9 @@ public class InfoWindowFragment extends Fragment {
 
         TextView description = (TextView) view.findViewById(R.id.description);
         description.setText("Description: " + myPolygon.getDescription());
+
+        TextView geometryInfo = (TextView) view.findViewById(R.id.geometry_info);
+        geometryInfo.setText("Area: "+String.format("%.2f",myPolygon.getArea())+" m\u00B2");
     }
 
     // TODO: Rename method, update argument and hook method into UI event

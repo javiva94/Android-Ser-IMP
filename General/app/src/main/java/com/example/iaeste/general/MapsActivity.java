@@ -54,6 +54,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -765,6 +766,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
                     MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
                     myPolygon.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+                    myPolygon.setArea(SphericalUtil.computeArea(auxPolygonToShow.getPoints()));
                     mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
 
                     auxPolygonToShow.remove();
@@ -795,6 +797,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
                     MyPolyline myPolyline = new MyPolyline(key, myLatLngList);
                     myPolyline.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+                    myPolyline.setLength(SphericalUtil.computeLength(auxPolylineToShow.getPoints()));
                     mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polyline").setValue(myPolyline);
 
                     auxPolylineToShow.remove();

@@ -20,6 +20,7 @@ public class MyPolyline extends MapObject implements Parcelable{
     private String title;
     private String description;
     private String author;
+    private double length;
 
     public MyPolyline(){
 
@@ -36,6 +37,7 @@ public class MyPolyline extends MapObject implements Parcelable{
         title = in.readString();
         description = in.readString();
         author = in.readString();
+        length = in.readDouble();
     }
 
     public static final Creator<MyPolyline> CREATOR = new Creator<MyPolyline>() {
@@ -58,6 +60,7 @@ public class MyPolyline extends MapObject implements Parcelable{
         result.put("title", title);
         result.put("description", description);
         result.put("author", author);
+        result.put("length", length);
 
         return result;
     }
@@ -103,6 +106,14 @@ public class MyPolyline extends MapObject implements Parcelable{
         this.author = author;
     }
 
+    public double getLength() {
+        return length;
+    }
+
+    public void setLength(double length) {
+        this.length = length;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -115,5 +126,6 @@ public class MyPolyline extends MapObject implements Parcelable{
         dest.writeString(title);
         dest.writeString(description);
         dest.writeString(author);
+        dest.writeDouble(length);
     }
 }
