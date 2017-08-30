@@ -450,6 +450,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public boolean onMarkerClick(Marker marker) {
                 edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
                 myMap.setOnMarkerClickListener(null);
+                setInfoWindowFragmentListeners();
                 Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
                 intent.putExtra("task", task);
                 intent.putExtra("mapObject", task.getPointById((String) marker.getTag()));
@@ -463,6 +464,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onPolylineClick(Polyline polyline) {
                 edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
                 myMap.setOnPolylineClickListener(null);
+                setInfoWindowFragmentListeners();
                 Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
                 intent.putExtra("task", task);
                 intent.putExtra("mapObject", task.getPolylineById((String) polyline.getTag()));
@@ -475,6 +477,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onPolygonClick(Polygon polygon) {
                 edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
                 myMap.setOnPolygonClickListener(null);
+                setInfoWindowFragmentListeners();
                 Intent intent = new Intent(MapsActivity.this, EditMapObjectActivity.class);
                 intent.putExtra("task", task);
                 intent.putExtra("mapObject", task.getPolygonById((String) polygon.getTag()));
@@ -725,6 +728,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_3.setClickable(false);
                     trash.setVisibility(View.VISIBLE);
                     edit.setVisibility(View.VISIBLE);
+                    myMap.setOnMapClickListener(null);
+                    setInfoWindowFragmentListeners();
                     isOpen = false;
                 } else {
                     addObj_1.startAnimation(FabOpen);
@@ -766,6 +771,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
                     listPointsForPolygon.clear();
                     finishButton.setVisibility(View.GONE);
+                    setInfoWindowFragmentListeners();
                 }
             }
         });
@@ -795,6 +801,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
                     listPointsForPolyline.clear();
                     finishButton.setVisibility(View.GONE);
+                    setInfoWindowFragmentListeners();
                 }
             }
         });
