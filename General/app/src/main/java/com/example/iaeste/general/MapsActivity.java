@@ -872,6 +872,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                             .add(R.id.mMapView, infoWindowFragment)
                             .addToBackStack(null)
                             .commit();
+
+                    myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                        @Override
+                        public void onMapClick(LatLng latLng) {
+                            getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
+                        }
+                    });
                 }else{
                     getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
                 }
@@ -892,6 +899,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                             .add(R.id.mMapView, infoWindowFragment)
                             .addToBackStack(null)
                             .commit();
+
+                    myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                        @Override
+                        public void onMapClick(LatLng latLng) {
+                            getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
+                        }
+                    });
                 }else{
                     getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
                 }

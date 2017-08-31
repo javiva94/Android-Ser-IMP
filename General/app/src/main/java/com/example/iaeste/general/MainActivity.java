@@ -40,6 +40,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mTaskDatabaseReference;
+    private DatabaseReference mUserDatabaseReference;
     private ChildEventListener mChildEventListener;
 
     @Override
@@ -101,9 +103,16 @@ public class MainActivity extends AppCompatActivity {
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user != null){
+                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                if(firebaseUser != null){
                     // user is signed in
+                    mUserDatabaseReference = mFirebaseDatabase.getReference("users");
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("displayName", firebaseUser.getDisplayName());
+                    map.put("email", firebaseUser.getEmail());
+                    map.put("providerId", firebaseUser.getProviderId());
+                    mUserDatabaseReference.child(firebaseUser.getUid()).setValue(map);
+
                     Toast.makeText(MainActivity.this, "You are now signed in", Toast.LENGTH_SHORT).show();
                 }else{
                     //user is signed out
@@ -119,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
+
+
 
     private void firebaseDatabaseInit(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
