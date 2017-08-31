@@ -1,6 +1,10 @@
 package com.example.iaeste.general.Model;
 
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ViewHolder;
+
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +15,7 @@ import java.util.Map;
  * Created by franc on 31/8/2017.
  */
 
+@IgnoreExtraProperties
 public class User {
 
     private String uid;
