@@ -23,6 +23,7 @@ public class Task implements Parcelable {
     private List<MyPolygon> polygonList = new ArrayList<>();
     private String title;
     private String description;
+    private String owner_uid;
 
 
     public Task(){
@@ -31,8 +32,12 @@ public class Task implements Parcelable {
 
     protected Task(Parcel in) {
         key = in.readString();
+        owner_uid = in.readString();
         title = in.readString();
+        description = in.readString();
         in.readList(pointList, getClass().getClassLoader());
+        in.readList(polylineList, getClass().getClassLoader());
+        in.readList(polygonList, getClass().getClassLoader());
     }
 
     public static final Creator<Task> CREATOR = new Creator<Task>() {
@@ -50,9 +55,13 @@ public class Task implements Parcelable {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        //result.put("uid", uid);
-        //result.put("author", author);
+        result.put("key", key);
         result.put("title", title);
+        result.put("description", description);
+        result.put("owner_uid", owner_uid);
+        result.put("pointList", pointList);
+        result.put("polylineList", polylineList);
+        result.put("polygonList", polygonList);
 
         return result;
     }
@@ -63,6 +72,14 @@ public class Task implements Parcelable {
 
     public String getKey() {
         return key;
+    }
+
+    public void setOwner_uid(String owner_uid) {
+        this.owner_uid = owner_uid;
+    }
+
+    public String getOwner_uid() {
+        return owner_uid;
     }
 
     public String getTitle() {
@@ -113,8 +130,13 @@ public class Task implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(key);
+        dest.writeString(owner_uid);
         dest.writeString(title);
+        dest.writeString(description);
         dest.writeList(pointList);
+        dest.writeList(polylineList);
+        dest.writeList(polygonList);
+
     }
 
     public Point getPointById(String id){

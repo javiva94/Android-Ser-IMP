@@ -18,6 +18,7 @@ import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.Model.User;
 import com.example.iaeste.general.View.UsersViewAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 public class AddTaskActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mTaskDatabaseReference;
     private DatabaseReference mUserDatabaseReference;
 
@@ -40,6 +42,7 @@ public class AddTaskActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_task);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
         mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
         mUserDatabaseReference = mFirebaseDatabase.getReference("users");
 
@@ -56,6 +59,7 @@ public class AddTaskActivity extends AppCompatActivity {
         newTask.setTitle(taskTitle.getText().toString());
         mTaskDatabaseReference.child(key).setValue(newTask);
         newTask.setKey(key);
+        newTask.setOwner_uid(mFirebaseAuth.getCurrentUser().getUid());
 
         Intent intent = new Intent(AddTaskActivity.this , MapsActivity.class);
         intent.putExtra("task", newTask);
