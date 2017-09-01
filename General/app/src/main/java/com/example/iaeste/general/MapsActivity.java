@@ -824,6 +824,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 myMap.setOnPolygonClickListener(null);
                 finishButton.setVisibility(View.GONE);
                 trash.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
+                setInfoWindowFragmentListeners();
             }
         });
     }
