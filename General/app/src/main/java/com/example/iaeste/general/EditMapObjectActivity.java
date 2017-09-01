@@ -48,6 +48,13 @@ public class EditMapObjectActivity extends AppCompatActivity {
         task = (Task) intent.getParcelableExtra("task");
         mapObject = (MapObject) intent.getParcelableExtra("mapObject");
 
+
+
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+
         if(mapObject instanceof Point){
             showPointEdition((Point) mapObject);
         }else{
@@ -60,12 +67,19 @@ public class EditMapObjectActivity extends AppCompatActivity {
             }
         }
 
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
-
     }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case android.R.id.home: //hago un case por si en un futuro agrego mas opciones
+                    Log.i("ActionBar", "Atrás!");
+                    finish();
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        }
 
     private void showPointEdition(Point point){
         TextView latitude = (TextView) findViewById(R.id.latitudeTextView);
@@ -111,6 +125,11 @@ public class EditMapObjectActivity extends AppCompatActivity {
         }
     }
 
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         final MenuItem menuItem = menu.add(Menu.NONE, 1000, Menu.NONE, "Done");
@@ -118,16 +137,6 @@ public class EditMapObjectActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case 1000:
-                updateFirebase();
-                finish();
-                break;
-        }
-        return true;
-    }
 
     private void updateFirebase(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
