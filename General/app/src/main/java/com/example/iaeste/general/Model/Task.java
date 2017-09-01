@@ -24,6 +24,8 @@ public class Task implements Parcelable {
     private String title;
     private String description;
     private String owner_uid;
+    private List<String> readUsersPermission = new ArrayList<String>();
+    private List<String> writeUsersPermission = new ArrayList<String>();
 
 
     public Task(){
@@ -62,6 +64,8 @@ public class Task implements Parcelable {
         result.put("pointList", pointList);
         result.put("polylineList", polylineList);
         result.put("polygonList", polygonList);
+        result.put("readPermission", readUsersPermission);
+        result.put("writePermission", writeUsersPermission);
 
         return result;
     }
@@ -120,6 +124,22 @@ public class Task implements Parcelable {
 
     public void setPolygonList(List<MyPolygon> polygonList) {
         this.polygonList = polygonList;
+    }
+
+    public List<String> getReadUsersPermission() {
+        return readUsersPermission;
+    }
+
+    public void setReadUsersPermission(List<String> readUsersPermission) {
+        this.readUsersPermission = readUsersPermission;
+    }
+
+    public List<String> getWriteUsersPermission() {
+        return writeUsersPermission;
+    }
+
+    public void setWriteUsersPermission(List<String> writeUsersPermission) {
+        this.writeUsersPermission = writeUsersPermission;
     }
 
     @Override

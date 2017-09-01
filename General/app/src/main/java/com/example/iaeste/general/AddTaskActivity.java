@@ -6,9 +6,12 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewStub;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,12 +28,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AddTaskActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mTaskDatabaseReference;
     private DatabaseReference mUserDatabaseReference;
+
+    private List<User> userList = new ArrayList<>();
 
     private ViewStub stubList;
     private ListView listView;
@@ -46,20 +54,38 @@ public class AddTaskActivity extends AppCompatActivity {
         mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
         mUserDatabaseReference = mFirebaseDatabase.getReference("users");
 
-        showUsersList();
+        databaseUsersListInitialization();
 
-        usersVieListInitialization();
+        usersViewListInitialization();
 
     }
 
     public void addTask(View view){
         EditText taskTitle = (EditText) findViewById(R.id.taskTitle);
         String key = mTaskDatabaseReference.push().getKey();
+
         Task newTask = new Task();
         newTask.setTitle(taskTitle.getText().toString());
+        newTask.setOwner_uid(mFirebaseAuth.getCurrentUser().getUid());
         mTaskDatabaseReference.child(key).setValue(newTask);
         newTask.setKey(key);
-        newTask.setOwner_uid(mFirebaseAuth.getCurrentUser().getUid());
+
+        for(int i=0; i< usersViewAdapter.getCount(); i++){
+            String user_uid= usersViewAdapter.getItem(i).getUid();
+            if(usersViewAdapter.getReadPermissionCheck()[i]){
+                newTask.getReadUsersPermission().add(user_uid);
+              //  mTaskDatabaseReference.child(key).child("readPermission").push().setValue(user_uid);
+            }
+            if((usersViewAdapter.getWritePermissionCheck()[i])){
+                newTask.getWriteUsersPermission().add(user_uid);
+            }
+        }
+
+
+      //  mTaskDatabaseReference.child(key).child("readPermission").push().setValue(newTask.getReadUsersPermission());
+     //   mTaskDatabaseReference.child(key).child("readPermission").setValue(newTask.getReadUsersPermission());
+       // mTaskDatabaseReference.child(key).child("writePermission").setValue(newTask.getWriteUsersPermission());
+
 
         Intent intent = new Intent(AddTaskActivity.this , MapsActivity.class);
         intent.putExtra("task", newTask);
@@ -67,7 +93,7 @@ public class AddTaskActivity extends AppCompatActivity {
         finish();
     }
 
-    private void showUsersList(){
+    private void databaseUsersListInitialization(){
         mUserDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -86,7 +112,7 @@ public class AddTaskActivity extends AppCompatActivity {
         });
     }
 
-    private void usersVieListInitialization(){
+    private void usersViewListInitialization(){
         stubList = (ViewStub) findViewById(R.id.stub_List_users);
         stubList.inflate();
 
@@ -95,6 +121,5 @@ public class AddTaskActivity extends AppCompatActivity {
         usersViewAdapter = new UsersViewAdapter(this, R.layout.activity_add_task);
         listView.setAdapter(usersViewAdapter);
     }
-
 
 }
