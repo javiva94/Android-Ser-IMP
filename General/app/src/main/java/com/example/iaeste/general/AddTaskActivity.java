@@ -61,8 +61,7 @@ public class AddTaskActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home: //hago un case por si en un futuro agrego mas opciones
-                Log.i("ActionBar", "Atrás!");
+            case android.R.id.home: //make case to put something here in the future
                 finish();
                 return true;
             default:

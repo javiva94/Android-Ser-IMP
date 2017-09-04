@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     static final int VIEW_MODE_GRIDVIEW = 1;
 
     public static final int RC_SIGN_IN = 1;
+    private String usuario;
+    private String admin;
+    private String GroupCommander;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -95,6 +98,29 @@ public class MainActivity extends AppCompatActivity {
         firebaseDatabaseInit();
 
         taskListViewInitialization();
+usuario="GroupCommander";
+
+        if (usuario.equals("admin")) {
+            FloatingActionButton floatingAdminActivity = (FloatingActionButton) findViewById(R.id.AdminActivityBtn);
+            floatingAdminActivity.setVisibility(View.VISIBLE);
+            floatingAdminActivity.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(MainActivity.this, AdminActivity.class));
+                }
+            });
+        }
+
+        if (usuario.equals("GroupCommander")) {
+            FloatingActionButton floatingGroupCommanderActivity = (FloatingActionButton) findViewById(R.id.GroupCommanderActivityBtn);
+            floatingGroupCommanderActivity.setVisibility(View.VISIBLE);
+            floatingGroupCommanderActivity.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(MainActivity.this, GroupCommanderActivity.class));
+                }
+            });
+        }
     }
 
     private void firebaseAuthenticationInit(){
