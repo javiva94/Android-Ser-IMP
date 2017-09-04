@@ -16,19 +16,20 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class User {
+public class MyUser {
 
     private String uid;
     private String displayName;
     private String email;
     private String providerId;
     private List<String> groups = new ArrayList<>();
+    private String role;
 
-    public User(){
+    public MyUser(){
 
     }
 
-    public  User(String uid, String displayName){
+    public MyUser(String uid, String displayName){
         this.uid = uid;
         this.displayName = displayName;
     }
@@ -41,6 +42,7 @@ public class User {
         result.put("email", email);
         result.put("providerId", providerId);
         result.put("groups", groups);
+        result.put("role", role);
 
         return result;
     }
@@ -83,5 +85,13 @@ public class User {
 
     public void setGroups(List<String> groups) {
         this.groups = groups;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

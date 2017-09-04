@@ -12,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 
@@ -21,6 +22,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.iaeste.general.Model.MapObject;
+import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.GridViewAdapter;
 import com.example.iaeste.general.View.ListViewAdapter;
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int RC_SIGN_IN = 1;
 
     private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mTaskDatabaseReference;
@@ -92,7 +95,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         firebaseAuthenticationInit();
-        firebaseDatabaseInit();
+
+        firebaseUsersDatabaseInit();
+
+        firebaseTaskDatabaseInit();
 
         taskListViewInitialization();
     }
@@ -103,17 +109,33 @@ public class MainActivity extends AppCompatActivity {
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                if(firebaseUser != null){
+                mFirebaseUser = firebaseAuth.getCurrentUser();
+                if(mFirebaseUser != null){
                     // user is signed in
                     mUserDatabaseReference = mFirebaseDatabase.getReference("users");
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("displayName", firebaseUser.getDisplayName());
-                    map.put("email", firebaseUser.getEmail());
-                    map.put("providerId", firebaseUser.getProviderId());
-                    mUserDatabaseReference.child(firebaseUser.getUid()).setValue(map);
+                    mUserDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            MyUser user = dataSnapshot.child(mFirebaseUser.getUid()).getValue(MyUser.class);
+                            if (user == null) {
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("displayName", mFirebaseUser.getDisplayName());
+                                map.put("email", mFirebaseUser.getEmail());
+                                map.put("providerId", mFirebaseUser.getProviderId());
+                                map.put("role", "user");
+                                mUserDatabaseReference.child(mFirebaseUser.getUid()).setValue(map);
+                                Toast.makeText(MainActivity.this, "Se agrego un nuevo usuario a la BD", Toast.LENGTH_SHORT).show();
 
-                    Toast.makeText(MainActivity.this, "You are now signed in", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                   // Toast.makeText(MainActivity.this, "You are now signed in", Toast.LENGTH_SHORT).show();
                 }else{
                     //user is signed out
                     startActivityForResult(
@@ -124,14 +146,44 @@ public class MainActivity extends AppCompatActivity {
                                                     new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
                                     .build(),
                             RC_SIGN_IN);
+
                 }
             }
         };
     }
 
+    private void firebaseUsersDatabaseInit(){
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mUserDatabaseReference = mFirebaseDatabase.getReference("users");
 
+        mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                MyUser user = dataSnapshot.child(mFirebaseUser.getUid()).getValue(MyUser.class);
+                if(user!=null) {
+                    if (user.getRole().equals("admin")) {
+                        Toast.makeText(MainActivity.this, "Inició sesión el admin", Toast.LENGTH_LONG).show();
+                    } else {
+                        if (user.getRole().equals("group_commander")) {
+                            Toast.makeText(MainActivity.this, "Inició sesión un group commander", Toast.LENGTH_LONG).show();
+                        } else {
+                            if (user.getRole().equals("user")) {
+                                Toast.makeText(MainActivity.this, "Inició sesión un usuario", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                }
+            }
 
-    private void firebaseDatabaseInit(){
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void firebaseTaskDatabaseInit(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
 

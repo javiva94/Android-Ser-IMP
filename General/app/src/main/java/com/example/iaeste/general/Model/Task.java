@@ -29,7 +29,7 @@ public class Task implements Parcelable {
 
 
     public Task(){
-        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        // Default constructor required for calls to DataSnapshot.getValue(MyUser.class)
     }
 
     protected Task(Parcel in) {

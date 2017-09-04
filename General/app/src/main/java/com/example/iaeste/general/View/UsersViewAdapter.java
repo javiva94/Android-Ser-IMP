@@ -4,28 +4,21 @@ import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.iaeste.general.Model.Task;
-import com.example.iaeste.general.Model.User;
+import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by franc on 31/8/2017.
  */
 
-public class UsersViewAdapter extends ArrayAdapter<User> {
+public class UsersViewAdapter extends ArrayAdapter<MyUser> {
 
     private boolean[] readPermissionCheck;
     private boolean[] writePermissionCheck;
@@ -41,9 +34,9 @@ public class UsersViewAdapter extends ArrayAdapter<User> {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v =  inflater.inflate(R.layout.user_list_item, null);
         }
-        User user = getItem(position);
+        MyUser myUser = getItem(position);
         TextView userDisplayName = (TextView) v.findViewById(R.id.txtDisplayUser);
-        userDisplayName.setText(user.getDisplayName());
+        userDisplayName.setText(myUser.getDisplayName());
 
         readPermissionCheck = new boolean[super.getCount()];
         writePermissionCheck = new boolean[super.getCount()];
@@ -81,12 +74,12 @@ public class UsersViewAdapter extends ArrayAdapter<User> {
 
     @Nullable
     @Override
-    public User getItem(int position) {
+    public MyUser getItem(int position) {
         return super.getItem(position);
     }
 
     @Override
-    public void add(@Nullable User object) {
+    public void add(@Nullable MyUser object) {
         super.add(object);
     }
 
