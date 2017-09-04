@@ -27,6 +27,7 @@ import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.GridViewAdapter;
 import com.example.iaeste.general.View.ListViewAdapter;
 import com.example.iaeste.general.View.TaskViewAdapter;
+import com.example.iaeste.general.View.UsersViewAdapter;
 import com.firebase.ui.auth.*;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.*;
@@ -58,9 +59,7 @@ public class MainActivity extends AppCompatActivity {
     static final int VIEW_MODE_GRIDVIEW = 1;
 
     public static final int RC_SIGN_IN = 1;
-    private String usuario;
-    private String admin;
-    private String GroupCommander;
+    private String actualUserRole = "user";
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -69,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mTaskDatabaseReference;
     private DatabaseReference mUserDatabaseReference;
     private ChildEventListener mChildEventListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,29 +104,6 @@ public class MainActivity extends AppCompatActivity {
         firebaseTaskDatabaseInit();
 
         taskListViewInitialization();
-usuario="GroupCommander";
-
-        if (usuario.equals("admin")) {
-            FloatingActionButton floatingAdminActivity = (FloatingActionButton) findViewById(R.id.AdminActivityBtn);
-            floatingAdminActivity.setVisibility(View.VISIBLE);
-            floatingAdminActivity.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(MainActivity.this, AdminActivity.class));
-                }
-            });
-        }
-
-        if (usuario.equals("GroupCommander")) {
-            FloatingActionButton floatingGroupCommanderActivity = (FloatingActionButton) findViewById(R.id.GroupCommanderActivityBtn);
-            floatingGroupCommanderActivity.setVisibility(View.VISIBLE);
-            floatingGroupCommanderActivity.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(MainActivity.this, GroupCommanderActivity.class));
-                }
-            });
-        }
     }
 
     private void firebaseAuthenticationInit(){
@@ -151,7 +128,6 @@ usuario="GroupCommander";
                                 map.put("role", "user");
                                 mUserDatabaseReference.child(mFirebaseUser.getUid()).setValue(map);
                                 Toast.makeText(MainActivity.this, "Se agrego un nuevo usuario a la BD", Toast.LENGTH_SHORT).show();
-
                             }
                         }
 
@@ -172,7 +148,6 @@ usuario="GroupCommander";
                                                     new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
                                     .build(),
                             RC_SIGN_IN);
-
                 }
             }
         };
@@ -185,16 +160,36 @@ usuario="GroupCommander";
         mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                MyUser user = dataSnapshot.child(mFirebaseUser.getUid()).getValue(MyUser.class);
-                if(user!=null) {
-                    if (user.getRole().equals("admin")) {
-                        Toast.makeText(MainActivity.this, "Inició sesión el admin", Toast.LENGTH_LONG).show();
-                    } else {
-                        if (user.getRole().equals("group_commander")) {
-                            Toast.makeText(MainActivity.this, "Inició sesión un group commander", Toast.LENGTH_LONG).show();
+                if (mFirebaseUser != null) {
+                    MyUser user = dataSnapshot.child(mFirebaseUser.getUid()).getValue(MyUser.class);
+                    if (user != null) {
+                        if (user.getRole().equals("admin")) {
+                            actualUserRole = "admin";
+                            FloatingActionButton floatingAdminActivity = (FloatingActionButton) findViewById(R.id.AdminActivityBtn);
+                            floatingAdminActivity.setVisibility(View.VISIBLE);
+                            floatingAdminActivity.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    startActivity(new Intent(MainActivity.this, AdminActivity.class));
+                                }
+                            });
+                            Toast.makeText(MainActivity.this, "Inició sesión el admin", Toast.LENGTH_LONG).show();
                         } else {
-                            if (user.getRole().equals("user")) {
-                                Toast.makeText(MainActivity.this, "Inició sesión un usuario", Toast.LENGTH_LONG).show();
+                            if (user.getRole().equals("group_commander")) {
+                                actualUserRole = "group_commander";
+                                FloatingActionButton floatingGroupCommanderActivity = (FloatingActionButton) findViewById(R.id.GroupCommanderActivityBtn);
+                                floatingGroupCommanderActivity.setVisibility(View.VISIBLE);
+                                floatingGroupCommanderActivity.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        startActivity(new Intent(MainActivity.this, GroupCommanderActivity.class));
+                                    }
+                                });
+                                Toast.makeText(MainActivity.this, "Inició sesión un group commander", Toast.LENGTH_LONG).show();
+                            } else {
+                                if (user.getRole().equals("user")) {
+                                    Toast.makeText(MainActivity.this, "Inició sesión un usuario", Toast.LENGTH_LONG).show();
+                                }
                             }
                         }
                     }
