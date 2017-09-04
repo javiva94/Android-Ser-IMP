@@ -51,6 +51,8 @@
             android:label="@string/title_activity_maps" />
         <activity android:name=".AddTaskActivity" />
         <activity android:name=".EditMapObjectActivity"></activity>
+        <activity android:name=".AdminActivity"></activity>
+        <activity android:name=".GroupCommanderActivity"></activity>
     </application>
 
 </manifest>

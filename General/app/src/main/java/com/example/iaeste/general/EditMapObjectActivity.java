@@ -54,7 +54,6 @@ public class EditMapObjectActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
         if(mapObject instanceof Point){
             showPointEdition((Point) mapObject);
         }else{
@@ -69,17 +68,6 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     }
 
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            switch (item.getItemId()) {
-                case android.R.id.home: //hago un case por si en un futuro agrego mas opciones
-                    Log.i("ActionBar", "Atrás!");
-                    finish();
-                    return true;
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        }
 
     private void showPointEdition(Point point){
         TextView latitude = (TextView) findViewById(R.id.latitudeTextView);
@@ -135,6 +123,23 @@ public class EditMapObjectActivity extends AppCompatActivity {
         final MenuItem menuItem = menu.add(Menu.NONE, 1000, Menu.NONE, "Done");
         MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 1000:
+                updateFirebase();
+                finish();
+                break;
+            case android.R.id.home: //make case to put something here in the future
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
 
