@@ -106,10 +106,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         Toast.makeText(this, "id: " + task.getKey(), Toast.LENGTH_LONG).show();
 
-        if (getSupportActionBar() != null){
+
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
+
 
         setFloatingButtons();
 
@@ -825,6 +825,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 finishButton.setVisibility(View.GONE);
                 trash.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
                 setInfoWindowFragmentListeners();
+
+
+
             }
         });
     }
