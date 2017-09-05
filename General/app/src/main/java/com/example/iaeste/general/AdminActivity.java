@@ -2,6 +2,7 @@ package com.example.iaeste.general;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -11,6 +12,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
@@ -26,6 +29,7 @@ import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.UsersViewAdapter;
+import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -56,6 +60,9 @@ public class AdminActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mUserDatabaseReference = mFirebaseDatabase.getReference("users");
         mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         databaseUsersListInitialization();
 
@@ -105,6 +112,31 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.admin_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: //make case to put something here in the future
+                finish();
+                return true;
+            case R.id.add_group:
+                Intent intent = new Intent(AdminActivity.this, AddGroupActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+
 
     private void tabHostInitialization(){
         TabHost tabHost = (TabHost) findViewById(R.id.tab_host);

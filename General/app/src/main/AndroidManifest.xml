@@ -53,6 +53,7 @@
         <activity android:name=".EditMapObjectActivity" />
         <activity android:name=".AdminActivity" />
         <activity android:name=".GroupCommanderActivity" />
+        <activity android:name=".AddGroupActivity" />
     </application>
 
 </manifest>
