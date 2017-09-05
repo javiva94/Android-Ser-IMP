@@ -1,11 +1,15 @@
 package com.example.iaeste.general;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,9 +17,11 @@ import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
@@ -27,43 +33,47 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AdminActivity extends AppCompatActivity {
 
-    private FirebaseDatabase mFirebaseDatabase;
-    private FirebaseAuth mFirebaseAuth;
-    private DatabaseReference mUserDatabaseReference;
+    private ArrayList<MyUser> myUserList = new ArrayList<>();
+    private ArrayList<MyGroup> myGroupList = new ArrayList<>();
 
-    private ViewStub stubList;
-    private ListView listView;
-    private UsersViewAdapter usersViewAdapter;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mUserDatabaseReference;
+    private DatabaseReference mGroupDatabaseReference;
+
+    private UsersFragment usersFragment;
+    private GroupsFragment groupsFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_add_task);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setContentView(R.layout.activity_admin);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mFirebaseAuth = FirebaseAuth.getInstance();
         mUserDatabaseReference = mFirebaseDatabase.getReference("users");
+        mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
 
         databaseUsersListInitialization();
 
-        usersViewListInitialization();
+        databaseGroupListInitialization();
 
+        tabHostInitialization();
     }
 
     private void databaseUsersListInitialization(){
-        mUserDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
-                    Log.e("New element", markerChild.toString());
+                    Log.e("User element", markerChild.toString());
                     MyUser newMyUser = markerChild.getValue(MyUser.class);
-                    usersViewAdapter.add(newMyUser);
+                    if(!myUserList.contains(newMyUser)) {
+                        myUserList.add(newMyUser);
+                    }
 
                 }
             }
@@ -75,13 +85,70 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
 
-    private void usersViewListInitialization(){
-        stubList = (ViewStub) findViewById(R.id.stub_List_users);
-        stubList.inflate();
+    private void databaseGroupListInitialization(){
+        mGroupDatabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                    Log.e("Group element", markerChild.toString());
+                    MyGroup newMyGroup = markerChild.getValue(MyGroup.class);
+                    if(!myGroupList.contains(newMyGroup)) {
+                        myGroupList.add(newMyGroup);
+                    }
 
-        listView = (ListView) findViewById(R.id.myListview);
+                }
+            }
 
-        usersViewAdapter = new UsersViewAdapter(this, R.layout.activity_add_task);
-        listView.setAdapter(usersViewAdapter);
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void tabHostInitialization(){
+        TabHost tabHost = (TabHost) findViewById(R.id.tab_host);
+        tabHost.setup();
+
+        TabHost.TabSpec tabGroups = tabHost.newTabSpec("Groups");
+        TabHost.TabSpec tabUsers = tabHost.newTabSpec("Users");
+
+        tabGroups.setIndicator("Groups");
+        tabGroups.setContent(R.id.groups);
+
+        tabUsers.setIndicator("Users");
+        tabUsers.setContent(R.id.users);
+
+        tabHost.addTab(tabGroups);
+        tabHost.addTab(tabUsers);
+
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                if(tabId.equals("Groups")){
+                    groupsFragment = new GroupsFragment();
+
+                    Bundle args = new Bundle();
+                    args.putParcelableArrayList("groupsList", myGroupList);
+                    groupsFragment.setArguments(args);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.groups, groupsFragment)
+                            .commit();
+                }
+                if(tabId.equals("Users")){
+                    usersFragment = new UsersFragment();
+
+                    Bundle args = new Bundle();
+                    args.putParcelableArrayList("usersList", myUserList);
+                    usersFragment.setArguments(args);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.users, usersFragment)
+                            .commit();
+                }
+            }
+        });
+
     }
 }

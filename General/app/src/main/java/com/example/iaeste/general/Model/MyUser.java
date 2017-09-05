@@ -1,5 +1,7 @@
 package com.example.iaeste.general.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 
@@ -16,7 +18,7 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class MyUser {
+public class MyUser implements Parcelable{
 
     private String uid;
     private String displayName;
@@ -33,6 +35,27 @@ public class MyUser {
         this.uid = uid;
         this.displayName = displayName;
     }
+
+    protected MyUser(Parcel in) {
+        uid = in.readString();
+        displayName = in.readString();
+        email = in.readString();
+        providerId = in.readString();
+        groups = in.createStringArrayList();
+        role = in.readString();
+    }
+
+    public static final Creator<MyUser> CREATOR = new Creator<MyUser>() {
+        @Override
+        public MyUser createFromParcel(Parcel in) {
+            return new MyUser(in);
+        }
+
+        @Override
+        public MyUser[] newArray(int size) {
+            return new MyUser[size];
+        }
+    };
 
     @Exclude
     public Map<String, Object> toMap() {
@@ -93,5 +116,20 @@ public class MyUser {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(uid);
+        dest.writeString(displayName);
+        dest.writeString(email);
+        dest.writeString(providerId);
+        dest.writeStringList(groups);
+        dest.writeString(role);
     }
 }
