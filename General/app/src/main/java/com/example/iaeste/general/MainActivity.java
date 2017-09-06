@@ -1,19 +1,15 @@
 package com.example.iaeste.general;
 
-import android.app.Activity;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
 
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Menu;
 
 import android.view.MenuInflater;
@@ -21,15 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.iaeste.general.Model.MapObject;
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.GridViewAdapter;
 import com.example.iaeste.general.View.ListViewAdapter;
 import com.example.iaeste.general.View.TaskViewAdapter;
-import com.example.iaeste.general.View.UsersViewAdapter;
 import com.firebase.ui.auth.*;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.*;
 import com.google.firebase.database.*;
 

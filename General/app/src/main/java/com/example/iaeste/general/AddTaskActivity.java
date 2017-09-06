@@ -12,7 +12,7 @@ import android.widget.ListView;
 
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.Model.Task;
-import com.example.iaeste.general.View.UsersViewAdapter;
+import com.example.iaeste.general.View.UsersPermissionsViewAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,7 +34,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
     private ViewStub stubList;
     private ListView listView;
-    private UsersViewAdapter usersViewAdapter;
+    private UsersPermissionsViewAdapter usersPermissionsViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,12 +76,12 @@ public class AddTaskActivity extends AppCompatActivity {
         newTask.setTitle(taskTitle.getText().toString());
         newTask.setOwner_uid(mFirebaseAuth.getCurrentUser().getUid());
 
-        for(int i=0; i< usersViewAdapter.getCount(); i++){
-            String user_uid= usersViewAdapter.getItem(i).getUid();
-            if(usersViewAdapter.getReadPermissionCheck()[i]){
+        for(int i = 0; i< usersPermissionsViewAdapter.getCount(); i++){
+            String user_uid= usersPermissionsViewAdapter.getItem(i).getUid();
+            if(usersPermissionsViewAdapter.getReadPermissionCheck()[i]){
                 newTask.getReadUsersPermission().add(user_uid);
             }
-            if((usersViewAdapter.getWritePermissionCheck()[i])){
+            if((usersPermissionsViewAdapter.getWritePermissionCheck()[i])){
                 newTask.getWriteUsersPermission().add(user_uid);
             }
         }
@@ -102,7 +102,7 @@ public class AddTaskActivity extends AppCompatActivity {
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("New element", markerChild.toString());
                     MyUser newMyUser = markerChild.getValue(MyUser.class);
-                    usersViewAdapter.add(newMyUser);
+                    usersPermissionsViewAdapter.add(newMyUser);
 
                 }
             }
@@ -120,8 +120,8 @@ public class AddTaskActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.myListview);
 
-        usersViewAdapter = new UsersViewAdapter(this, R.layout.activity_add_task);
-        listView.setAdapter(usersViewAdapter);
+        usersPermissionsViewAdapter = new UsersPermissionsViewAdapter(this, R.layout.activity_add_task);
+        listView.setAdapter(usersPermissionsViewAdapter);
     }
 
 }

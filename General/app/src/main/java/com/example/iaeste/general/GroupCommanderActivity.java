@@ -7,25 +7,13 @@ package com.example.iaeste.general;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewStub;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.iaeste.general.Model.MyUser;
-import com.example.iaeste.general.Model.Point;
-import com.example.iaeste.general.Model.Task;
-import com.example.iaeste.general.View.UsersViewAdapter;
+import com.example.iaeste.general.View.UsersPermissionsViewAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +29,7 @@ public class GroupCommanderActivity extends AppCompatActivity {
 
     private ViewStub stubList;
     private ListView listView;
-    private UsersViewAdapter usersViewAdapter;
+    private UsersPermissionsViewAdapter usersPermissionsViewAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +57,7 @@ public class GroupCommanderActivity extends AppCompatActivity {
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("New element", markerChild.toString());
                     MyUser newMyUser = markerChild.getValue(MyUser.class);
-                    usersViewAdapter.add(newMyUser);
+                    usersPermissionsViewAdapter.add(newMyUser);
 
                 }
             }
@@ -87,8 +75,8 @@ public class GroupCommanderActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.myListview);
 
-        usersViewAdapter = new UsersViewAdapter(this, R.layout.activity_add_task);
-        listView.setAdapter(usersViewAdapter);
+        usersPermissionsViewAdapter = new UsersPermissionsViewAdapter(this, R.layout.activity_add_task);
+        listView.setAdapter(usersPermissionsViewAdapter);
     }
 
 }

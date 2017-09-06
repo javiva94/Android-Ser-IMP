@@ -63,9 +63,6 @@ public class UsersFragment extends Fragment {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             myUserList = getArguments().getParcelableArrayList("usersList");
         }
-
-
-
     }
 
     @Override

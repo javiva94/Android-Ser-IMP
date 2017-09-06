@@ -18,12 +18,12 @@ import com.example.iaeste.general.R;
  * Created by franc on 31/8/2017.
  */
 
-public class UsersViewAdapter extends ArrayAdapter<MyUser> {
+public class UsersPermissionsViewAdapter extends ArrayAdapter<MyUser> {
 
     private boolean[] readPermissionCheck;
     private boolean[] writePermissionCheck;
 
-    public UsersViewAdapter(@NonNull Context context, @LayoutRes int resource) {
+    public UsersPermissionsViewAdapter(@NonNull Context context, @LayoutRes int resource) {
         super(context, resource);
     }
 

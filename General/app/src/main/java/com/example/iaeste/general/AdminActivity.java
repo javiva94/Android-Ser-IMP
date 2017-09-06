@@ -1,36 +1,17 @@
 package com.example.iaeste.general;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewStub;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.Model.MyUser;
-import com.example.iaeste.general.Model.Point;
-import com.example.iaeste.general.Model.Task;
-import com.example.iaeste.general.View.UsersViewAdapter;
-import com.firebase.ui.auth.AuthUI;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +19,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AdminActivity extends AppCompatActivity {
 
@@ -128,6 +108,7 @@ public class AdminActivity extends AppCompatActivity {
                 return true;
             case R.id.add_group:
                 Intent intent = new Intent(AdminActivity.this, AddGroupActivity.class);
+                intent.putParcelableArrayListExtra("usersList", myUserList);
                 startActivity(intent);
                 break;
             default:
