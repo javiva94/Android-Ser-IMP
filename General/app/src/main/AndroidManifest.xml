@@ -54,6 +54,7 @@
         <activity android:name=".AdminActivity" />
         <activity android:name=".GroupCommanderActivity" />
         <activity android:name=".AddGroupActivity" />
+        <activity android:name=".AddUserActivity" />
     </application>
 
 </manifest>
