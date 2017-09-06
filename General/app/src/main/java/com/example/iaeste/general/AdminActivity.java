@@ -111,6 +111,10 @@ public class AdminActivity extends AppCompatActivity {
                 intent.putParcelableArrayListExtra("usersList", myUserList);
                 startActivity(intent);
                 break;
+            case R.id.add_user:
+                Intent intent1 = new Intent(AdminActivity.this, AddUserActivity.class);
+                startActivity(intent1);
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }

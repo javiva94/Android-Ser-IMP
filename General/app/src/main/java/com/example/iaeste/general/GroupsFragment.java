@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.View.MyGroupsRecyclerViewAdapter;
-import com.example.iaeste.general.dummy.DummyContent;
-import com.example.iaeste.general.dummy.DummyContent.DummyItem;
 
 import java.util.List;
 

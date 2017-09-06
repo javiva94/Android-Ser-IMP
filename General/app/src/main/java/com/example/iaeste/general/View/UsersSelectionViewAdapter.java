@@ -14,13 +14,18 @@ import android.widget.TextView;
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by franc on 6/9/2017.
  */
 
 public class UsersSelectionViewAdapter extends ArrayAdapter<MyUser> {
 
-    private boolean[] usersSelected;
+    private boolean[] usersSelection;
+
+     private List<MyUser> usersSelected;
 
     public UsersSelectionViewAdapter(@NonNull Context context, @LayoutRes int resource) {
         super(context, resource);
@@ -37,9 +42,9 @@ public class UsersSelectionViewAdapter extends ArrayAdapter<MyUser> {
         TextView userDisplayName = (TextView) v.findViewById(R.id.txtDisplayUser);
         userDisplayName.setText(myUser.getDisplayName());
 
-        usersSelected = new boolean[super.getCount()];
+        usersSelection = new boolean[super.getCount()];
         for (int i=0; i < super.getCount(); i++){
-            usersSelected[i] = false;
+            usersSelection[i] = false;
         }
 
         final CheckBox selectedCheckBox = (CheckBox) v.findViewById(R.id.selectedCheckBox);
@@ -47,9 +52,9 @@ public class UsersSelectionViewAdapter extends ArrayAdapter<MyUser> {
             @Override
             public void onClick(View v) {
                 if(selectedCheckBox.isChecked()) {
-                    usersSelected[position] = true;
+                    usersSelection[position] = true;
                 }else{
-                    usersSelected[position] = false;
+                    usersSelection[position] = false;
                 }
             }
         });
@@ -68,8 +73,12 @@ public class UsersSelectionViewAdapter extends ArrayAdapter<MyUser> {
         super.add(object);
     }
 
-    public boolean[] getUsersSelected() {
+    public List<MyUser> getUsersSelected() {
+        usersSelected = new ArrayList<>();
+        for(int i=0; i<usersSelection.length; i++){
+            if(usersSelection[i] == true)
+                usersSelected.add(super.getItem(i));
+        }
         return usersSelected;
     }
-
 }

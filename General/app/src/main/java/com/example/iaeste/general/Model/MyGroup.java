@@ -16,6 +16,16 @@ public class MyGroup implements Parcelable {
     private List<MyUser> members;
     private String owner_uid;
 
+    public MyGroup (){
+
+    }
+
+    public MyGroup (String displayName, List<MyUser> members, String owner_uid){
+        this.displayName = displayName;
+        this.members = members;
+        this.owner_uid = owner_uid;
+    }
+
     protected MyGroup(Parcel in) {
         uid = in.readString();
         displayName = in.readString();
