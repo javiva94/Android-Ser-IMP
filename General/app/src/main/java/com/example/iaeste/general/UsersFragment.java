@@ -2,17 +2,24 @@ package com.example.iaeste.general;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.View.MyUsersRecyclerViewAdapter;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,7 +43,12 @@ public class UsersFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
-    private ArrayList<MyUser> myUserList;
+    private ArrayList<MyUser> myUserList = new ArrayList<>();
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mUserDatabaseReference;
+
+    MyUsersRecyclerViewAdapter myUsersRecyclerViewAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -61,8 +73,12 @@ public class UsersFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            myUserList = getArguments().getParcelableArrayList("usersList");
         }
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mUserDatabaseReference = mFirebaseDatabase.getReference("users");
+
+        databaseUsersListInitialization();
     }
 
     @Override
@@ -79,8 +95,10 @@ public class UsersFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyUsersRecyclerViewAdapter(myUserList, mListener));
+            myUsersRecyclerViewAdapter = new MyUsersRecyclerViewAdapter(myUserList, mListener);
+            recyclerView.setAdapter(myUsersRecyclerViewAdapter);
         }
+
         return view;
     }
 
@@ -89,6 +107,7 @@ public class UsersFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -104,4 +123,37 @@ public class UsersFragment extends Fragment {
         // TODO: Update argument type and name
         void onListFragmentInteraction(MyUser item);
     }
+
+    private void databaseUsersListInitialization(){
+        mUserDatabaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                MyUser newMyUser = dataSnapshot.getValue(MyUser.class);
+                newMyUser.setUid(dataSnapshot.getKey());
+                myUsersRecyclerViewAdapter.addValue(newMyUser);
+                myUsersRecyclerViewAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 }

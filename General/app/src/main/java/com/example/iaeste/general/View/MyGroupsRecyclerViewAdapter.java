@@ -4,11 +4,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.iaeste.general.GroupsFragment.OnListFragmentInteractionListener;
 import com.example.iaeste.general.R;
 import com.example.iaeste.general.Model.MyGroup;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
@@ -35,10 +38,24 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).getUid());
+        holder.mIdView.setText(mValues.get(position).getId());
         holder.mContentView.setText(mValues.get(position).getDisplayName());
+
+        holder.mDeleteGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference mGroupDatabaseReference = FirebaseDatabase.getInstance().getReference("groups");
+                mGroupDatabaseReference.child((String) mValues.get(position).getId()).removeValue();
+
+                mValues.remove(position);
+                notifyItemRemoved(position);
+                //this line below gives you the animation and also updates the
+                //list items after the deleted item
+                notifyItemRangeChanged(position, getItemCount());
+            }
+        });
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +78,7 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
+        public final Button mDeleteGroup;
         public MyGroup mItem;
 
         public ViewHolder(View view) {
@@ -68,11 +86,16 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
+            mDeleteGroup = (Button) view.findViewById(R.id.delete_group);
         }
 
         @Override
         public String toString() {
             return super.toString() + " '" + mContentView.getText() + "'";
         }
+    }
+
+    public void addValue(MyGroup myGroup){
+        mValues.add(myGroup);
     }
 }

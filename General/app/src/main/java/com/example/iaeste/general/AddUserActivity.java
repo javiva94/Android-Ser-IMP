@@ -6,22 +6,31 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewStub;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.Model.MyUser;
+import com.example.iaeste.general.View.ListSelectionViewAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,11 +39,19 @@ import java.util.Map;
 
 public class AddUserActivity extends AppCompatActivity {
 
+    private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+    private DatabaseReference mGroupDatabaseReference;
+    private DatabaseReference mUserDatabaseReference;
 
     private EditText userName;
     private EditText userEmail;
     private EditText userPassword;
+
+    private ViewStub stubList;
+    private ListView listView;
+    private ListSelectionViewAdapter listSelectionViewAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,12 +61,52 @@ public class AddUserActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        userName = (EditText) findViewById(R.id.user_name);
+        mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
+        mUserDatabaseReference = mFirebaseDatabase.getReference("users");
+
+        userName = (EditText) findViewById(R.id.content);
         userEmail = (EditText) findViewById(R.id.user_email);
         userPassword = (EditText) findViewById(R.id.user_password);
 
+        databaseGroupsListInitialization();
+
+        groupsViewListInitialization();
+
+    }
+
+    private void databaseGroupsListInitialization(){
+        mGroupDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                    Log.e("New element", markerChild.toString());
+                    MyGroup newMyGroup = markerChild.getValue(MyGroup.class);
+                    newMyGroup.setId(markerChild.getKey());
+                    listSelectionViewAdapter.add(newMyGroup);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void groupsViewListInitialization(){
+        stubList = (ViewStub) findViewById(R.id.stub_list);
+        stubList.inflate();
+
+        listView = (ListView) findViewById(R.id.myListview);
+
+        listSelectionViewAdapter = new ListSelectionViewAdapter<MyGroup>(this, R.layout.activity_add_user);
+        listView.setAdapter(listSelectionViewAdapter);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @Override
@@ -90,6 +147,7 @@ public class AddUserActivity extends AppCompatActivity {
                                    .setDisplayName(userName.getText().toString()).build();
                            user.updateProfile(profileUpdates);
                        }
+                       addUserToDatabase();
                        Intent intent = new Intent(AddUserActivity.this, MainActivity.class);
                        startActivity(intent);
                    }
@@ -102,4 +160,23 @@ public class AddUserActivity extends AppCompatActivity {
                });
     }
 
+    private void addUserToDatabase(){
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+
+        MyUser myUser = new MyUser();
+        myUser.setDisplayName(userName.getText().toString());
+        myUser.setEmail(userEmail.getText().toString());
+        myUser.setProviderId(mFirebaseUser.getProviderId());
+        myUser.setRole("user");
+        mUserDatabaseReference.child(mFirebaseUser.getUid()).setValue(myUser);
+
+        for(MyGroup myGroup : (List<MyGroup>)listSelectionViewAdapter.getItemSelected()){
+            myGroup.getMembers().add(myUser);
+            Map<String, Object> childUpdates = new HashMap<>();
+            Map<String, Object> myGroupValues = myGroup.toMap();
+            childUpdates.put(myGroup.getId(), myGroupValues);
+            mGroupDatabaseReference.updateChildren(childUpdates);
+        }
+
+    }
 }

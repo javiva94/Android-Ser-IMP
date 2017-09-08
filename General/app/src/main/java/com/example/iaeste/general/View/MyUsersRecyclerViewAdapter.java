@@ -1,14 +1,25 @@
 package com.example.iaeste.general.View;
 
+import android.content.Context;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.iaeste.general.AdminActivity;
+import com.example.iaeste.general.MainActivity;
 import com.example.iaeste.general.R;
+import com.example.iaeste.general.UsersFragment;
 import com.example.iaeste.general.UsersFragment.OnListFragmentInteractionListener;
 import com.example.iaeste.general.Model.MyUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
@@ -35,10 +46,24 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).getDisplayName());
         holder.mContentView.setText(mValues.get(position).getRole());
+
+        holder.mDeleteUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference mUserDatabaseReference = FirebaseDatabase.getInstance().getReference("users");
+                mUserDatabaseReference.child((String) mValues.get(position).getUid()).removeValue();
+//ELIMINAR USUARIO DE AUTH!!!!
+                mValues.remove(position);
+                notifyItemRemoved(position);
+                //this line below gives you the animation and also updates the
+                //list items after the deleted item
+                notifyItemRangeChanged(position, getItemCount());
+            }
+        });
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,13 +86,15 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
+        public final Button mDeleteUser;
         public MyUser mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.user_name);
+            mIdView = (TextView) view.findViewById(R.id.content);
             mContentView = (TextView) view.findViewById(R.id.role);
+            mDeleteUser = (Button) view.findViewById(R.id.delete_user);
         }
 
         @Override
@@ -75,4 +102,10 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
             return super.toString() + " '" + mContentView.getText() + "'";
         }
     }
+
+
+    public void addValue(MyUser myUser){
+        mValues.add(myUser);
+    }
+
 }
