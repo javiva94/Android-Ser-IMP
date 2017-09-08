@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         taskList = new ArrayList<Task>();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Tasks");
+        toolbar.setTitle(R.string.tlb3);
         setSupportActionBar(toolbar);
 
        /* FloatingActionButton floatingMapButton = (FloatingActionButton) findViewById(R.id.showMapBtn);
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                                 map.put("providerId", mFirebaseUser.getProviderId());
                                 map.put("role", "user");
                                 mUserDatabaseReference.child(mFirebaseUser.getUid()).setValue(map);
-                                Toast.makeText(MainActivity.this, "Se agrego un nuevo usuario a la BD", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, R.string.toast3, Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                                     startActivity(new Intent(MainActivity.this, AdminActivity.class));
                                 }
                             });
-                            Toast.makeText(MainActivity.this, "Inició sesión el admin", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, R.string.toast4, Toast.LENGTH_LONG).show();
                         } else {
                             if (user.getRole().equals("group_commander")) {
                                 actualUserRole = "group_commander";
@@ -178,10 +178,10 @@ public class MainActivity extends AppCompatActivity {
                                         startActivity(new Intent(MainActivity.this, GroupCommanderActivity.class));
                                     }
                                 });
-                                Toast.makeText(MainActivity.this, "Inició sesión un group commander", Toast.LENGTH_LONG).show();
+                                Toast.makeText(MainActivity.this, R.string.toast5, Toast.LENGTH_LONG).show();
                             } else {
                                 if (user.getRole().equals("user")) {
-                                    Toast.makeText(MainActivity.this, "Inició sesión un usuario", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(MainActivity.this, R.string.toast6, Toast.LENGTH_LONG).show();
                                 }
                             }
                         }
@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 deleteTask(position);
-                Toast.makeText(MainActivity.this, "Delete task: "+position, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.toast7+position, Toast.LENGTH_SHORT).show();
                 return true;
             }
         });
@@ -323,9 +323,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == RC_SIGN_IN){
             if(requestCode == RESULT_OK){
-                Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast8, Toast.LENGTH_SHORT).show();
             }else if (resultCode == RESULT_CANCELED){
-                Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast9, Toast.LENGTH_SHORT).show();
                 finish();
                 }
             }

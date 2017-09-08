@@ -72,11 +72,11 @@ public class EditMapObjectActivity extends AppCompatActivity {
     private void showPointEdition(Point point){
         TextView latitude = (TextView) findViewById(R.id.latitudeTextView);
         TextView longitude = (TextView) findViewById(R.id.longitudeTextView);
-        latitude.setText("Latitude: "+String.valueOf(point.getPosition().getLatitude()));
-        longitude.setText("Longitude: "+String.valueOf(point.getPosition().getLongitude()));
+        latitude.setText(R.string.Lat+String.valueOf(point.getPosition().getLatitude()));
+        longitude.setText(R.string.Long+String.valueOf(point.getPosition().getLongitude()));
 
         TextView author = (TextView) findViewById(R.id.authorTextView);
-        author.setText("Author: "+point.getAuthor());
+        author.setText(R.string.Author+point.getAuthor());
 
         EditText title = (EditText) findViewById(R.id.title);
         EditText description = (EditText) findViewById(R.id.description);
@@ -91,7 +91,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     private void showPolylineEdition(MyPolyline polyline){
         TextView author = (TextView) findViewById(R.id.authorTextView);
-        author.setText("Author: "+polyline.getAuthor());
+        author.setText(R.string.Author+polyline.getAuthor());
 
         if(polyline.getTitle()!=null) {
             title.setText(polyline.getTitle());
@@ -103,7 +103,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     private void showPolygonEdition(MyPolygon polygon){
         TextView author = (TextView) findViewById(R.id.authorTextView);
-        author.setText("Author: "+polygon.getAuthor());
+        author.setText(R.string.Author+polygon.getAuthor());
 
         if(polygon.getTitle()!=null) {
             title.setText(polygon.getTitle());
@@ -120,7 +120,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        final MenuItem menuItem = menu.add(Menu.NONE, 1000, Menu.NONE, "Done");
+        final MenuItem menuItem = menu.add(Menu.NONE, 1000, Menu.NONE, R.string.tlb2);
         MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return super.onCreateOptionsMenu(menu);
     }

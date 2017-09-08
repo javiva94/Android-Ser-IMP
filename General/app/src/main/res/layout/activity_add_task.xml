@@ -14,7 +14,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:hint="Title"
+        android:hint="@string/edt2"
         android:padding="20dp"
         android:selectAllOnFocus="true"
         android:textAllCaps="false"
@@ -26,7 +26,8 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintHorizontal_bias="0.0"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/writeTextView" />
+        app:layout_constraintBottom_toTopOf="@+id/writeTextView"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/addTask"
@@ -35,11 +36,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="8dp"
-
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:onClick="addTask"
-        android:text="ADD TASK"
+        android:text="@string/btn1"
         android:textColor="@color/common_google_signin_btn_text_dark_default"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
@@ -48,7 +48,7 @@
         android:id="@+id/readTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Read"
+        android:text="@string/txt1"
         android:textAlignment="center"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -64,7 +64,7 @@
         android:id="@+id/writeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Write"
+        android:text="@string/txt2"
         app:layout_constraintLeft_toRightOf="@+id/readTextView"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"

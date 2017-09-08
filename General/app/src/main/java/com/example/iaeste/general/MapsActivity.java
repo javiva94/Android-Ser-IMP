@@ -117,8 +117,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         // Create Progress Bar.
         myProgress = new ProgressDialog(this);
-        myProgress.setTitle("Map Loading ...");
-        myProgress.setMessage("Please wait...");
+        myProgress.setTitle(R.string.load);
         myProgress.setCancelable(true);
         // Display Progress Bar.
         myProgress.show();
@@ -264,21 +263,21 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     if (markerChild.getKey().equals("Point")) {
                         Point pointToRemove = markerChild.getValue(Point.class);
                         removePoint(pointToRemove);
-                        Toast.makeText(MapsActivity.this, "Se ha eliminado un punto de interes.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this,R.string.point, Toast.LENGTH_SHORT).show();
                     }
 
                     //Linea
                     if(markerChild.getKey().equals("Polyline")){
                         MyPolyline myPolylineToRemove = markerChild.getValue(MyPolyline.class);
                         removePolyline(myPolylineToRemove);
-                        Toast.makeText(MapsActivity.this, "Se ha eliminado una polilinea.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this, R.string.polyline, Toast.LENGTH_SHORT).show();
                     }
 
                     //Poligono
                     if (markerChild.getKey().equals("Polygon")){
                         MyPolygon polygonToRemove = markerChild.getValue(MyPolygon.class);
                         removePolygon(polygonToRemove);
-                        Toast.makeText(MapsActivity.this, "Se ha eliminado un polígono.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this,R.string.polygon, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -530,14 +529,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
-                    Toast.makeText(this, "Permission granted!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,R.string.per1, Toast.LENGTH_LONG).show();
 
                     // Show current location on Map.
                     this.showMyLocation();
                 }
                 // Cancelled or denied.
                 else {
-                    Toast.makeText(this, "Permission denied!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this,R.string.per2, Toast.LENGTH_LONG).show();
                 }
                 break;
             }
@@ -558,7 +557,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         boolean enabled = locationManager.isProviderEnabled(bestProvider);
 
         if (!enabled) {
-            Toast.makeText(this, "No location provider enabled!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,R.string.per3, Toast.LENGTH_LONG).show();
             Log.i(MYTAG, "No location provider enabled!");
             return null;
         }

@@ -13,7 +13,7 @@
 
         <TextView
             android:id="@+id/tv_title"
-            android:text="address title"
+            android:text="@string/edt2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
    />
@@ -21,7 +21,7 @@
 
         <TextView
             android:id="@+id/tv_lat"
-            android:text="latitude"
+            android:text="@string/Lat"
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -29,7 +29,7 @@
 
         <TextView
             android:id="@+id/tv_lng"
-            android:text="longtitude"
+            android:text="@string/Long"
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

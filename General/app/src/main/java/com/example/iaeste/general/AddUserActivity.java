@@ -65,7 +65,7 @@ public class AddUserActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        final MenuItem createUserMenuItem = menu.add(Menu.NONE, 1000, Menu.NONE, "Create");
+        final MenuItem createUserMenuItem = menu.add(Menu.NONE, 1000, Menu.NONE, R.string.tlb1);
         MenuItemCompat.setShowAsAction(createUserMenuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         createUserMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -83,7 +83,7 @@ public class AddUserActivity extends AppCompatActivity {
                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                    @Override
                    public void onSuccess(AuthResult authResult) {
-                       Toast.makeText(AddUserActivity.this, "Successfully created new user", Toast.LENGTH_SHORT).show();
+                       Toast.makeText(AddUserActivity.this, R.string.toast1, Toast.LENGTH_SHORT).show();
                        FirebaseUser user = mFirebaseAuth.getCurrentUser();
                        if (user != null) {
                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -97,7 +97,7 @@ public class AddUserActivity extends AppCompatActivity {
                .addOnFailureListener(new OnFailureListener() {
                    @Override
                    public void onFailure(@NonNull Exception e) {
-                       Toast.makeText(AddUserActivity.this, "Falied creating new user", Toast.LENGTH_SHORT).show();
+                       Toast.makeText(AddUserActivity.this, R.string.toast2, Toast.LENGTH_SHORT).show();
                    }
                });
     }

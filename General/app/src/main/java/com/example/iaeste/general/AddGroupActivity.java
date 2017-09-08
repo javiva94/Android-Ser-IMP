@@ -3,6 +3,7 @@ package com.example.iaeste.general;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -105,7 +106,7 @@ public class AddGroupActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        final MenuItem createGroupMenuItem= menu.add(Menu.NONE, 1000, Menu.NONE, "Create");
+        final MenuItem createGroupMenuItem= menu.add(Menu.NONE, 1000, Menu.NONE,R.string.tlb1);
         MenuItemCompat.setShowAsAction(createGroupMenuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         createGroupMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override

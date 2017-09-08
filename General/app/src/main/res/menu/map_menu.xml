@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/Menu_typeNone"
-        android:title="None" />
+        android:title="@string/menu4" />
     <item
         android:id="@+id/Menu_typeNormal"
-        android:title="Normal"/>
+        android:title="@string/menu5"/>
     <item
         android:id="@+id/Menu_typeTerrain"
-        android:title="Terrain"/>
+        android:title="@string/menu6"/>
     <item
         android:id="@+id/Menu_typeSatellite"
-        android:title="Satellite"/>
+        android:title="@string/menu7"/>
     <item
         android:id="@+id/Menu_typeHybrid"
-        android:title="Hybrid"/>
+        android:title="@string/menu8"/>
 </menu>

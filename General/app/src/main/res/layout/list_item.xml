@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtTitle"
-        android:text="Title"
+        android:text="@string/edt2"
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_toRightOf="@id/imageView"
@@ -32,7 +32,7 @@
         android:id="@+id/txtDescription"
         android:layout_below="@id/txtTitle"
         android:layout_marginLeft="80dp"
-        android:text="Description"
+        android:text="@string/Des"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_marginTop="10dp"/>
 </RelativeLayout>

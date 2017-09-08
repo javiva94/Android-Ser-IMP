@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">General</string>
+    <string name="title_activity_main">Actividad Principal</string>
+    <string name="title_activity_maps">Mapa</string>
+    <string name="sign_out">Cerrar Sesión</string>
+    <string name="menu1">crear grupo</string>
+    <string name="menu2">crear usuario</string>
+    <string name="menu3">Cambiar vista</string>
+    <string name="menu4">nada</string>
+    <string name="menu5">Normal</string>
+    <string name="menu6">Terreno</string>
+    <string name="menu7">Satélite</string>
+    <string name="menu8">Híbrido</string>
+    <string name="menu9">Borrar</string>
+    <string name="edt1">Titulo del grupo</string>
+    <string name="tlb1">Crear</string>
+    <string name="toast1">Nuevo usuario creado correctamente</string>
+    <string name="toast2">Error al crear un nuevo usuario</string>
+    <string name="tlb2">Hecho</string>
+    <string name="Author">Autor: </string>
+    <string name="Lat">Latitud: </string>
+    <string name="Long">Longitud: </string>
+    <string name="tlb3">Tarea</string>
+    <string name="toast3">Se agrego un nuevo usuario a la BD</string>
+    <string name="toast4">Inició sesión administrador</string>
+    <string name="toast5">Inició sesión Lider del grupo</string>
+    <string name="toast6">Inició sesión usuario</string>
+    <string name="toast7">Eliminar tarea: </string>
+    <string name="toast8">¡Registrado!</string>
+    <string name="toast9">Iniciar sesión cancelado</string>
+    <string name="Des">Descripción: </string>
+    <string name="Length">Longitud: </string>
+    <string name="area">Area: </string>
+    <string name="load">Cargando el mapa...</string>
+    <string name="point">Se ha eliminado un punto</string>
+    <string name="polygon">Se ha eliminado un polígono</string>
+    <string name="polyline">Se ha eliminado una polílinea</string>
+    <string name="per1">¡Permiso concedido!</string>
+    <string name="per2">¡Permiso denegado!</string>
+    <string name="per3">¡Ningún proveedor de ubicación habilitado!</string>
+    <string name="edt2">Título</string>
+    <string name="btn1">Añadir Tarea</string>
+    <string name="txt1">Lectura</string>
+    <string name="txt2">Escritura</string>
+    <string name="geo">"Geometría: "</string>
+    <string name="btn2">Finalizar</string>
+
+</resources>

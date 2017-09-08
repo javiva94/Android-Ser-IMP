@@ -7,6 +7,6 @@
         app:showAsAction="never"/>
 
     <item android:id="@+id/item_menu_1"
-        android:title="Switch view" />
+        android:title="@string/menu3" />
 
 </menu>
