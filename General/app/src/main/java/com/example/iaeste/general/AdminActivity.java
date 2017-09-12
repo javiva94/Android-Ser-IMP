@@ -1,13 +1,17 @@
 package com.example.iaeste.general;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TabHost;
 
 import com.example.iaeste.general.Model.MyGroup;
@@ -22,75 +26,15 @@ import java.util.ArrayList;
 
 public class AdminActivity extends AppCompatActivity {
 
-    private ArrayList<MyUser> myUserList = new ArrayList<>();
-    private ArrayList<MyGroup> myGroupList = new ArrayList<>();
-
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mUserDatabaseReference;
-    private DatabaseReference mGroupDatabaseReference;
-
-    private UsersFragment usersFragment;
-    private GroupsFragment groupsFragment;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mUserDatabaseReference = mFirebaseDatabase.getReference("users");
-        mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        databaseUsersListInitialization();
-
-        databaseGroupListInitialization();
-
         tabHostInitialization();
-    }
-
-    private void databaseUsersListInitialization(){
-        mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
-                    Log.e("User element", markerChild.toString());
-                    MyUser newMyUser = markerChild.getValue(MyUser.class);
-                    if(!myUserList.contains(newMyUser)) {
-                        myUserList.add(newMyUser);
-                    }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void databaseGroupListInitialization(){
-        mGroupDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
-                    Log.e("Group element", markerChild.toString());
-                    MyGroup newMyGroup = markerChild.getValue(MyGroup.class);
-                    if(!myGroupList.contains(newMyGroup)) {
-                        myGroupList.add(newMyGroup);
-                    }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     @Override
@@ -108,7 +52,6 @@ public class AdminActivity extends AppCompatActivity {
                 return true;
             case R.id.add_group:
                 Intent intent = new Intent(AdminActivity.this, AddGroupActivity.class);
-                intent.putParcelableArrayListExtra("usersList", myUserList);
                 startActivity(intent);
                 break;
             case R.id.add_user:
@@ -120,8 +63,6 @@ public class AdminActivity extends AppCompatActivity {
         }
         return true;
     }
-
-
 
     private void tabHostInitialization(){
         TabHost tabHost = (TabHost) findViewById(R.id.tab_host);
@@ -143,29 +84,18 @@ public class AdminActivity extends AppCompatActivity {
             @Override
             public void onTabChanged(String tabId) {
                 if(tabId.equals("Groups")){
-                    groupsFragment = new GroupsFragment();
-
-                    Bundle args = new Bundle();
-                    args.putParcelableArrayList("groupsList", myGroupList);
-                    groupsFragment.setArguments(args);
-
                     getSupportFragmentManager().beginTransaction()
-                            .add(R.id.groups, groupsFragment)
+                            .add(R.id.groups, new GroupsFragment())
                             .commit();
                 }
                 if(tabId.equals("Users")){
-                    usersFragment = new UsersFragment();
-
-                    Bundle args = new Bundle();
-                    args.putParcelableArrayList("usersList", myUserList);
-                    usersFragment.setArguments(args);
-
                     getSupportFragmentManager().beginTransaction()
-                            .add(R.id.users, usersFragment)
+                            .add(R.id.users, new UsersFragment())
                             .commit();
                 }
             }
         });
 
     }
+
 }

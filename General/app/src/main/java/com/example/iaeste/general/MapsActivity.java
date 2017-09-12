@@ -595,7 +595,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         }
         // With Android API >= 23, need to catch SecurityException.
         catch (SecurityException e) {
-            Toast.makeText(this, "Show My Location Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.toast10 + e.getMessage(), Toast.LENGTH_LONG).show();
             Log.e(MYTAG, "Show My Location Error:" + e.getMessage());
             e.printStackTrace();
             return;
@@ -626,7 +626,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
            // circle = drawCircle(new MyLatLng(myLocation.getLatitude(), myLocation.getLongitude()));
         } else {
-            Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.toast11, Toast.LENGTH_LONG).show();
             Log.i(MYTAG, "Location not found");
         }
 
@@ -749,7 +749,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private void setFinishPolygonButton(){
         final Button finishButton = (Button) findViewById(R.id.finishButton);
-        finishButton.setText("Finish Polygon");
+        finishButton.setText(R.string.txt5);
         finishButton.setVisibility(View.VISIBLE);
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -780,7 +780,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private void setFinishPolylineButton(){
         final Button finishButton = (Button) findViewById(R.id.finishButton);
-        finishButton.setText("Finish Polyline");
+        finishButton.setText(R.string.txt4);
         finishButton.setVisibility(View.VISIBLE);
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -813,7 +813,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         edit.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.colorPrimary)}));
         trash.setBackgroundTintList(new ColorStateList(new int[][]{new int[]{0}}, new int[]{getResources().getColor(R.color.buttonPressedDelete)}));
         final Button finishButton = (Button) findViewById(R.id.finishButton);
-        finishButton.setText("Finish Delete");
+        finishButton.setText(R.string.txt3);
         finishButton.setVisibility(View.VISIBLE);
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override

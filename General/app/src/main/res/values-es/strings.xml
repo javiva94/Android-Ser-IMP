@@ -7,7 +7,7 @@
     <string name="menu1">crear grupo</string>
     <string name="menu2">crear usuario</string>
     <string name="menu3">Cambiar vista</string>
-    <string name="menu4">nada</string>
+    <string name="menu4">Ninguno</string>
     <string name="menu5">Normal</string>
     <string name="menu6">Terreno</string>
     <string name="menu7">Satélite</string>
@@ -45,5 +45,10 @@
     <string name="txt2">Escritura</string>
     <string name="geo">"Geometría: "</string>
     <string name="btn2">Finalizar</string>
+    <string name="txt3">Terminar</string>
+    <string name="txt4">Terminar Polilinea</string>
+    <string name="txt5">Terminar Polígono</string>
+    <string name="toast10">"Mostrar mi error de ubicación: "</string>
+    <string name="toast11">Ubicación no encontrada!</string>
 
 </resources>

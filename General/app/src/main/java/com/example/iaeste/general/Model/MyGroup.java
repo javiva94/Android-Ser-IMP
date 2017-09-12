@@ -3,7 +3,11 @@ package com.example.iaeste.general.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by franc on 5/9/2017.
@@ -11,7 +15,7 @@ import java.util.List;
 
 public class MyGroup implements Parcelable {
 
-    private String uid;
+    private String id;
     private String displayName;
     private List<MyUser> members;
     private String owner_uid;
@@ -27,14 +31,24 @@ public class MyGroup implements Parcelable {
     }
 
     protected MyGroup(Parcel in) {
-        uid = in.readString();
+        id = in.readString();
         displayName = in.readString();
         members = in.createTypedArrayList(MyUser.CREATOR);
         owner_uid = in.readString();
     }
 
-    public String getUid() {
-        return uid;
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("displayName", displayName);
+        result.put("members", members);
+        result.put("owner_uid", owner_uid);
+
+        return result;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getOwner_uid() {
@@ -49,8 +63,8 @@ public class MyGroup implements Parcelable {
         return members;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setOwner_uid(String owner_uid) {
@@ -67,7 +81,7 @@ public class MyGroup implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(uid);
+        dest.writeString(id);
         dest.writeString(displayName);
         dest.writeTypedList(members);
         dest.writeString(owner_uid);

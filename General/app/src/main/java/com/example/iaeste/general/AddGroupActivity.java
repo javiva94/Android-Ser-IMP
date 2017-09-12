@@ -15,7 +15,7 @@ import android.widget.ListView;
 
 import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.Model.MyUser;
-import com.example.iaeste.general.View.UsersSelectionViewAdapter;
+import com.example.iaeste.general.View.ListSelectionViewAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +41,7 @@ public class AddGroupActivity extends AppCompatActivity {
 
     private ViewStub stubList;
     private ListView listView;
-    private UsersSelectionViewAdapter usersSelectionViewAdapter;
+    private ListSelectionViewAdapter listSelectionViewAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +69,7 @@ public class AddGroupActivity extends AppCompatActivity {
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("New element", markerChild.toString());
                     MyUser newMyUser = markerChild.getValue(MyUser.class);
-                    usersSelectionViewAdapter.add(newMyUser);
+                    listSelectionViewAdapter.add(newMyUser);
                 }
             }
 
@@ -86,8 +86,8 @@ public class AddGroupActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.myListview);
 
-        usersSelectionViewAdapter = new UsersSelectionViewAdapter(this, R.layout.activity_add_task);
-        listView.setAdapter(usersSelectionViewAdapter);
+        listSelectionViewAdapter = new ListSelectionViewAdapter<MyUser>(this, R.layout.activity_add_group);
+        listView.setAdapter(listSelectionViewAdapter);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -122,9 +122,8 @@ public class AddGroupActivity extends AppCompatActivity {
     private void addGroup(){
         mGroupDatabaseReference = mFirebaseDatabase.getReference("/groups/");
         String key =  mGroupDatabaseReference.push().getKey();
-        usersSelectionViewAdapter.getUsersSelected();
         EditText groupTitle = (EditText) findViewById(R.id.group_title);
-        MyGroup newGroup = new MyGroup(groupTitle.getText().toString(), usersSelectionViewAdapter.getUsersSelected(), mFirebaseAuth.getCurrentUser().getUid());
+        MyGroup newGroup = new MyGroup(groupTitle.getText().toString(), listSelectionViewAdapter.getItemSelected(), mFirebaseAuth.getCurrentUser().getUid());
         mGroupDatabaseReference.child(key).setValue(newGroup);
     }
 }

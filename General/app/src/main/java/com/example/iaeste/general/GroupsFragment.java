@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,14 @@ import android.view.ViewGroup;
 import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.View.MyGroupsRecyclerViewAdapter;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +38,12 @@ public class GroupsFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
-    private List<MyGroup> myGroupList;
+    private List<MyGroup> myGroupList = new ArrayList<>();
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mGroupDatabaseReference;
+
+    MyGroupsRecyclerViewAdapter myGroupsRecyclerViewAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -55,8 +68,13 @@ public class GroupsFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            myGroupList = getArguments().getParcelableArrayList("groupsList");
         }
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
+
+        databaseGroupListInitialization();
+
     }
 
     @Override
@@ -73,7 +91,8 @@ public class GroupsFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyGroupsRecyclerViewAdapter(myGroupList, mListener));
+            myGroupsRecyclerViewAdapter = new MyGroupsRecyclerViewAdapter(myGroupList, mListener);
+            recyclerView.setAdapter(myGroupsRecyclerViewAdapter);
         }
         return view;
     }
@@ -97,5 +116,37 @@ public class GroupsFragment extends Fragment {
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(MyGroup item);
+    }
+
+    private void databaseGroupListInitialization(){
+        mGroupDatabaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                MyGroup newMyGroup = dataSnapshot.getValue(MyGroup.class);
+                newMyGroup.setId(dataSnapshot.getKey());
+                myGroupsRecyclerViewAdapter.addValue(newMyGroup);
+                myGroupsRecyclerViewAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

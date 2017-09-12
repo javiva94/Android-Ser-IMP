@@ -26,6 +26,8 @@
     <string name="toast7">Delete task: </string>
     <string name="toast8">Signed in!</string>
     <string name="toast9">Sign in canceled</string>
+    <string name="toast10">Show My Location Error: </string>
+    <string name="toast11">Location not found!</string>
     <string name="Author">Author: </string>
     <string name="Long">Longitude: </string>
     <string name="Lat">Latitude: </string>
@@ -44,7 +46,9 @@
     <string name="btn2">Finish</string>
     <string name="txt1">Read</string>
     <string name="txt2">Write</string>
-
+    <string name="txt3">Finish Delete</string>
+    <string name="txt4">Finish Polyline</string>
+    <string name="txt5">Finish Polygon</string>
 
 
 

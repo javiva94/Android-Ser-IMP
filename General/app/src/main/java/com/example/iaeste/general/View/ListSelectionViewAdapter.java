@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.R;
 
@@ -21,13 +22,13 @@ import java.util.List;
  * Created by franc on 6/9/2017.
  */
 
-public class UsersSelectionViewAdapter extends ArrayAdapter<MyUser> {
+public class ListSelectionViewAdapter<T> extends ArrayAdapter<T> {
 
-    private boolean[] usersSelection;
+    private boolean[] itemSelection;
 
-     private List<MyUser> usersSelected;
+     private List<T> itemSelected;
 
-    public UsersSelectionViewAdapter(@NonNull Context context, @LayoutRes int resource) {
+    public ListSelectionViewAdapter(@NonNull Context context, @LayoutRes int resource) {
         super(context, resource);
     }
 
@@ -38,13 +39,22 @@ public class UsersSelectionViewAdapter extends ArrayAdapter<MyUser> {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v =  inflater.inflate(R.layout.user_list_item2, null);
         }
-        MyUser myUser = getItem(position);
-        TextView userDisplayName = (TextView) v.findViewById(R.id.txtDisplayUser);
-        userDisplayName.setText(myUser.getDisplayName());
+        T T = getItem(position);
+        if(T instanceof MyUser){
+            TextView userDisplayName = (TextView) v.findViewById(R.id.txtDisplayUser);
+            MyUser myUser = (MyUser) T;
+            userDisplayName.setText(myUser.getDisplayName());
+        }
+        if(T instanceof MyGroup){
+            TextView userDisplayName = (TextView) v.findViewById(R.id.txtDisplayUser);
+            MyGroup myGroup = (MyGroup) T;
+            userDisplayName.setText(myGroup.getDisplayName());
+        }
 
-        usersSelection = new boolean[super.getCount()];
+
+        itemSelection = new boolean[super.getCount()];
         for (int i=0; i < super.getCount(); i++){
-            usersSelection[i] = false;
+            itemSelection[i] = false;
         }
 
         final CheckBox selectedCheckBox = (CheckBox) v.findViewById(R.id.selectedCheckBox);
@@ -52,9 +62,9 @@ public class UsersSelectionViewAdapter extends ArrayAdapter<MyUser> {
             @Override
             public void onClick(View v) {
                 if(selectedCheckBox.isChecked()) {
-                    usersSelection[position] = true;
+                    itemSelection[position] = true;
                 }else{
-                    usersSelection[position] = false;
+                    itemSelection[position] = false;
                 }
             }
         });
@@ -64,21 +74,21 @@ public class UsersSelectionViewAdapter extends ArrayAdapter<MyUser> {
 
     @Nullable
     @Override
-    public MyUser getItem(int position) {
+    public T getItem(int position) {
         return super.getItem(position);
     }
 
     @Override
-    public void add(@Nullable MyUser object) {
+    public void add(@Nullable T object) {
         super.add(object);
     }
 
-    public List<MyUser> getUsersSelected() {
-        usersSelected = new ArrayList<>();
-        for(int i=0; i<usersSelection.length; i++){
-            if(usersSelection[i] == true)
-                usersSelected.add(super.getItem(i));
+    public List<T> getItemSelected() {
+        itemSelected = new ArrayList<>();
+        for(int i=0; i<itemSelection.length; i++){
+            if(itemSelection[i] == true)
+                itemSelected.add(super.getItem(i));
         }
-        return usersSelected;
+        return itemSelected;
     }
 }
