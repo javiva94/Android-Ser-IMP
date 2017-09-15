@@ -1,10 +1,12 @@
 package com.example.iaeste.general;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.ViewStub;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.example.iaeste.general.Model.MyGroup;
@@ -17,6 +19,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
 public class EditGroupActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
@@ -28,10 +32,16 @@ public class EditGroupActivity extends AppCompatActivity {
     private ListView listView;
     private ListSelectionViewAdapter listSelectionViewAdapter;
 
+    private List<MyUser> groupUserList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_group);
+
+        Intent intent = getIntent();
+        String groupName = intent.getStringExtra("groupName");
+        groupUserList = intent.getParcelableArrayListExtra("groupUserList");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -44,6 +54,9 @@ public class EditGroupActivity extends AppCompatActivity {
         databaseUsersListInitialization();
 
         usersViewListInitialization();
+
+        EditText group_title = (EditText) findViewById(R.id.group_title);
+        group_title.setText(groupName);
     }
 
     private void databaseUsersListInitialization(){
@@ -54,6 +67,9 @@ public class EditGroupActivity extends AppCompatActivity {
                     MyUser newMyUser = markerChild.getValue(MyUser.class);
                     newMyUser.setUid(markerChild.getKey());
                     listSelectionViewAdapter.add(newMyUser);
+                    if(groupUserList.contains(newMyUser)){
+                        listSelectionViewAdapter.setItemsSelected(listSelectionViewAdapter.getPosition(newMyUser), newMyUser);
+                    }
                 }
             }
 
@@ -70,7 +86,7 @@ public class EditGroupActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.listview_divider);
 
-        listSelectionViewAdapter = new ListSelectionViewAdapter<MyUser>(this, R.layout.activity_edit_group);
+        listSelectionViewAdapter = new ListSelectionViewAdapter<MyUser>(this, R.layout.activity_edit_group, groupUserList);
         listView.setAdapter(listSelectionViewAdapter);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

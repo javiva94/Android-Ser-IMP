@@ -1,5 +1,6 @@
 package com.example.iaeste.general;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -17,6 +18,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
 public class EditUserActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
@@ -29,10 +32,15 @@ public class EditUserActivity extends AppCompatActivity {
     private ListView listView;
     private ListSelectionViewAdapter listSelectionViewAdapter;
 
+    private List<MyGroup> userGroupList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user);
+
+        Intent intent = getIntent();
+        userGroupList = intent.getParcelableArrayListExtra("userGroupList");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -72,7 +80,7 @@ public class EditUserActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.listview_divider);
 
-        listSelectionViewAdapter = new ListSelectionViewAdapter<MyGroup>(this, R.layout.activity_edit_user);
+        listSelectionViewAdapter = new ListSelectionViewAdapter<MyGroup>(this, R.layout.activity_edit_user, userGroupList);
         listView.setAdapter(listSelectionViewAdapter);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

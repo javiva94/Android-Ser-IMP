@@ -2,6 +2,7 @@ package com.example.iaeste.general.View;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -85,6 +87,8 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, EditGroupActivity.class);
+                intent.putExtra("groupName", mValues.get(position).getDisplayName());
+                intent.putParcelableArrayListExtra("groupUserList", (ArrayList<? extends Parcelable>) mValues.get(position).getMembers());
                 context.startActivity(intent);
             }
         });

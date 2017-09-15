@@ -24,7 +24,8 @@ public class MyUser implements Parcelable{
     private String displayName;
     private String email;
     private String providerId;
-    private List<String> groups = new ArrayList<>();
+   // private List<String> groups = new ArrayList<>();
+    private List<MyGroup> groups = new ArrayList<>();
     private String role;
 
     public MyUser(){
@@ -41,7 +42,8 @@ public class MyUser implements Parcelable{
         displayName = in.readString();
         email = in.readString();
         providerId = in.readString();
-        groups = in.createStringArrayList();
+       // groups = in.createStringArrayList();
+        groups = in.createTypedArrayList(MyGroup.CREATOR);
         role = in.readString();
     }
 
@@ -86,7 +88,7 @@ public class MyUser implements Parcelable{
         return providerId;
     }
 
-    public List<String> getGroups() {
+    public List<MyGroup> getGroups() {
         return groups;
     }
 
@@ -106,7 +108,7 @@ public class MyUser implements Parcelable{
         this.providerId = providerId;
     }
 
-    public void setGroups(List<String> groups) {
+    public void setGroups(List<MyGroup> groups) {
         this.groups = groups;
     }
 
@@ -129,7 +131,8 @@ public class MyUser implements Parcelable{
         dest.writeString(displayName);
         dest.writeString(email);
         dest.writeString(providerId);
-        dest.writeStringList(groups);
+      //  dest.writeStringList(groups);
+        dest.writeTypedList(groups);
         dest.writeString(role);
     }
 }

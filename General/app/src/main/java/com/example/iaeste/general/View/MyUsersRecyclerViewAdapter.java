@@ -2,6 +2,7 @@ package com.example.iaeste.general.View;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -80,6 +82,7 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, EditUserActivity.class);
+                intent.putParcelableArrayListExtra("userGroupList", (ArrayList<? extends Parcelable>) mValues.get(position).getGroups());
                 context.startActivity(intent);
             }
         });
