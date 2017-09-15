@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.google.firebase.database.Exclude;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ public class MyGroup implements Parcelable {
     private String id;
     private String displayName;
     private List<MyUser> members;
+    private List<Task> tasks = new ArrayList<>();
     private String owner_uid;
 
     public MyGroup (){
@@ -34,6 +36,7 @@ public class MyGroup implements Parcelable {
         id = in.readString();
         displayName = in.readString();
         members = in.createTypedArrayList(MyUser.CREATOR);
+        tasks = in.createTypedArrayList(Task.CREATOR);
         owner_uid = in.readString();
     }
 
@@ -42,6 +45,7 @@ public class MyGroup implements Parcelable {
         HashMap<String, Object> result = new HashMap<>();
         result.put("displayName", displayName);
         result.put("members", members);
+        result.put("tasks", tasks);
         result.put("owner_uid", owner_uid);
 
         return result;
@@ -63,6 +67,10 @@ public class MyGroup implements Parcelable {
         return members;
     }
 
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -79,11 +87,16 @@ public class MyGroup implements Parcelable {
         this.members = members;
     }
 
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(displayName);
         dest.writeTypedList(members);
+        dest.writeTypedList(tasks);
         dest.writeString(owner_uid);
     }
 

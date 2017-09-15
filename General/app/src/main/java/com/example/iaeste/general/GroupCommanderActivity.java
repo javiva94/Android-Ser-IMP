@@ -4,13 +4,18 @@ package com.example.iaeste.general;
  * Created by iaeste on 04/09/2017.
  */
 
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.ViewStub;
 import android.widget.ListView;
+import android.widget.TabHost;
 
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.View.UsersPermissionsViewAdapter;
@@ -23,60 +28,67 @@ import com.google.firebase.database.ValueEventListener;
 
 public class GroupCommanderActivity extends AppCompatActivity {
 
-    private FirebaseDatabase mFirebaseDatabase;
-    private FirebaseAuth mFirebaseAuth;
-    private DatabaseReference mUserDatabaseReference;
-
-    private ViewStub stubList;
-    private ListView listView;
-    private UsersPermissionsViewAdapter usersPermissionsViewAdapter;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_add_task);
+        setContentView(R.layout.activity_admin);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mUserDatabaseReference = mFirebaseDatabase.getReference("users");
-
-        databaseUsersListInitialization();
-
-        usersViewListInitialization();
-
+        tabHostInitialization();
     }
 
-    private void databaseUsersListInitialization(){
-        mUserDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
-                    Log.e("New element", markerChild.toString());
-                    MyUser newMyUser = markerChild.getValue(MyUser.class);
-                    usersPermissionsViewAdapter.add(newMyUser);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.groupcommander_menu, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: //make case to put something here in the future
+                finish();
+                return true;
+            case R.id.add_user:
+                Intent intent1 = new Intent(GroupCommanderActivity.this, AddUserActivity.class);
+                startActivity(intent1);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    private void tabHostInitialization(){
+        TabHost tabHost = (TabHost) findViewById(R.id.tab_host);
+        tabHost.setup();
+
+        TabHost.TabSpec tabUsers = tabHost.newTabSpec("Users");
+
+        tabUsers.setIndicator("Users");
+        tabUsers.setContent(R.id.users);
+
+        tabHost.addTab(tabUsers);
+
+        tabHost.setCurrentTab(0);
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.users, new UsersFragment())
+                .commit();
+
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                if(tabId.equals("Users")){
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.users, new UsersFragment())
+                            .commit();
                 }
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         });
-    }
 
-    private void usersViewListInitialization(){
-        stubList = (ViewStub) findViewById(R.id.stub_List_users);
-        stubList.inflate();
-
-        listView = (ListView) findViewById(R.id.myListview);
-
-        usersPermissionsViewAdapter = new UsersPermissionsViewAdapter(this, R.layout.activity_add_task);
-        listView.setAdapter(usersPermissionsViewAdapter);
     }
 
 }

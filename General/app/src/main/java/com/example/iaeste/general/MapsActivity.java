@@ -287,7 +287,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("Element moved", markerChild.toString());
                 }
-
             }
 
             @Override

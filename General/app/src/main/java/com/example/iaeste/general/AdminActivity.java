@@ -80,6 +80,11 @@ public class AdminActivity extends AppCompatActivity {
         tabHost.addTab(tabGroups);
         tabHost.addTab(tabUsers);
 
+        tabHost.setCurrentTab(0);
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.groups, new GroupsFragment())
+                .commit();
+
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String tabId) {

@@ -69,6 +69,7 @@ public class AddGroupActivity extends AppCompatActivity {
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("New element", markerChild.toString());
                     MyUser newMyUser = markerChild.getValue(MyUser.class);
+                    newMyUser.setUid(markerChild.getKey());
                     listSelectionViewAdapter.add(newMyUser);
                 }
             }
@@ -123,7 +124,7 @@ public class AddGroupActivity extends AppCompatActivity {
         mGroupDatabaseReference = mFirebaseDatabase.getReference("/groups/");
         String key =  mGroupDatabaseReference.push().getKey();
         EditText groupTitle = (EditText) findViewById(R.id.group_title);
-        MyGroup newGroup = new MyGroup(groupTitle.getText().toString(), listSelectionViewAdapter.getItemSelected(), mFirebaseAuth.getCurrentUser().getUid());
+        MyGroup newGroup = new MyGroup(groupTitle.getText().toString(), listSelectionViewAdapter.getItemsSelected(), mFirebaseAuth.getCurrentUser().getUid());
         mGroupDatabaseReference.child(key).setValue(newGroup);
     }
 }

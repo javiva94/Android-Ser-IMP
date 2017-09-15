@@ -8,10 +8,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.iaeste.general.GroupsFragment.OnListFragmentInteractionListener;
+import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.R;
 import com.example.iaeste.general.Model.MyGroup;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -40,8 +44,21 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).getId());
-        holder.mContentView.setText(mValues.get(position).getDisplayName());
+        holder.mIdView.setText(mValues.get(position).getDisplayName());
+
+        DatabaseReference userDabaseReference = FirebaseDatabase.getInstance().getReference("/users/"+mValues.get(position).getOwner_uid());
+        userDabaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                MyUser myUser = dataSnapshot.getValue(MyUser.class);
+                holder.mContentView.setText(myUser.getDisplayName());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         holder.mDeleteGroup.setOnClickListener(new View.OnClickListener() {
             @Override

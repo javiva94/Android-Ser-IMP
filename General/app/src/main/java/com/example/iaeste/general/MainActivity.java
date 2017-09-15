@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.GridViewAdapter;
@@ -50,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
     static final int VIEW_MODE_LISTVIEW = 0;
     static final int VIEW_MODE_GRIDVIEW = 1;
-
     public static final int RC_SIGN_IN = 1;
     private String actualUserRole = "user";
 
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mTaskDatabaseReference;
     private DatabaseReference mUserDatabaseReference;
+    private DatabaseReference mGroupDatabaseReference;
     private ChildEventListener mChildEventListener;
 
 
@@ -86,7 +87,9 @@ public class MainActivity extends AppCompatActivity {
         floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, AddTaskActivity.class));
+                Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                intent.putExtra("userRole", actualUserRole);
+                startActivity(intent);
             }
         });
 
@@ -200,14 +203,53 @@ public class MainActivity extends AppCompatActivity {
     private void firebaseTaskDatabaseInit(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
+        mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
 
+        mGroupDatabaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                MyGroup newMyGroup = dataSnapshot.getValue(MyGroup.class);
+                if(newMyGroup.getMembers() != null) {
+                    for (MyUser myUser : newMyGroup.getMembers()) {
+                        if (myUser.getUid().equals(mFirebaseUser.getUid())) {
+                            for (Task task : newMyGroup.getTasks()) {
+                                taskViewAdapter.add(task);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+/*
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Task newTask = new Task();
-                 newTask.setTitle((String) dataSnapshot.child("title").getValue());
-                 newTask.setKey(dataSnapshot.getKey());
-                taskViewAdapter.add(newTask);
+                Task newTask = dataSnapshot.getValue(Task.class);
+                // newTask.setTitle((String) dataSnapshot.child("title").getValue());
+                newTask.setKey(dataSnapshot.getKey());
+                if(taskList.contains(newTask)) {
+                    taskViewAdapter.add(newTask);
+                }
             }
 
             @Override
@@ -239,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        mTaskDatabaseReference.addChildEventListener(mChildEventListener);
+        mTaskDatabaseReference.addChildEventListener(mChildEventListener);*/
     }
 
     private void taskListViewInitialization(){

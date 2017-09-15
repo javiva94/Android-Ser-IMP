@@ -26,7 +26,7 @@ public class ListSelectionViewAdapter<T> extends ArrayAdapter<T> {
 
     private boolean[] itemSelection;
 
-     private List<T> itemSelected;
+     private List<T> itemsSelected;
 
     public ListSelectionViewAdapter(@NonNull Context context, @LayoutRes int resource) {
         super(context, resource);
@@ -83,12 +83,12 @@ public class ListSelectionViewAdapter<T> extends ArrayAdapter<T> {
         super.add(object);
     }
 
-    public List<T> getItemSelected() {
-        itemSelected = new ArrayList<>();
+    public List<T> getItemsSelected() {
+        itemsSelected = new ArrayList<>();
         for(int i=0; i<itemSelection.length; i++){
             if(itemSelection[i] == true)
-                itemSelected.add(super.getItem(i));
+                itemsSelected.add(super.getItem(i));
         }
-        return itemSelected;
+        return itemsSelected;
     }
 }

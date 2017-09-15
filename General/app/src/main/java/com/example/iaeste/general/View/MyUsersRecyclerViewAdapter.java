@@ -18,9 +18,14 @@ import com.example.iaeste.general.R;
 import com.example.iaeste.general.UsersFragment;
 import com.example.iaeste.general.UsersFragment.OnListFragmentInteractionListener;
 import com.example.iaeste.general.Model.MyUser;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.FileInputStream;
 import java.util.List;
 
 /**

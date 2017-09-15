@@ -164,13 +164,14 @@ public class AddUserActivity extends AppCompatActivity {
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         MyUser myUser = new MyUser();
+        myUser.setUid(mFirebaseUser.getUid());
         myUser.setDisplayName(userName.getText().toString());
         myUser.setEmail(userEmail.getText().toString());
         myUser.setProviderId(mFirebaseUser.getProviderId());
         myUser.setRole("user");
         mUserDatabaseReference.child(mFirebaseUser.getUid()).setValue(myUser);
 
-        for(MyGroup myGroup : (List<MyGroup>)listSelectionViewAdapter.getItemSelected()){
+        for(MyGroup myGroup : (List<MyGroup>)listSelectionViewAdapter.getItemsSelected()){
             myGroup.getMembers().add(myUser);
             Map<String, Object> childUpdates = new HashMap<>();
             Map<String, Object> myGroupValues = myGroup.toMap();

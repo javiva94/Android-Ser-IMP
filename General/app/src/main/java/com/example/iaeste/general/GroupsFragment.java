@@ -74,7 +74,6 @@ public class GroupsFragment extends Fragment {
         mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
 
         databaseGroupListInitialization();
-
     }
 
     @Override
