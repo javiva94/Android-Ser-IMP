@@ -82,7 +82,6 @@ public class AddUserActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
-                    Log.e("New element", markerChild.toString());
                     MyGroup newMyGroup = markerChild.getValue(MyGroup.class);
                     newMyGroup.setId(markerChild.getKey());
                     listSelectionViewAdapter.add(newMyGroup);
@@ -100,7 +99,7 @@ public class AddUserActivity extends AppCompatActivity {
         stubList = (ViewStub) findViewById(R.id.stub_list);
         stubList.inflate();
 
-        listView = (ListView) findViewById(R.id.myListview);
+        listView = (ListView) findViewById(R.id.listview_divider);
 
         listSelectionViewAdapter = new ListSelectionViewAdapter<MyGroup>(this, R.layout.activity_add_user);
         listView.setAdapter(listSelectionViewAdapter);

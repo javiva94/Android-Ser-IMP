@@ -79,7 +79,7 @@
                 android:id="@+id/stub_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout="@layout/my_user_listview" />
+                android:layout="@layout/listview" />
         </LinearLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

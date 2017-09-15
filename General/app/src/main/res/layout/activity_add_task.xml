@@ -98,7 +98,7 @@
                 android:id="@+id/stub_List_users"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout="@layout/my_user_listview"
+                android:layout="@layout/listview"
                 app:layout_constraintBottom_toTopOf="@+id/addTask"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"

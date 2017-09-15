@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         stubList.inflate();
         stubGrid.inflate();
 
-        listView = (ListView) findViewById(R.id.myListview);
+        listView = (ListView) findViewById(R.id.mylistview);
         gridView = (GridView) findViewById(R.id.mygridview);
 
         //get current view mode in share reference

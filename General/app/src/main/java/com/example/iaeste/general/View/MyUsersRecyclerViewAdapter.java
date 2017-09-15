@@ -1,6 +1,7 @@
 package com.example.iaeste.general.View;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,10 +10,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.iaeste.general.AdminActivity;
+import com.example.iaeste.general.EditUserActivity;
 import com.example.iaeste.general.MainActivity;
 import com.example.iaeste.general.R;
 import com.example.iaeste.general.UsersFragment;
@@ -38,9 +41,12 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
     private final List<MyUser> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyUsersRecyclerViewAdapter(List<MyUser> items, OnListFragmentInteractionListener listener) {
+    private Context context;
+
+    public MyUsersRecyclerViewAdapter(List<MyUser> items, OnListFragmentInteractionListener listener, Context context) {
         mValues = items;
         mListener = listener;
+        this.context = context;
     }
 
     @Override
@@ -61,12 +67,20 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
             public void onClick(View v) {
                 DatabaseReference mUserDatabaseReference = FirebaseDatabase.getInstance().getReference("users");
                 mUserDatabaseReference.child((String) mValues.get(position).getUid()).removeValue();
-//ELIMINAR USUARIO DE AUTH!!!!
+                //ELIMINAR USUARIO DE AUTH!!!!
                 mValues.remove(position);
                 notifyItemRemoved(position);
                 //this line below gives you the animation and also updates the
                 //list items after the deleted item
                 notifyItemRangeChanged(position, getItemCount());
+            }
+        });
+
+        holder.mEditUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, EditUserActivity.class);
+                context.startActivity(intent);
             }
         });
 
@@ -91,7 +105,8 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
-        public final Button mDeleteUser;
+        public final ImageButton mDeleteUser;
+        public final ImageButton mEditUser;
         public MyUser mItem;
 
         public ViewHolder(View view) {
@@ -99,7 +114,8 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.content);
             mContentView = (TextView) view.findViewById(R.id.role);
-            mDeleteUser = (Button) view.findViewById(R.id.delete_user);
+            mDeleteUser = (ImageButton) view.findViewById(R.id.delete_user);
+            mEditUser = (ImageButton) view.findViewById(R.id.edit_user);
         }
 
         @Override

@@ -39,15 +39,30 @@
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintLeft_toLeftOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/delete_group"
-        style="@style/FirebaseUI.Button"
+        style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="2dp"
         android:layout_weight="1"
-        android:background="@color/buttonPressedDelete"
+        android:backgroundTint="@color/buttonPressedDelete"
         android:text="Delete"
         app:layout_constraintRight_toRightOf="parent"
-        tools:layout_editor_absoluteY="0dp" />
+        app:srcCompat="@android:drawable/ic_menu_delete"
+        tools:layout_editor_absoluteY="1dp" />
+
+    <ImageButton
+        android:id="@+id/edit_group"
+        style="@style/Widget.AppCompat.ImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:backgroundTint="@color/buttonPressedEdit"
+        android:text="Edit"
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        tools:layout_editor_absoluteY="1dp"
+        app:layout_constraintRight_toLeftOf="@+id/delete_group"
+        android:layout_marginRight="0dp" />
+
 </android.support.constraint.ConstraintLayout>

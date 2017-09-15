@@ -1,16 +1,10 @@
 package com.example.iaeste.general;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewStub;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import com.example.iaeste.general.Model.MyGroup;
@@ -23,16 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import android.view.MenuItem;
-import android.widget.TextView;
-
-
-/**
- * Created by iaeste on 05/09/2017.
- */
-
-public class AddGroupActivity extends AppCompatActivity {
+public class EditGroupActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mFirebaseAuth;
@@ -44,13 +29,12 @@ public class AddGroupActivity extends AppCompatActivity {
     private ListSelectionViewAdapter listSelectionViewAdapter;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_group);
+        setContentView(R.layout.activity_edit_group);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -81,12 +65,12 @@ public class AddGroupActivity extends AppCompatActivity {
     }
 
     private void usersViewListInitialization(){
-        stubList = (ViewStub) findViewById(R.id.stub_List_users);
+        stubList = (ViewStub) findViewById(R.id.stub_list_users);
         stubList.inflate();
 
         listView = (ListView) findViewById(R.id.listview_divider);
 
-        listSelectionViewAdapter = new ListSelectionViewAdapter<MyUser>(this, R.layout.activity_add_group);
+        listSelectionViewAdapter = new ListSelectionViewAdapter<MyUser>(this, R.layout.activity_edit_group);
         listView.setAdapter(listSelectionViewAdapter);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -104,26 +88,4 @@ public class AddGroupActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        final MenuItem createGroupMenuItem= menu.add(Menu.NONE, 1000, Menu.NONE,R.string.tlb1);
-        MenuItemCompat.setShowAsAction(createGroupMenuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        createGroupMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                addGroup();
-                finish();
-                return false;
-            }
-        });
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    private void addGroup(){
-        mGroupDatabaseReference = mFirebaseDatabase.getReference("/groups/");
-        String key =  mGroupDatabaseReference.push().getKey();
-        EditText groupTitle = (EditText) findViewById(R.id.group_title);
-        MyGroup newGroup = new MyGroup(groupTitle.getText().toString(), listSelectionViewAdapter.getItemsSelected(), mFirebaseAuth.getCurrentUser().getUid());
-        mGroupDatabaseReference.child(key).setValue(newGroup);
-    }
 }

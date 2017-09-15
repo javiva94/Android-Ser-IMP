@@ -149,7 +149,7 @@ public class AddTaskActivity extends AppCompatActivity {
         stubList = (ViewStub) findViewById(R.id.stub_List_users);
         stubList.inflate();
 
-        listView = (ListView) findViewById(R.id.myListview);
+        listView = (ListView) findViewById(R.id.listview_divider);
 
         groupListViewAdapter = new ListSelectionViewAdapter<MyGroup>(this, R.layout.activity_add_task);
         listView.setAdapter(groupListViewAdapter);

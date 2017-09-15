@@ -95,7 +95,7 @@ public class UsersFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            myUsersRecyclerViewAdapter = new MyUsersRecyclerViewAdapter(myUserList, mListener);
+            myUsersRecyclerViewAdapter = new MyUsersRecyclerViewAdapter(myUserList, mListener, getContext());
             recyclerView.setAdapter(myUsersRecyclerViewAdapter);
         }
 

@@ -90,7 +90,7 @@ public class GroupsFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            myGroupsRecyclerViewAdapter = new MyGroupsRecyclerViewAdapter(myGroupList, mListener);
+            myGroupsRecyclerViewAdapter = new MyGroupsRecyclerViewAdapter(myGroupList, mListener, getContext());
             recyclerView.setAdapter(myGroupsRecyclerViewAdapter);
         }
         return view;
