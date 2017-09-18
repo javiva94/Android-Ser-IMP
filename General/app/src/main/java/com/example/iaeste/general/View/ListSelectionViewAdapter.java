@@ -51,12 +51,16 @@ public class ListSelectionViewAdapter<T> extends ArrayAdapter<T> {
 
         final CheckBox selectedCheckBox = (CheckBox) v.findViewById(R.id.selectedCheckBox);
 
+        itemSelection = new boolean[super.getCount()];
+        for (int i=0; i < super.getCount(); i++){
+            itemSelection[i] = false;
+        }
+
         T T = getItem(position);
         if(T instanceof MyUser){
             TextView userDisplayName = (TextView) v.findViewById(R.id.txtDisplayUser);
             MyUser myUser = (MyUser) T;
             userDisplayName.setText(myUser.getDisplayName());
-            System.out.println(itemsChecked.get(0));
             if(isUserChecked(myUser)) {
                 selectedCheckBox.setChecked(true);
                 itemSelection[position]=true;
@@ -71,11 +75,6 @@ public class ListSelectionViewAdapter<T> extends ArrayAdapter<T> {
                 itemSelection[position]=true;
             }
 
-        }
-
-        itemSelection = new boolean[super.getCount()];
-        for (int i=0; i < super.getCount(); i++){
-            itemSelection[i] = false;
         }
 
         selectedCheckBox.setOnClickListener(new View.OnClickListener() {

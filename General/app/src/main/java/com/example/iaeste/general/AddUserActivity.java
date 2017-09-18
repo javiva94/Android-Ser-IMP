@@ -168,6 +168,7 @@ public class AddUserActivity extends AppCompatActivity {
         myUser.setEmail(userEmail.getText().toString());
         myUser.setProviderId(mFirebaseUser.getProviderId());
         myUser.setRole("user");
+       // myUser.getGroups().addAll(listSelectionViewAdapter.getItemsSelected());
         mUserDatabaseReference.child(mFirebaseUser.getUid()).setValue(myUser);
 
         for(MyGroup myGroup : (List<MyGroup>)listSelectionViewAdapter.getItemsSelected()){

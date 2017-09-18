@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.iaeste.general.AdminActivity;
 import com.example.iaeste.general.EditUserActivity;
 import com.example.iaeste.general.MainActivity;
+import com.example.iaeste.general.Model.MyGroup;
 import com.example.iaeste.general.R;
 import com.example.iaeste.general.UsersFragment;
 import com.example.iaeste.general.UsersFragment.OnListFragmentInteractionListener;
@@ -26,8 +27,11 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -82,7 +86,7 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, EditUserActivity.class);
-                intent.putParcelableArrayListExtra("userGroupList", (ArrayList<? extends Parcelable>) mValues.get(position).getGroups());
+                intent.putExtra("myUser",mValues.get(position));
                 context.startActivity(intent);
             }
         });

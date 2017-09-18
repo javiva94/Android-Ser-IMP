@@ -45,8 +45,8 @@ public class MyGroup implements Parcelable {
         HashMap<String, Object> result = new HashMap<>();
         result.put("displayName", displayName);
         result.put("members", members);
-        result.put("tasks", tasks);
         result.put("owner_uid", owner_uid);
+        result.put("tasks", tasks);
 
         return result;
     }

@@ -87,6 +87,7 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, EditGroupActivity.class);
+                intent.putExtra("myGroup", mValues.get(position));
                 intent.putExtra("groupName", mValues.get(position).getDisplayName());
                 intent.putParcelableArrayListExtra("groupUserList", (ArrayList<? extends Parcelable>) mValues.get(position).getMembers());
                 context.startActivity(intent);

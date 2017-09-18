@@ -1,9 +1,11 @@
 package com.example.iaeste.general;
 
 import android.content.Intent;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewStub;
 import android.widget.EditText;
@@ -19,7 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EditGroupActivity extends AppCompatActivity {
 
@@ -34,12 +38,16 @@ public class EditGroupActivity extends AppCompatActivity {
 
     private List<MyUser> groupUserList;
 
+    private MyGroup myGroup;
+    private EditText group_title_editText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_group);
 
         Intent intent = getIntent();
+        myGroup = intent.getParcelableExtra("myGroup");
         String groupName = intent.getStringExtra("groupName");
         groupUserList = intent.getParcelableArrayListExtra("groupUserList");
 
@@ -49,14 +57,15 @@ public class EditGroupActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
 
+        mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
         mUserDatabaseReference = mFirebaseDatabase.getReference("users");
 
         databaseUsersListInitialization();
 
         usersViewListInitialization();
 
-        EditText group_title = (EditText) findViewById(R.id.group_title);
-        group_title.setText(groupName);
+        group_title_editText = (EditText) findViewById(R.id.group_title);
+        group_title_editText.setText(groupName);
     }
 
     private void databaseUsersListInitialization(){
@@ -67,7 +76,7 @@ public class EditGroupActivity extends AppCompatActivity {
                     MyUser newMyUser = markerChild.getValue(MyUser.class);
                     newMyUser.setUid(markerChild.getKey());
                     listSelectionViewAdapter.add(newMyUser);
-                    if(groupUserList.contains(newMyUser)){
+                    if(groupUserList!=null && groupUserList.contains(newMyUser)){
                         listSelectionViewAdapter.setItemsSelected(listSelectionViewAdapter.getPosition(newMyUser), newMyUser);
                     }
                 }
@@ -102,6 +111,27 @@ public class EditGroupActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        final MenuItem createUserMenuItem = menu.add(Menu.NONE, 1000, Menu.NONE, "DONE");
+        MenuItemCompat.setShowAsAction(createUserMenuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        createUserMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                updateDatabase();
+                finish();
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void updateDatabase(){
+        myGroup.setDisplayName(group_title_editText.getText().toString());
+        myGroup.setMembers(listSelectionViewAdapter.getItemsSelected());
+        mGroupDatabaseReference.child(myGroup.getId()).setValue(myGroup);
     }
 
 }
