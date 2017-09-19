@@ -9,6 +9,7 @@
     <string name="title_activity_groupCom">GroupCommander Activity</string>
     <string name="title_activity_group">Add Group</string>
     <string name="title_activity_user">Add User</string>
+    <string name="title_activity_editGroup">Edit Group</string>
 
     <string name="menu1">create group</string>
     <string name="menu2">create user</string>

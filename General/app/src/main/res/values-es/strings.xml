@@ -56,5 +56,6 @@
     <string name="title_activity_group">Añadir Grupo</string>
     <string name="title_activity_groupCom">Líder de Grupo</string>
     <string name="title_activity_user">Añadir Usuario</string>
+    <string name="title_activity_editGroup">Editar Grupo</string>
 
 </resources>
