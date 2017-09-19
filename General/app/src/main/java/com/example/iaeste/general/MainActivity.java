@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mTaskDatabaseReference;
+    private ValueEventListener mValueEventUserRoleListener;
     private DatabaseReference mUserDatabaseReference;
     private DatabaseReference mGroupDatabaseReference;
     private ChildEventListener mChildEventListener;
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         firebaseTaskDatabaseInit();
 
         taskListViewInitialization();
+
     }
 
     private void firebaseAuthenticationInit(){
@@ -153,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mUserDatabaseReference = mFirebaseDatabase.getReference("users");
 
-        mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
+        mValueEventUserRoleListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (mFirebaseUser != null) {
@@ -196,7 +198,8 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+        mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
 
     }
 
