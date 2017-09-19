@@ -365,6 +365,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 String key = mMapObjectsDatabaseReference.push().getKey();
                 Point newPoint = new Point(key,
                         new MyLatLng(point.latitude, point.longitude));
+                newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
                 newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
                 mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
             }
@@ -763,6 +764,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     }
 
                     MyPolygon myPolygon = new MyPolygon(key, myLatLngList);
+                    myPolygon.setUid(mFirebaseAuth.getCurrentUser().getUid());
                     myPolygon.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
                     myPolygon.setArea(SphericalUtil.computeArea(auxPolygonToShow.getPoints()));
                     mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polygon").setValue(myPolygon);
@@ -794,6 +796,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     }
 
                     MyPolyline myPolyline = new MyPolyline(key, myLatLngList);
+                    myPolyline.setUid(mFirebaseAuth.getCurrentUser().getUid());
                     myPolyline.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
                     myPolyline.setLength(SphericalUtil.computeLength(auxPolylineToShow.getPoints()));
                     mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Polyline").setValue(myPolyline);

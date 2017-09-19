@@ -22,6 +22,7 @@ public class MyPolygon extends MapObject implements Parcelable{
     private String description;
     private String author;
     private double area;
+    private String uid;
 
     public MyPolygon(){
 
@@ -39,6 +40,7 @@ public class MyPolygon extends MapObject implements Parcelable{
         description = in.readString();
         author = in.readString();
         area = in.readDouble();
+        uid = in.readString();
     }
 
     public static final Creator<MyPolygon> CREATOR = new Creator<MyPolygon>() {
@@ -62,6 +64,7 @@ public class MyPolygon extends MapObject implements Parcelable{
         result.put("description", description);
         result.put("author", author);
         result.put("area", area);
+        result.put("uid", uid);
 
         return result;
     }
@@ -115,6 +118,14 @@ public class MyPolygon extends MapObject implements Parcelable{
         this.area = area;
     }
 
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -128,5 +139,6 @@ public class MyPolygon extends MapObject implements Parcelable{
         dest.writeString(description);
         dest.writeString(author);
         dest.writeDouble(area);
+        dest.writeString(uid);
     }
 }

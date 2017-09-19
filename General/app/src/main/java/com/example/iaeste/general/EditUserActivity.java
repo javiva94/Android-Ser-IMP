@@ -72,6 +72,8 @@ public class EditUserActivity extends AppCompatActivity {
                     MyGroup newMyGroup = markerChild.getValue(MyGroup.class);
                     newMyGroup.setId(markerChild.getKey());
                     listSelectionViewAdapter.add(newMyGroup);
+
+                    //Add to userGroupList those groups where actual user is already in
                     if(newMyGroup.getMembers()!=null) {
                         for(MyUser myUserAux: newMyGroup.getMembers()){
                             if (myUserAux.getUid().equals(myUser.getUid())) {
@@ -131,7 +133,12 @@ public class EditUserActivity extends AppCompatActivity {
     private void updateDatabase(){
         for(int i=0; i<listSelectionViewAdapter.getCount(); i++){
             MyGroup myGroup = (MyGroup) listSelectionViewAdapter.getItem(i);
-            List<MyUser> myUserList = myGroup.getMembers();
+            List<MyUser> myUserList;
+            if(myGroup.getMembers()!=null){
+                myUserList = myGroup.getMembers();
+            }else{
+                myUserList = new ArrayList<>();
+            }
             if(containsGroup(listSelectionViewAdapter.getItemsSelected(), myGroup)){
                 if(!containsUser(myUserList, myUser)) {
                     myUserList.add(myUser);
