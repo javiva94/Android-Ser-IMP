@@ -50,5 +50,11 @@
     <string name="txt5">Terminar Polígono</string>
     <string name="toast10">"Mostrar mi error de ubicación: "</string>
     <string name="toast11">Ubicación no encontrada!</string>
+    <string name="title_activity_addTask">Tarea</string>
+    <string name="title_activity_admin">Administrador</string>
+    <string name="title_activity_editMap">Editar Mapa</string>
+    <string name="title_activity_group">Añadir Grupo</string>
+    <string name="title_activity_groupCom">Líder de Grupo</string>
+    <string name="title_activity_user">Añadir Usuario</string>
 
 </resources>

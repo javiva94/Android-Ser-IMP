@@ -49,13 +49,27 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".AddTaskActivity" />
-        <activity android:name=".EditMapObjectActivity" />
-        <activity android:name=".AdminActivity" />
-        <activity android:name=".GroupCommanderActivity" />
-        <activity android:name=".AddGroupActivity" />
-        <activity android:name=".AddUserActivity" />
+
+        <activity android:name=".AddTaskActivity"
+            android:label="@string/title_activity_addTask"/>
+
+        <activity android:name=".EditMapObjectActivity"
+            android:label="@string/title_activity_editMap"/>
+
+        <activity android:name=".AdminActivity"
+            android:label="@string/title_activity_admin"/>
+
+        <activity android:name=".GroupCommanderActivity"
+            android:label="@string/title_activity_groupCom"/>
+
+        <activity android:name=".AddGroupActivity"
+            android:label="@string/title_activity_group"/>
+
+        <activity android:name=".AddUserActivity"
+            android:label="@string/title_activity_user"/>
+
         <activity android:name=".EditUserActivity" />
+
         <activity android:name=".EditGroupActivity"></activity>
     </application>
 
