@@ -33,6 +33,7 @@ public class EditUserActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private DatabaseReference mGroupDatabaseReference;
+    private ValueEventListener mValueEventGroupListener;
     private DatabaseReference mUserDatabaseReference;
 
     private ViewStub stubList;
@@ -65,7 +66,7 @@ public class EditUserActivity extends AppCompatActivity {
     }
 
     private void databaseGroupsListInitialization(){
-        mGroupDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mValueEventGroupListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
@@ -88,7 +89,7 @@ public class EditUserActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
     }
 
     private void groupsViewListInitialization(){
@@ -186,4 +187,22 @@ public class EditUserActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        listSelectionViewAdapter.clear();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGroupDatabaseReference.addListenerForSingleValueEvent(mValueEventGroupListener);
+        databaseGroupsListInitialization();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
+    }
 }

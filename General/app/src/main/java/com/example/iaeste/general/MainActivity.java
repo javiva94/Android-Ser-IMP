@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private ValueEventListener mValueEventUserRoleListener;
     private DatabaseReference mUserDatabaseReference;
     private DatabaseReference mGroupDatabaseReference;
-    private ChildEventListener mChildEventListener;
+    private ChildEventListener mChildEventTaskListener;
 
 
     @Override
@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
     private void firebaseUsersDatabaseInit(){
@@ -199,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
+      //  mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
 
     }
 
@@ -208,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
         mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
 
-        mGroupDatabaseReference.addChildEventListener(new ChildEventListener() {
+        mChildEventTaskListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 MyGroup newMyGroup = dataSnapshot.getValue(MyGroup.class);
@@ -242,49 +243,9 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
-/*
-        mChildEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Task newTask = dataSnapshot.getValue(Task.class);
-                // newTask.setTitle((String) dataSnapshot.child("title").getValue());
-                newTask.setKey(dataSnapshot.getKey());
-                if(taskList.contains(newTask)) {
-                    taskViewAdapter.add(newTask);
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                String key = dataSnapshot.getKey();
-                boolean find = false;
-                int i = 0;
-                while (!find){
-                    if(taskList.get(i).getKey().equals(key)){
-                        taskViewAdapter.remove(taskList.get(i));
-                        find = true;
-                    }
-                    i++;
-                }
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         };
-        mTaskDatabaseReference.addChildEventListener(mChildEventListener);*/
+      //  mGroupDatabaseReference.addChildEventListener(mChildEventTaskListener);
+
     }
 
     private void taskListViewInitialization(){
@@ -354,13 +315,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+      //  mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+       // mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
+        taskViewAdapter.clear();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
+        mGroupDatabaseReference.addChildEventListener(mChildEventTaskListener);
     }
 
     @Override

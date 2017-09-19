@@ -37,6 +37,8 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
 
     private Context context;
 
+    private ValueEventListener mValueEventListener;
+
     public MyGroupsRecyclerViewAdapter(List<MyGroup> items, OnListFragmentInteractionListener listener, Context context) {
         mValues = items;
         mListener = listener;
@@ -56,7 +58,7 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
         holder.mIdView.setText(mValues.get(position).getDisplayName());
 
         DatabaseReference userDabaseReference = FirebaseDatabase.getInstance().getReference("/users/"+mValues.get(position).getOwner_uid());
-        userDabaseReference.addValueEventListener(new ValueEventListener() {
+        mValueEventListener =new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 MyUser myUser = dataSnapshot.getValue(MyUser.class);
@@ -67,7 +69,8 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+        userDabaseReference.addValueEventListener(mValueEventListener);
 
         holder.mDeleteGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,4 +140,6 @@ public class MyGroupsRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupsRe
     public void addValue(MyGroup myGroup){
         mValues.add(myGroup);
     }
+
+
 }
