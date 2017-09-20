@@ -58,6 +58,7 @@
     <string name="title_activity_groupCom">ГроупЦоммандер Ацтивити</string>
     <string name="title_activity_user">Адд Усер</string>
     <string name="title_activity_editGroup">Измени групу</string>
+    <string name="title_activity_editUser">Едит Усер</string>
 
 
 </resources>

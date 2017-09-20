@@ -118,7 +118,7 @@ public class EditGroupActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        final MenuItem createUserMenuItem = menu.add(Menu.NONE, 1000, Menu.NONE, "DONE");
+        final MenuItem createUserMenuItem = menu.add(Menu.NONE, 1000, Menu.NONE, R.string.tlb2);
         MenuItemCompat.setShowAsAction(createUserMenuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         createUserMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
