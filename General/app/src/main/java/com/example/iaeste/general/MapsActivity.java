@@ -185,12 +185,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myMap.setMyLocationEnabled(true);
 
         myMap.setInfoWindowAdapter(new MyInfoWindow(getLayoutInflater()));
-        myMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                Toast.makeText(MapsActivity.this, marker.getTitle(), Toast.LENGTH_LONG).show();
-            }
-        });
 
         setInfoWindowFragmentListeners();
 
@@ -324,6 +318,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         );
         if(point.getImageId()!= null) {
            newMarker.setIcon(bitmapDescriptorFromVector(this, R.drawable.marker_camera));
+            newMarker.setSnippet(newMarker.getSnippet() + "/&" + point.getImageId());
         }
         newMarker.setTag(point.getId());
         markerHashMap.put(point.getId(), newMarker);
@@ -455,7 +450,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                         new MyLatLng(point.latitude, point.longitude));
                 newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
                 newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
-                newPoint.setImageId("images/"+key);
+                newPoint.setImageId(key);
                 imageId = key;
                 mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
                 addCameraPhoto();
@@ -495,7 +490,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private void uploadImageToFirebaseStorage(Bitmap image){
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference imageRef = storage.getReference("images/"+imageId+".jpg");
+        StorageReference imageRef = storage.getReference("/images/"+imageId+".jpg");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
