@@ -200,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-      //  mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
 
     }
 
@@ -244,7 +243,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-      //  mGroupDatabaseReference.addChildEventListener(mChildEventTaskListener);
 
     }
 
@@ -315,8 +313,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-      //  mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-       // mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        taskViewAdapter.clear();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         taskViewAdapter.clear();
     }
 

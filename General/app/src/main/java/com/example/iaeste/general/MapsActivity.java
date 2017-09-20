@@ -2,7 +2,13 @@ package com.example.iaeste.general;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -40,6 +46,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -48,14 +56,20 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.maps.android.SphericalUtil;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,7 +82,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private static final String MYTAG = "MYTAG";
-    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash, edit;
+    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash, edit, camera;
     Animation FabOpen, FabClose, FabClockWise, Fabanticlockwise;
     boolean isOpen = false;
 
@@ -76,6 +90,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     // Request Code to ask the user for permission to view their current location (***).
     // Value 8bit (value <256)
     public static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
+    private static final int CAMERA_PIC_REQUEST = 1337;
 
     private Task task;
     private List<LatLng> listPointsForPolyline = new ArrayList<>();
@@ -95,6 +110,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private ChildEventListener mChildEventListener;
 
     InfoWindowFragment infoWindowFragment;
+
+    private String imageId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -301,13 +318,25 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private void addPoint(Point point){
         Marker newMarker = myMap.addMarker(
                 new MarkerOptions()
-                        .position(new LatLng(point.getPosition().getLatitude(),point.getPosition().getLongitude()))
+                        .position(new LatLng(point.getPosition().getLatitude(), point.getPosition().getLongitude()))
                         .title(point.getTitle())
-                        .snippet(point.getAuthor()+"/&"+ point.getDescription())
+                        .snippet(point.getAuthor() + "/&" + point.getDescription())
         );
+        if(point.getImageId()!= null) {
+           newMarker.setIcon(bitmapDescriptorFromVector(this, R.drawable.marker_camera));
+        }
         newMarker.setTag(point.getId());
         markerHashMap.put(point.getId(), newMarker);
         task.getPointList().add(point);
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     private void removePoint(Point point){
@@ -414,6 +443,80 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         });
     }
+
+    public void Picture(View view){
+        cancelPreviousIncompleteActions();
+        myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey());
+                String key = mMapObjectsDatabaseReference.push().getKey();
+                Point newPoint = new Point(key,
+                        new MyLatLng(point.latitude, point.longitude));
+                newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
+                newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+                newPoint.setImageId("images/"+key);
+                imageId = key;
+                mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
+                addCameraPhoto();
+            }
+
+        });
+
+    }
+
+    public void addCameraPhoto () {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                requestPermissions(new String[]{Manifest.permission.CAMERA},
+                        CAMERA_PIC_REQUEST);
+            }else{
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+            }
+        }else{
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAMERA_PIC_REQUEST) {
+            if(data != null) {
+                Bitmap image = (Bitmap) data.getExtras().get("data");
+                uploadImageToFirebaseStorage(image);
+            }
+        }
+    }
+
+    private void uploadImageToFirebaseStorage(Bitmap image){
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference imageRef = storage.getReference("images/"+imageId+".jpg");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = imageRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(MapsActivity.this, "La imagen NO se guardo en firebase", Toast.LENGTH_SHORT);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Toast.makeText(MapsActivity.this, "La imagen se guardo en firebase!", Toast.LENGTH_SHORT);
+              //  Uri downloadUrl = taskSnapshot.getDownloadUrl();
+            }
+        });
+    }
+
 
     public void remove (View view){
         myMap.setOnMapClickListener(null);
@@ -540,6 +643,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 }
                 break;
             }
+            case CAMERA_PIC_REQUEST: {
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+            }
         }
     }
 
@@ -614,35 +721,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     .build();                   // Creates a CameraPosition from the builder
             myMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-
-            // Add Marker to Map
-          /*  MarkerOptions option = new MarkerOptions();
-            option.title("My Location");
-            option.snippet("....");
-            option.position(latLng);
-            myPosition = myMap.addMarker(option);
-            myPosition.setTag("MyLocation");
-            myPosition.showInfoWindow();*/
-
-           // circle = drawCircle(new MyLatLng(myLocation.getLatitude(), myLocation.getLongitude()));
         } else {
             Toast.makeText(this, R.string.toast11, Toast.LENGTH_LONG).show();
             Log.i(MYTAG, "Location not found");
         }
 
     }
-/*
-    private Circle drawCircle(MyLatLng latLng) {
 
-        CircleOptions options = new CircleOptions()
-                .center(latLng)
-                .radius(100)
-                .fillColor(0x20ff0100)
-                .strokeWidth(2);
-
-        return myMap.addCircle(options);
-    }
-*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -710,6 +795,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         addObj_3 = (FloatingActionButton) findViewById(R.id.addObj_3);
         trash = (FloatingActionButton) findViewById(R.id.trash);
         edit = (FloatingActionButton) findViewById(R.id.edit);
+        camera = (FloatingActionButton) findViewById(R.id.camera);
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         FabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
@@ -722,10 +808,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_1.startAnimation(FabClose);
                     addObj_2.startAnimation(FabClose);
                     addObj_3.startAnimation(FabClose);
+                    camera.startAnimation(FabClose);
                     addObj.startAnimation(Fabanticlockwise);
                     addObj_1.setClickable(false);
                     addObj_2.setClickable(false);
                     addObj_3.setClickable(false);
+                    camera.setClickable(false);
                     trash.setVisibility(View.VISIBLE);
                     edit.setVisibility(View.VISIBLE);
                     myMap.setOnMapClickListener(null);
@@ -735,10 +823,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_1.startAnimation(FabOpen);
                     addObj_2.startAnimation(FabOpen);
                     addObj_3.startAnimation(FabOpen);
+                    camera.startAnimation(FabOpen);
                     addObj.startAnimation(FabClockWise);
                     addObj_1.setClickable(true);
                     addObj_2.setClickable(true);
                     addObj_3.setClickable(true);
+                    camera.setClickable(true);
                     trash.setVisibility(View.GONE);
                     edit.setVisibility(View.GONE);
                     isOpen = true;

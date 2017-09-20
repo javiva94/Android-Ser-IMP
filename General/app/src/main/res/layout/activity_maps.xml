@@ -30,7 +30,6 @@
         android:clickable="true"
         android:onClick="edit"
         app:srcCompat="@drawable/ic_edit_light"
-        map:fabSize="normal"
         map:layout_constraintBottom_toTopOf="@+id/addObj"
         map:layout_constraintRight_toRightOf="parent" />
 
@@ -50,6 +49,23 @@
         map:layout_constraintBottom_toTopOf="@+id/edit"
         map:layout_constraintRight_toRightOf="parent"
         map:srcCompat="@drawable/ic_delete_light" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:elevation="5dp"
+        android:onClick="Picture"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:layout_constraintBottom_toTopOf="@+id/addObj_3"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@android:drawable/ic_menu_camera" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addObj_3"

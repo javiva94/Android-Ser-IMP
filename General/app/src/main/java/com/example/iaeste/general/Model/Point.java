@@ -20,6 +20,7 @@ public class Point extends MapObject implements Parcelable {
     private String description;
     private String author;
     private String uid;
+    private String imageId;
 
     public Point(){
 
@@ -40,6 +41,7 @@ public class Point extends MapObject implements Parcelable {
         description = in.readString();
         author = in.readString();
         uid = in.readString();
+        imageId = in.readString();
     }
 
     @Exclude
@@ -51,6 +53,7 @@ public class Point extends MapObject implements Parcelable {
         result.put("description", description);
         result.put("author", author);
         result.put("uid", uid);
+        result.put("imageId", imageId);
 
         return result;
     }
@@ -116,6 +119,14 @@ public class Point extends MapObject implements Parcelable {
         this.uid = uid;
     }
 
+    public String getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -129,6 +140,7 @@ public class Point extends MapObject implements Parcelable {
         dest.writeString(description);
         dest.writeString(author);
         dest.writeString(uid);
+        dest.writeString(imageId);
     }
 
 
