@@ -72,11 +72,11 @@ public class EditMapObjectActivity extends AppCompatActivity {
     private void showPointEdition(Point point){
         TextView latitude = (TextView) findViewById(R.id.latitudeTextView);
         TextView longitude = (TextView) findViewById(R.id.longitudeTextView);
-        latitude.setText(R.string.Lat+String.valueOf(point.getPosition().getLatitude()));
-        longitude.setText(R.string.Long+String.valueOf(point.getPosition().getLongitude()));
+        latitude.setText(getResources().getString(R.string.Lat)+" "+String.valueOf(point.getPosition().getLatitude()));
+        longitude.setText(getResources().getString(R.string.Long)+" "+String.valueOf(point.getPosition().getLongitude()));
 
         TextView author = (TextView) findViewById(R.id.authorTextView);
-        author.setText(R.string.Author+point.getAuthor());
+        author.setText(getResources().getString(R.string.Author)+" "+point.getAuthor());
 
         EditText title = (EditText) findViewById(R.id.title);
         EditText description = (EditText) findViewById(R.id.description);
@@ -91,7 +91,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     private void showPolylineEdition(MyPolyline polyline){
         TextView author = (TextView) findViewById(R.id.authorTextView);
-        author.setText(R.string.Author+polyline.getAuthor());
+        author.setText(getResources().getString(R.string.Author)+" "+polyline.getAuthor());
 
         if(polyline.getTitle()!=null) {
             title.setText(polyline.getTitle());
@@ -103,7 +103,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     private void showPolygonEdition(MyPolygon polygon){
         TextView author = (TextView) findViewById(R.id.authorTextView);
-        author.setText(R.string.Author+polygon.getAuthor());
+        author.setText(getResources().getString(R.string.Author)+" "+polygon.getAuthor());
 
         if(polygon.getTitle()!=null) {
             title.setText(polygon.getTitle());

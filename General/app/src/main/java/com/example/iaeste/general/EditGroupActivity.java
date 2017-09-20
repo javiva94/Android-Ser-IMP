@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class EditGroupActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mUserDatabaseReference;
+    private ValueEventListener mValueEventUserListener;
     private DatabaseReference mGroupDatabaseReference;
 
     private ViewStub stubList;
@@ -69,13 +71,14 @@ public class EditGroupActivity extends AppCompatActivity {
     }
 
     private void databaseUsersListInitialization(){
-        mUserDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mValueEventUserListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     MyUser newMyUser = markerChild.getValue(MyUser.class);
                     newMyUser.setUid(markerChild.getKey());
                     listSelectionViewAdapter.add(newMyUser);
+
                     if(groupUserList!=null && groupUserList.contains(newMyUser)){
                         listSelectionViewAdapter.setItemsSelected(listSelectionViewAdapter.getPosition(newMyUser), newMyUser);
                     }
@@ -86,7 +89,7 @@ public class EditGroupActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
     }
 
     private void usersViewListInitialization(){
@@ -134,4 +137,21 @@ public class EditGroupActivity extends AppCompatActivity {
         mGroupDatabaseReference.child(myGroup.getId()).setValue(myGroup);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        listSelectionViewAdapter.clear();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mUserDatabaseReference.addListenerForSingleValueEvent(mValueEventUserListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
+    }
 }
