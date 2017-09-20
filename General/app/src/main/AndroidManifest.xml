@@ -68,7 +68,8 @@
         <activity android:name=".AddUserActivity"
             android:label="@string/title_activity_user"/>
 
-        <activity android:name=".EditUserActivity" />
+        <activity android:name=".EditUserActivity"
+            android:label="@string/title_activity_editUser" />
 
         <activity android:name=".EditGroupActivity"
             android:label="@string/title_activity_editGroup"></activity>
