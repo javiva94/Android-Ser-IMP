@@ -93,13 +93,13 @@ public class InfoWindowFragment extends Fragment {
         title.setText(myPolyline.getTitle());
 
         TextView author = (TextView) view.findViewById(R.id.author);
-        author.setText(R.string.Author+myPolyline.getAuthor());
+        author.setText(getResources().getString(R.string.Author)+" "+myPolyline.getAuthor());
 
         TextView description = (TextView) view.findViewById(R.id.description);
-        description.setText(R.string.Des+ myPolyline.getDescription());
+        description.setText(getResources().getString(R.string.Des)+" "+myPolyline.getDescription());
 
         TextView geometryInfo = (TextView) view.findViewById(R.id.geometry_info);
-        geometryInfo.setText(R.string.Length +String.format("%.2f",myPolyline.getLength())+" m");
+        geometryInfo.setText(getResources().getString(R.string.Length)+" "+String.format("%.2f",myPolyline.getLength())+" m");
     }
 
     private void inflatePolygonInfoWindowFragment(View view){
@@ -107,13 +107,13 @@ public class InfoWindowFragment extends Fragment {
         title.setText(myPolygon.getTitle());
 
         TextView author = (TextView) view.findViewById(R.id.author);
-        author.setText(R.string.Author+myPolygon.getAuthor());
+        author.setText(getResources().getString(R.string.Author)+" "+myPolygon.getAuthor());
 
         TextView description = (TextView) view.findViewById(R.id.description);
-        description.setText(R.string.Des+ myPolygon.getDescription());
+        description.setText(getResources().getString(R.string.Des)+" "+myPolygon.getDescription());
 
         TextView geometryInfo = (TextView) view.findViewById(R.id.geometry_info);
-        geometryInfo.setText(R.string.area + String.format("%.2f",myPolygon.getArea())+" m\u00B2");
+        geometryInfo.setText(getResources().getString(R.string.area)+" "+String.format("%.2f",myPolygon.getArea())+" m\u00B2");
     }
 
     // TODO: Rename method, update argument and hook method into UI event
