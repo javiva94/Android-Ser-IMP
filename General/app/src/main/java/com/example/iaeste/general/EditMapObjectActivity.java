@@ -4,21 +4,16 @@ import android.content.Intent;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.iaeste.general.Model.MapObject;
 import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.MyPolyline;
 import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -42,7 +37,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_map_object);
 
         title = (EditText) findViewById(R.id.title);
-        description = (EditText) findViewById(R.id.description);
+        description = (EditText) findViewById(R.id.DescriptionTitle);
 
         Intent intent = getIntent(); // gets the previously created intent
         task = (Task) intent.getParcelableExtra("task");
@@ -79,7 +74,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
         author.setText(getResources().getString(R.string.Author)+" "+point.getAuthor());
 
         EditText title = (EditText) findViewById(R.id.title);
-        EditText description = (EditText) findViewById(R.id.description);
+        EditText description = (EditText) findViewById(R.id.DescriptionTitle);
 
         if(point.getTitle()!=null) {
             title.setText(point.getTitle());
@@ -172,7 +167,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     private Point getPointModified(Point point){
         EditText title = (EditText) findViewById(R.id.title);
-        EditText description = (EditText) findViewById(R.id.description);
+        EditText description = (EditText) findViewById(R.id.DescriptionTitle);
 
         point.setTitle(title.getText().toString());
         point.setDescription(description.getText().toString());
@@ -182,7 +177,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     private MyPolyline getPolylineModified(MyPolyline polyline){
         EditText title = (EditText) findViewById(R.id.title);
-        EditText description = (EditText) findViewById(R.id.description);
+        EditText description = (EditText) findViewById(R.id.DescriptionTitle);
 
         polyline.setTitle(title.getText().toString());
         polyline.setDescription(description.getText().toString());
@@ -192,7 +187,7 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     private MyPolygon getPolygonModified(MyPolygon polygon){
         EditText title = (EditText) findViewById(R.id.title);
-        EditText description = (EditText) findViewById(R.id.description);
+        EditText description = (EditText) findViewById(R.id.DescriptionTitle);
 
         polygon.setTitle(title.getText().toString());
         polygon.setDescription(description.getText().toString());

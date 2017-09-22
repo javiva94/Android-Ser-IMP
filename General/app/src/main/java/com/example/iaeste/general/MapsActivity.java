@@ -184,9 +184,18 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         }
         myMap.setMyLocationEnabled(true);
 
-        myMap.setInfoWindowAdapter(new MyInfoWindow(getLayoutInflater()));
+        myMap.setInfoWindowAdapter(new MyInfoWindow(getLayoutInflater(), this));
 
         setInfoWindowFragmentListeners();
+
+        myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if(infoWindowFragment.isAdded()){
+                    getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
+                }
+            }
+        });
 
     }
 
@@ -310,15 +319,21 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void addPoint(Point point){
-        Marker newMarker = myMap.addMarker(
-                new MarkerOptions()
-                        .position(new LatLng(point.getPosition().getLatitude(), point.getPosition().getLongitude()))
-                        .title(point.getTitle())
-                        .snippet(point.getAuthor() + "/&" + point.getDescription())
-        );
-        if(point.getImageId()!= null) {
-           newMarker.setIcon(bitmapDescriptorFromVector(this, R.drawable.marker_camera));
-            newMarker.setSnippet(newMarker.getSnippet() + "/&" + point.getImageId());
+        Marker newMarker;
+        if(point.getImageId()== null) {
+            newMarker = myMap.addMarker(
+                    new MarkerOptions()
+                            .position(new LatLng(point.getPosition().getLatitude(), point.getPosition().getLongitude()))
+                            .title(point.getTitle())
+                            .snippet(point.getAuthor() + "/&" + point.getDescription())
+            );
+        }else{
+            newMarker = myMap.addMarker(
+                    new MarkerOptions()
+                            .position(new LatLng(point.getPosition().getLatitude(), point.getPosition().getLongitude()))
+                            .icon(bitmapDescriptorFromVector(this, R.drawable.marker_camera))
+                            .snippet("image")
+            );
         }
         newMarker.setTag(point.getId());
         markerHashMap.put(point.getId(), newMarker);
@@ -999,6 +1014,32 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 }else{
                     getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
                 }
+            }
+        });
+
+        myMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if(marker.getSnippet().equals("image")){
+                    if(!infoWindowFragment.isAdded()) {
+                        Point point = task.getPointById((String) marker.getTag());
+
+                        infoWindowFragment = new InfoWindowFragment();
+
+                        Bundle args = new Bundle();
+                        args.putParcelable("PointPicture",point);
+                        infoWindowFragment.setArguments(args);
+
+                        getSupportFragmentManager().beginTransaction()
+                                .add(R.id.mMapView, infoWindowFragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }else {
+                        getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
+                    }
+
+                }
+                return false;
             }
         });
     }

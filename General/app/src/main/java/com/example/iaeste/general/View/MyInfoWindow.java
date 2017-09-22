@@ -1,16 +1,11 @@
 package com.example.iaeste.general.View;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
+import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.widget.ImageView;
-import android.widget.Toast;
 
+import com.example.iaeste.general.InfoWindowFragment;
 import com.example.iaeste.general.R;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.Marker;
 
 /*
@@ -32,19 +27,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 public class MyInfoWindow implements InfoWindowAdapter {
 
     private View popup=null;
     private LayoutInflater inflater=null;
 
-    public MyInfoWindow(LayoutInflater inflater) {
+    private static final int MAX_AVAILABLE = 1;
+    private final Semaphore available = new Semaphore(MAX_AVAILABLE);
+
+    private Context context;
+
+    private InfoWindowFragment infoWindowFragment;
+
+    public MyInfoWindow(LayoutInflater inflater, Context context) {
         this.inflater=inflater;
+        this.context = context;
+        infoWindowFragment = new InfoWindowFragment();
     }
 
     @Override
@@ -54,55 +56,30 @@ public class MyInfoWindow implements InfoWindowAdapter {
 
     @SuppressLint("InflateParams")
     @Override
-    public View getInfoContents(Marker marker) {
-        if (popup == null) {
-            popup = inflater.inflate(R.layout.my_info_window, null);
-        }
-        //Title
-        TextView tv = (TextView) popup.findViewById(R.id.title);
-        tv.setText(marker.getTitle());
+    public View getInfoContents(final Marker marker) {
+        if(marker.getSnippet().equals("image")) {
+            return null;
+        }else{
+            if (popup == null) {
+                popup = inflater.inflate(R.layout.my_info_window, null);
+            }
 
-        //Snippet parameters
-        String snippet[] = marker.getSnippet().split("/&");
-        String author = snippet[0];
-        tv = (TextView) popup.findViewById(R.id.author);
-        tv.setText("Author: " + author);
+            //Title
+            TextView tv = (TextView) popup.findViewById(R.id.title);
+            tv.setText(marker.getTitle());
 
-        if (snippet.length == 2) {
+            //Snippet parameters
+            String snippet[] = marker.getSnippet().split("/&");
+            String author = snippet[0];
+            tv = (TextView) popup.findViewById(R.id.AuthorTitle);
+            tv.setText(author);
+
             String description = snippet[1];
-            tv = (TextView) popup.findViewById(R.id.description);
-            tv.setText("Description: " + description);
+            tv = (TextView) popup.findViewById(R.id.DescriptionTitle);
+            tv.setText(description);
+
+            return popup;
         }
-
-        if (snippet.length > 2) {
-            String description = snippet[1];
-            tv = (TextView) popup.findViewById(R.id.description);
-            tv.setText("Description: " + description);
-
-            String imageId = snippet[2];
-            System.out.println(imageId);
-
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference imageRef = storage.getReference("/images/" + imageId + ".jpg");
-
-            final long ONE_MEGABYTE = 1024 * 1024;
-            imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                @Override
-                public void onSuccess(byte[] bytes) {
-                    // Data for "images/island.jpg" is returns, use this as needed
-                    ImageView imageView = (ImageView) popup.findViewById(R.id.image);
-                    Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    imageView.setImageBitmap(image);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                    Log.e("Error imagen:", exception.toString());
-                }
-            });
-        }
-        return popup;
     }
 
 }

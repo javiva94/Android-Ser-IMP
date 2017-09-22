@@ -1,18 +1,27 @@
 package com.example.iaeste.general;
 
-import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.iaeste.general.Model.MapObject;
 import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.MyPolyline;
+import com.example.iaeste.general.Model.Point;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
 
 
 /**
@@ -31,6 +40,7 @@ public class InfoWindowFragment extends Fragment {
 
     private MyPolyline myPolyline;
     private MyPolygon myPolygon;
+    private Point pointPicture;
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,6 +76,9 @@ public class InfoWindowFragment extends Fragment {
             if(getArguments().containsKey("MyPolygon")){
                 myPolygon = (MyPolygon) getArguments().get("MyPolygon");
             }
+            if(getArguments().containsKey("PointPicture")){
+                pointPicture = (Point) getArguments().get("PointPicture");
+            }
 
         }
     }
@@ -82,6 +95,10 @@ public class InfoWindowFragment extends Fragment {
         }else{
             if (myPolygon!=null){
                 inflatePolygonInfoWindowFragment(view);
+            }else{
+                if(pointPicture!=null){
+                    inflatePictureInfoWindowFragment(view);
+                }
             }
         }
 
@@ -114,6 +131,46 @@ public class InfoWindowFragment extends Fragment {
 
         TextView geometryInfo = (TextView) view.findViewById(R.id.geometry_info);
         geometryInfo.setText(getResources().getString(R.string.area)+" "+String.format("%.2f",myPolygon.getArea())+" m\u00B2");
+    }
+
+    private void inflatePictureInfoWindowFragment(final View view){
+        TextView author = (TextView) view.findViewById(R.id.author);
+        author.setText(getResources().getString(R.string.Author)+" "+pointPicture.getAuthor());
+
+        TextView description = (TextView) view.findViewById(R.id.description);
+        description.setText(getResources().getString(R.string.Des)+" "+pointPicture.getDescription());
+
+        TextView geometryInfo = (TextView) view.findViewById(R.id.geometry_info);
+        geometryInfo.setVisibility(View.GONE);
+
+        final ImageView imageView = (ImageView) view.findViewById(R.id.image);
+        imageView.setClickable(true);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference imageRef = storage.getReference("/images/" + pointPicture.getImageId() + ".jpg");
+
+        final long ONE_MEGABYTE = 1024 * 1024;
+        imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                // Data for "images/island.jpg" is returns, use this as needed
+                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                imageView.setImageBitmap(image);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.e("Error imagen:", exception.toString());
+            }
+        });
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
