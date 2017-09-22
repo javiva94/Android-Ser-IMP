@@ -3,6 +3,7 @@ package com.example.iaeste.general;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -16,12 +17,16 @@ import android.widget.TextView;
 import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.MyPolyline;
 import com.example.iaeste.general.Model.Point;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+
+import static android.content.ContentValues.TAG;
 
 
 /**
@@ -43,6 +48,8 @@ public class InfoWindowFragment extends Fragment {
     private Point pointPicture;
 
     private OnFragmentInteractionListener mListener;
+
+    private Bitmap image;
 
     public InfoWindowFragment() {
         // Required empty public constructor
@@ -148,7 +155,16 @@ public class InfoWindowFragment extends Fragment {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FullImageFragment fullImageFragment = new FullImageFragment();
 
+                Bundle args = new Bundle();
+                args.putParcelable("image", image);
+                fullImageFragment.setArguments(args);
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .add(R.id.mMapView, fullImageFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 
@@ -160,7 +176,7 @@ public class InfoWindowFragment extends Fragment {
             @Override
             public void onSuccess(byte[] bytes) {
                 // Data for "images/island.jpg" is returns, use this as needed
-                Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 imageView.setImageBitmap(image);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -211,4 +227,5 @@ public class InfoWindowFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
 }
