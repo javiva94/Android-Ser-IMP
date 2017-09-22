@@ -82,9 +82,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private static final String MYTAG = "MYTAG";
-    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash, edit, camera;
+    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash, edit, camera,location, marker1, camera1;
     Animation FabOpen, FabClose, FabClockWise, Fabanticlockwise;
     boolean isOpen = false;
+    boolean isOpen1 = false;
 
 
     // Request Code to ask the user for permission to view their current location (***).
@@ -806,6 +807,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         trash = (FloatingActionButton) findViewById(R.id.trash);
         edit = (FloatingActionButton) findViewById(R.id.edit);
         camera = (FloatingActionButton) findViewById(R.id.camera);
+        location = (FloatingActionButton) findViewById(R.id.location);
+        camera1 = (FloatingActionButton) findViewById(R.id.camera1);
+        marker1 = (FloatingActionButton) findViewById(R.id.marker1);
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         FabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         FabClockWise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
@@ -819,29 +823,62 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_2.startAnimation(FabClose);
                     addObj_3.startAnimation(FabClose);
                     camera.startAnimation(FabClose);
+                    location.startAnimation(FabClose);
+                    camera1.startAnimation(FabClose);
+                    marker1.startAnimation(FabClose);
                     addObj.startAnimation(Fabanticlockwise);
                     addObj_1.setClickable(false);
                     addObj_2.setClickable(false);
                     addObj_3.setClickable(false);
                     camera.setClickable(false);
+                    location.setClickable(false);
+                    camera1.setClickable(false);
+                    marker1.setClickable(false);
                     trash.setVisibility(View.VISIBLE);
                     edit.setVisibility(View.VISIBLE);
                     myMap.setOnMapClickListener(null);
                     setInfoWindowFragmentListeners();
                     isOpen = false;
                 } else {
+
                     addObj_1.startAnimation(FabOpen);
                     addObj_2.startAnimation(FabOpen);
                     addObj_3.startAnimation(FabOpen);
                     camera.startAnimation(FabOpen);
+                    location.startAnimation(FabOpen);
+                    marker1.startAnimation(FabClose);
+                    camera1.startAnimation(FabClose);
                     addObj.startAnimation(FabClockWise);
                     addObj_1.setClickable(true);
                     addObj_2.setClickable(true);
                     addObj_3.setClickable(true);
                     camera.setClickable(true);
+                    location.setClickable(true);
+                    camera1.setClickable(false);
+                    marker1.setClickable(false);
                     trash.setVisibility(View.GONE);
                     edit.setVisibility(View.GONE);
                     isOpen = true;
+                    location.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (isOpen1) {
+                                marker1.startAnimation(FabClose);
+                                camera1.startAnimation(FabClose);
+                                camera1.setClickable(true);
+                                marker1.setClickable(true);
+                                isOpen1 = false;
+                            }
+                            else {
+
+                                marker1.startAnimation(FabOpen);
+                                camera1.startAnimation(FabOpen);
+                                camera1.setClickable(false);
+                                marker1.setClickable(false);
+                                isOpen1 = true;}
+
+                        }
+                    });
                 }
             }
         });
