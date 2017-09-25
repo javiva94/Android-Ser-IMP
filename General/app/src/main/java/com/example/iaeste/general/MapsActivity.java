@@ -35,6 +35,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
 import android.support.v4.app.Fragment;
+
 import com.example.iaeste.general.Model.MyPolyline;
 import com.example.iaeste.general.Model.MyLatLng;
 import com.example.iaeste.general.Model.MyPolygon;
@@ -82,7 +83,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private GoogleMap myMap;
     private ProgressDialog myProgress;
     private static final String MYTAG = "MYTAG";
-    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash, edit, camera,location, marker1, camera1;
+    FloatingActionButton addObj_3, addObj_2, addObj_1, addObj, trash, edit, camera, location, marker1, camera1;
     Animation FabOpen, FabClose, FabClockWise, Fabanticlockwise;
     boolean isOpen = false;
     boolean isOpen1 = false;
@@ -114,6 +115,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private String imageId;
 
+    private Location myLocation = null;
+    private LocationManager locationManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,8 +129,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         Toast.makeText(this, "id: " + task.getKey(), Toast.LENGTH_LONG).show();
 
 
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
         setFloatingButtons();
@@ -192,7 +196,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if(infoWindowFragment.isAdded()){
+                if (infoWindowFragment.isAdded()) {
                     getSupportFragmentManager().beginTransaction().remove(infoWindowFragment).commit();
                 }
             }
@@ -200,32 +204,39 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    private void deletePointFromFirebase(Marker marker){
+    private void deletePointFromFirebase(Marker marker) {
         String key = (String) marker.getTag();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
         mMapObjectsDatabaseReference.child(key).removeValue();
     }
 
-    private void deleteLineFromFirebase(Polyline polyline){
+    private void deleteLineFromFirebase(Polyline polyline) {
         String key = (String) polyline.getTag();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
         mMapObjectsDatabaseReference.child(key).removeValue();
     }
 
-    private void deletePolygonFromFirebase(Polygon polygon){
+    private void deletePolygonFromFirebase(Polygon polygon) {
         String key = (String) polygon.getTag();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
         mMapObjectsDatabaseReference.child(key).removeValue();
     }
 
-    private void firebaseDatabaseInit(){
+    private void deleteImageFromFirebase(Marker marker) {
+        String imageId = (String) marker.getTag();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference imageRef = storage.getReference("/images/" + imageId + ".jpg");
+        imageRef.delete();
+    }
+
+    private void firebaseDatabaseInit() {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
 
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("New element", markerChild.toString());
                     //Punto
                     if (markerChild.getKey().equals("Point")) {
@@ -234,13 +245,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     }
 
                     //Linea
-                    if (markerChild.getKey().equals("Polyline")){
+                    if (markerChild.getKey().equals("Polyline")) {
                         MyPolyline newMyPolyline = markerChild.getValue(MyPolyline.class);
                         addPolyline(newMyPolyline);
                     }
 
                     //Poligono
-                    if (markerChild.getKey().equals("Polygon")){
+                    if (markerChild.getKey().equals("Polygon")) {
                         MyPolygon newPolygon = markerChild.getValue(MyPolygon.class);
                         addPolygon(newPolygon);
                     }
@@ -249,7 +260,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("Element modified", markerChild.toString());
                     //Punto
                     if (markerChild.getKey().equals("Point")) {
@@ -259,14 +270,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     }
 
                     //Linea
-                    if (markerChild.getKey().equals("Polyline")){
+                    if (markerChild.getKey().equals("Polyline")) {
                         MyPolyline myPolylineModified = markerChild.getValue(MyPolyline.class);
                         removePolyline(myPolylineModified);
                         addPolyline(myPolylineModified);
                     }
 
                     //Poligono
-                    if (markerChild.getKey().equals("Polygon")){
+                    if (markerChild.getKey().equals("Polygon")) {
                         MyPolygon myPolygonModified = markerChild.getValue(MyPolygon.class);
                         removePolygon(myPolygonModified);
                         addPolygon(myPolygonModified);
@@ -277,35 +288,35 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("Element to delete", markerChild.toString());
 
                     //Punto
                     if (markerChild.getKey().equals("Point")) {
                         Point pointToRemove = markerChild.getValue(Point.class);
                         removePoint(pointToRemove);
-                        Toast.makeText(MapsActivity.this,R.string.point, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this, R.string.point, Toast.LENGTH_SHORT).show();
                     }
 
                     //Linea
-                    if(markerChild.getKey().equals("Polyline")){
+                    if (markerChild.getKey().equals("Polyline")) {
                         MyPolyline myPolylineToRemove = markerChild.getValue(MyPolyline.class);
                         removePolyline(myPolylineToRemove);
                         Toast.makeText(MapsActivity.this, R.string.polyline, Toast.LENGTH_SHORT).show();
                     }
 
                     //Poligono
-                    if (markerChild.getKey().equals("Polygon")){
+                    if (markerChild.getKey().equals("Polygon")) {
                         MyPolygon polygonToRemove = markerChild.getValue(MyPolygon.class);
                         removePolygon(polygonToRemove);
-                        Toast.makeText(MapsActivity.this,R.string.polygon, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this, R.string.polygon, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                for(DataSnapshot markerChild : dataSnapshot.getChildren()) {
+                for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("Element moved", markerChild.toString());
                 }
             }
@@ -319,16 +330,16 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         mMapObjectsDatabaseReference.addChildEventListener(mChildEventListener);
     }
 
-    private void addPoint(Point point){
+    private void addPoint(Point point) {
         Marker newMarker;
-        if(point.getImageId()== null) {
+        if (point.getImageId() == null) {
             newMarker = myMap.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(point.getPosition().getLatitude(), point.getPosition().getLongitude()))
                             .title(point.getTitle())
                             .snippet(point.getAuthor() + "/&" + point.getDescription())
             );
-        }else{
+        } else {
             newMarker = myMap.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(point.getPosition().getLatitude(), point.getPosition().getLongitude()))
@@ -350,14 +361,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private void removePoint(Point point){
+    private void removePoint(Point point) {
         Marker markerToRemove = markerHashMap.get(point.getId());
         markerToRemove.remove();
         markerHashMap.remove(markerToRemove);
         task.getPointList().remove(point);
     }
 
-    private void addPolyline (MyPolyline myPolyline){
+    private void addPolyline(MyPolyline myPolyline) {
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.addAll(convertMyLatLngToLatLng(myPolyline.getPoints()));
 
@@ -369,14 +380,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         task.getPolylineList().add(myPolyline);
     }
 
-    private void removePolyline(MyPolyline myPolyline){
+    private void removePolyline(MyPolyline myPolyline) {
         Polyline polylineToRemove = polylineHashMap.get(myPolyline.getId());
         polylineToRemove.remove();
         polylineHashMap.remove(polylineToRemove);
         task.getPolylineList().remove(polylineToRemove);
     }
 
-    private void addPolygon(MyPolygon myPolygon){
+    private void addPolygon(MyPolygon myPolygon) {
         PolygonOptions polygonOptions = new PolygonOptions();
         polygonOptions.addAll(convertMyLatLngToLatLng(myPolygon.getVertices()));
 
@@ -388,7 +399,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         task.getPolygonList().add(myPolygon);
     }
 
-    private void removePolygon(MyPolygon myPolygon){
+    private void removePolygon(MyPolygon myPolygon) {
         Polygon polygonToRemove = polygonHashMap.get(myPolygon.getId());
         polygonToRemove.remove();
         polygonHashMap.remove(polygonToRemove);
@@ -396,12 +407,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     }
 
 
-    public void Dot (View view) {
+    public void Dot(View view) {
         cancelPreviousIncompleteActions();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey());
+                mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
                 String key = mMapObjectsDatabaseReference.push().getKey();
                 Point newPoint = new Point(key,
                         new MyLatLng(point.latitude, point.longitude));
@@ -413,54 +424,54 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
-    public void Multiline (View view) {
+    public void Multiline(View view) {
         cancelPreviousIncompleteActions();
         listPointsForPolyline.clear();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
                 listPointsForPolyline.add(point);
-                if(auxPolylineToShow != null) {
+                if (auxPolylineToShow != null) {
                     auxPolylineToShow.remove();
                 }
-                PolylineOptions polylineOptions= new PolylineOptions();
+                PolylineOptions polylineOptions = new PolylineOptions();
                 polylineOptions.addAll(listPointsForPolyline);
                 auxPolylineToShow = myMap.addPolyline(polylineOptions);
 
-                if(listPointsForPolyline.size()==2) {
+                if (listPointsForPolyline.size() == 2) {
                     setFinishPolylineButton();
                 }
             }
         });
     }
 
-    public void Polygon (View view) {
+    public void Polygon(View view) {
         cancelPreviousIncompleteActions();
         listPointsForPolygon.clear();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
                 listPointsForPolygon.add(point);
-                if(auxPolygonToShow != null) {
+                if (auxPolygonToShow != null) {
                     auxPolygonToShow.remove();
                 }
-                PolygonOptions polygonOptions= new PolygonOptions();
+                PolygonOptions polygonOptions = new PolygonOptions();
                 polygonOptions.addAll(listPointsForPolygon);
                 auxPolygonToShow = myMap.addPolygon(polygonOptions);
 
-                if(listPointsForPolygon.size()==3) {
+                if (listPointsForPolygon.size() == 3) {
                     setFinishPolygonButton();
                 }
             }
         });
     }
 
-    public void Picture(View view){
+    public void Picture(View view) {
         cancelPreviousIncompleteActions();
         myMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey());
+                mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
                 String key = mMapObjectsDatabaseReference.push().getKey();
                 Point newPoint = new Point(key,
                         new MyLatLng(point.latitude, point.longitude));
@@ -474,6 +485,69 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         });
 
+    }
+
+    public void PictureActualPosition(View view) {
+        cancelPreviousIncompleteActions();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        String locationProvider = this.getEnabledLocationProvider();
+        if (locationProvider == null) {
+            return;
+        }
+
+        LatLng latLng = new LatLng(
+                locationManager.getLastKnownLocation(locationProvider).getLatitude(),
+                locationManager.getLastKnownLocation(locationProvider).getLongitude());
+
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
+        String key = mMapObjectsDatabaseReference.push().getKey();
+        Point newPoint = new Point(key,
+                new MyLatLng(latLng.latitude, latLng.longitude));
+        newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
+        newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+        newPoint.setImageId(key);
+        imageId = key;
+        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
+        addCameraPhoto();
+    }
+
+    public void MarkerActualPosition(View view) {
+        cancelPreviousIncompleteActions();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        String locationProvider = this.getEnabledLocationProvider();
+        if (locationProvider == null) {
+            return;
+        }
+
+        LatLng latLng = new LatLng(
+                locationManager.getLastKnownLocation(locationProvider).getLatitude(),
+                locationManager.getLastKnownLocation(locationProvider).getLongitude());
+
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
+        String key = mMapObjectsDatabaseReference.push().getKey();
+        Point newPoint = new Point(key,
+                new MyLatLng(latLng.latitude, latLng.longitude));
+        newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
+        newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
     }
 
     public void addCameraPhoto () {
@@ -536,6 +610,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             @Override
             public boolean onMarkerClick(Marker marker) {
                 deletePointFromFirebase(marker);
+                if(marker.getSnippet().equals("image")){
+                    deleteImageFromFirebase(marker);
+                }
                 return false;
             }
         });
@@ -686,7 +763,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     // Call this method only when you have the permissions to view a user's location.
     private void showMyLocation() {
 
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         String locationProvider = this.getEnabledLocationProvider();
 
@@ -699,7 +776,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         // Met
         final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
 
-        Location myLocation = null;
         try {
             // This code need permissions (Asked above ***)
             locationManager.requestLocationUpdates(
@@ -824,8 +900,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     addObj_3.startAnimation(FabClose);
                     camera.startAnimation(FabClose);
                     location.startAnimation(FabClose);
-                    camera1.startAnimation(FabClose);
                     marker1.startAnimation(FabClose);
+                    camera1.startAnimation(FabClose);
                     addObj.startAnimation(Fabanticlockwise);
                     addObj_1.setClickable(false);
                     addObj_2.setClickable(false);
@@ -840,14 +916,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     setInfoWindowFragmentListeners();
                     isOpen = false;
                 } else {
-
+                    trash.setVisibility(View.GONE);
+                    edit.setVisibility(View.GONE);
                     addObj_1.startAnimation(FabOpen);
                     addObj_2.startAnimation(FabOpen);
                     addObj_3.startAnimation(FabOpen);
                     camera.startAnimation(FabOpen);
                     location.startAnimation(FabOpen);
-                    marker1.startAnimation(FabClose);
-                    camera1.startAnimation(FabClose);
                     addObj.startAnimation(FabClockWise);
                     addObj_1.setClickable(true);
                     addObj_2.setClickable(true);
@@ -856,26 +931,25 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     location.setClickable(true);
                     camera1.setClickable(false);
                     marker1.setClickable(false);
-                    trash.setVisibility(View.GONE);
-                    edit.setVisibility(View.GONE);
                     isOpen = true;
                     location.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (isOpen1) {
-                                marker1.startAnimation(FabClose);
-                                camera1.startAnimation(FabClose);
-                                camera1.setClickable(true);
-                                marker1.setClickable(true);
-                                isOpen1 = false;
+                            if(isOpen) {
+                                if (isOpen1) {
+                                    marker1.startAnimation(FabClose);
+                                    camera1.startAnimation(FabClose);
+                                    camera1.setClickable(false);
+                                    marker1.setClickable(false);
+                                    isOpen1 = false;
+                                } else {
+                                    marker1.startAnimation(FabOpen);
+                                    camera1.startAnimation(FabOpen);
+                                    camera1.setClickable(true);
+                                    marker1.setClickable(true);
+                                    isOpen1 = true;
+                                }
                             }
-                            else {
-
-                                marker1.startAnimation(FabOpen);
-                                camera1.startAnimation(FabOpen);
-                                camera1.setClickable(false);
-                                marker1.setClickable(false);
-                                isOpen1 = true;}
 
                         }
                     });

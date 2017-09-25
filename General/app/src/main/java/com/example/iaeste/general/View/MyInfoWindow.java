@@ -72,11 +72,13 @@ public class MyInfoWindow implements InfoWindowAdapter {
             String snippet[] = marker.getSnippet().split("/&");
             String author = snippet[0];
             tv = (TextView) popup.findViewById(R.id.AuthorTitle);
-            tv.setText(author);
+            tv.setText(context.getResources().getString(R.string.Author)+" "+author);
 
-            String description = snippet[1];
-            tv = (TextView) popup.findViewById(R.id.DescriptionTitle);
-            tv.setText(description);
+            if(snippet.length==2) {
+                String description = snippet[1];
+                tv = (TextView) popup.findViewById(R.id.DescriptionTitle);
+                tv.setText(context.getResources().getString(R.string.Des)+" "+description);
+            }
 
             return popup;
         }
