@@ -34,7 +34,7 @@
     <string name="Length">Дужина: </string>
     <string name="Des">Опис: </string>
     <string name="load">Мапа Лоадинг ...</string>
-    <string name="point">Избрисана тачка</string>
+    <string name="myMarker">Избрисана тачка</string>
     <string name="polyline">Избрисана полиглина</string>
     <string name="polygon">Избрисан полигон</string>
     <string name="per1">Дозвола одобрена!</string>

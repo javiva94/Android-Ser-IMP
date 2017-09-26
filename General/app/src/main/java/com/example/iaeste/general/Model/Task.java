@@ -18,7 +18,7 @@ public class Task implements Parcelable {
     private String key;
 
   //  private List<MapObject> mapObjects = new ArrayList<>();
-    private List<Point> pointList = new ArrayList<>();
+    private List<MyMarker> myMarkerList = new ArrayList<>();
     private List<MyPolyline> polylineList = new ArrayList<>();
     private List<MyPolygon> polygonList = new ArrayList<>();
     private String title;
@@ -37,7 +37,7 @@ public class Task implements Parcelable {
         owner_uid = in.readString();
         title = in.readString();
         description = in.readString();
-        in.readList(pointList, getClass().getClassLoader());
+        in.readList(myMarkerList, getClass().getClassLoader());
         in.readList(polylineList, getClass().getClassLoader());
         in.readList(polygonList, getClass().getClassLoader());
     }
@@ -61,7 +61,7 @@ public class Task implements Parcelable {
         result.put("title", title);
         result.put("description", description);
         result.put("owner_uid", owner_uid);
-        result.put("pointList", pointList);
+        result.put("myMarkerList", myMarkerList);
         result.put("polylineList", polylineList);
         result.put("polygonList", polygonList);
         result.put("readPermission", readUsersPermission);
@@ -102,12 +102,12 @@ public class Task implements Parcelable {
         return description;
     }
 
-    public List<Point> getPointList() {
-        return pointList;
+    public List<MyMarker> getMyMarkerList() {
+        return myMarkerList;
     }
 
-    public void setPointList(List<Point> pointList) {
-        this.pointList = pointList;
+    public void setMyMarkerList(List<MyMarker> myMarkerList) {
+        this.myMarkerList = myMarkerList;
     }
 
     public List<MyPolyline> getPolylineList() {
@@ -153,18 +153,18 @@ public class Task implements Parcelable {
         dest.writeString(owner_uid);
         dest.writeString(title);
         dest.writeString(description);
-        dest.writeList(pointList);
+        dest.writeList(myMarkerList);
         dest.writeList(polylineList);
         dest.writeList(polygonList);
 
     }
 
-    public Point getPointById(String id){
+    public MyMarker getPointById(String id){
         boolean find = false;
         int i=0;
         while(!find){
-            if (pointList.get(i).getId().equals(id)) {
-                return pointList.get(i);
+            if (myMarkerList.get(i).getId().equals(id)) {
+                return myMarkerList.get(i);
             }i++;
         }
         return null;

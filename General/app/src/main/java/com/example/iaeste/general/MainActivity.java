@@ -76,23 +76,14 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle(R.string.tlb3);
         setSupportActionBar(toolbar);
 
-       /* FloatingActionButton floatingMapButton = (FloatingActionButton) findViewById(R.id.showMapBtn);
-        floatingMapButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton floatingMapButton = (FloatingActionButton) findViewById(R.id.showMapBtn);
+        floatingMapButton.setVisibility(View.GONE);
+     /*   floatingMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, MapsActivity.class));
             }
         });*/
-
-        FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
-        floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
-                intent.putExtra("userRole", actualUserRole);
-                startActivity(intent);
-            }
-        });
 
         firebaseAuthenticationInit();
 
@@ -172,6 +163,15 @@ public class MainActivity extends AppCompatActivity {
                                     startActivity(new Intent(MainActivity.this, AdminActivity.class));
                                 }
                             });
+                            FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
+                            floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                                    intent.putExtra("userRole", actualUserRole);
+                                    startActivity(intent);
+                                }
+                            });
                             Toast.makeText(MainActivity.this, R.string.toast4, Toast.LENGTH_LONG).show();
                         } else {
                             if (user.getRole().equals("group_commander")) {
@@ -184,9 +184,19 @@ public class MainActivity extends AppCompatActivity {
                                         startActivity(new Intent(MainActivity.this, GroupCommanderActivity.class));
                                     }
                                 });
+                                FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
+                                floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                                        intent.putExtra("userRole", actualUserRole);
+                                        startActivity(intent);
+                                    }
+                                });
                                 Toast.makeText(MainActivity.this, R.string.toast5, Toast.LENGTH_LONG).show();
                             } else {
                                 if (user.getRole().equals("user")) {
+                                    actualUserRole = "user";
                                     Toast.makeText(MainActivity.this, R.string.toast6, Toast.LENGTH_LONG).show();
                                 }
                             }
@@ -212,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 MyGroup newMyGroup = dataSnapshot.getValue(MyGroup.class);
-                if(newMyGroup.getMembers() != null) {
+                if (newMyGroup.getMembers() != null) {
                     for (MyUser myUser : newMyGroup.getMembers()) {
                         if (myUser.getUid().equals(mFirebaseUser.getUid())) {
                             for (Task task : newMyGroup.getTasks()) {
@@ -230,6 +240,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Task newTaskToRemove = dataSnapshot.getValue(Task.class);
+                taskList.remove(newTaskToRemove);
+                taskViewAdapter.remove(newTaskToRemove);
 
             }
 
@@ -243,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-
     }
 
     private void taskListViewInitialization(){
@@ -332,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
         mGroupDatabaseReference.addChildEventListener(mChildEventTaskListener);
+        mTaskDatabaseReference.addChildEventListener(mChildEventTaskListener);
     }
 
     @Override

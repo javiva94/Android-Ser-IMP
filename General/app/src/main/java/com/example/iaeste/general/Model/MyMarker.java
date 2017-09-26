@@ -6,13 +6,12 @@ import android.os.Parcelable;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 
 @IgnoreExtraProperties
-public class Point extends MapObject implements Parcelable {
+public class MyMarker extends MapObject implements Parcelable {
 
     private String id;
     private MyLatLng position;
@@ -22,11 +21,11 @@ public class Point extends MapObject implements Parcelable {
     private String uid;
     private String imageId;
 
-    public Point(){
+    public MyMarker(){
 
     }
 
-    public Point(String id, MyLatLng position){
+    public MyMarker(String id, MyLatLng position){
         this.id = id;
         this.position = position;
         this.title = "";
@@ -34,7 +33,7 @@ public class Point extends MapObject implements Parcelable {
     }
 
 
-    protected Point(Parcel in) {
+    protected MyMarker(Parcel in) {
         id = in.readString();
         position = in.readParcelable(MyLatLng.class.getClassLoader());
         title = in.readString();
@@ -67,15 +66,15 @@ public class Point extends MapObject implements Parcelable {
         this.id = id;
     }
 
-    public static final Creator<Point> CREATOR = new Creator<Point>() {
+    public static final Creator<MyMarker> CREATOR = new Creator<MyMarker>() {
         @Override
-        public Point createFromParcel(Parcel in) {
-            return new Point(in);
+        public MyMarker createFromParcel(Parcel in) {
+            return new MyMarker(in);
         }
 
         @Override
-        public Point[] newArray(int size) {
-            return new Point[size];
+        public MyMarker[] newArray(int size) {
+            return new MyMarker[size];
         }
     };
 

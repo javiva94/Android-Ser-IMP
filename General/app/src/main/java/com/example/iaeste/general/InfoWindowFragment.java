@@ -3,7 +3,6 @@ package com.example.iaeste.general;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -14,19 +13,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.iaeste.general.Model.MyMarker;
 import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.MyPolyline;
-import com.example.iaeste.general.Model.Point;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
-import java.util.ArrayList;
-
-import static android.content.ContentValues.TAG;
 
 
 /**
@@ -45,7 +38,7 @@ public class InfoWindowFragment extends Fragment {
 
     private MyPolyline myPolyline;
     private MyPolygon myPolygon;
-    private Point pointPicture;
+    private MyMarker myMarkerPicture;
 
     private OnFragmentInteractionListener mListener;
 
@@ -84,7 +77,7 @@ public class InfoWindowFragment extends Fragment {
                 myPolygon = (MyPolygon) getArguments().get("MyPolygon");
             }
             if(getArguments().containsKey("PointPicture")){
-                pointPicture = (Point) getArguments().get("PointPicture");
+                myMarkerPicture = (MyMarker) getArguments().get("PointPicture");
             }
 
         }
@@ -103,7 +96,7 @@ public class InfoWindowFragment extends Fragment {
             if (myPolygon!=null){
                 inflatePolygonInfoWindowFragment(view);
             }else{
-                if(pointPicture!=null){
+                if(myMarkerPicture !=null){
                     inflatePictureInfoWindowFragment(view);
                 }
             }
@@ -142,10 +135,10 @@ public class InfoWindowFragment extends Fragment {
 
     private void inflatePictureInfoWindowFragment(final View view){
         TextView author = (TextView) view.findViewById(R.id.author);
-        author.setText(getResources().getString(R.string.Author)+" "+pointPicture.getAuthor());
+        author.setText(getResources().getString(R.string.Author)+" "+ myMarkerPicture.getAuthor());
 
         TextView description = (TextView) view.findViewById(R.id.description);
-        description.setText(getResources().getString(R.string.Des)+" "+pointPicture.getDescription());
+        description.setText(getResources().getString(R.string.Des)+" "+ myMarkerPicture.getDescription());
 
         TextView geometryInfo = (TextView) view.findViewById(R.id.geometry_info);
         geometryInfo.setVisibility(View.GONE);
@@ -169,7 +162,7 @@ public class InfoWindowFragment extends Fragment {
         });
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference imageRef = storage.getReference("/images/" + pointPicture.getImageId() + ".jpg");
+        StorageReference imageRef = storage.getReference("/images/" + myMarkerPicture.getImageId() + ".jpg");
 
         final long ONE_MEGABYTE = 1024 * 1024;
         imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {

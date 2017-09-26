@@ -33,7 +33,7 @@
     <string name="Length">Longitud: </string>
     <string name="area">Area: </string>
     <string name="load">Cargando el mapa...</string>
-    <string name="point">Se ha eliminado un punto</string>
+    <string name="myMarker">Se ha eliminado un punto</string>
     <string name="polygon">Se ha eliminado un polígono</string>
     <string name="polyline">Se ha eliminado una polílinea</string>
     <string name="per1">¡Permiso concedido!</string>

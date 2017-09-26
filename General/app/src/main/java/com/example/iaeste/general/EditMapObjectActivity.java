@@ -10,9 +10,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.iaeste.general.Model.MapObject;
+import com.example.iaeste.general.Model.MyMarker;
 import com.example.iaeste.general.Model.MyPolygon;
 import com.example.iaeste.general.Model.MyPolyline;
-import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -49,8 +49,8 @@ public class EditMapObjectActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        if(mapObject instanceof Point){
-            showPointEdition((Point) mapObject);
+        if(mapObject instanceof MyMarker){
+            showPointEdition((MyMarker) mapObject);
         }else{
             if(mapObject instanceof MyPolyline) {
                 showPolylineEdition((MyPolyline) mapObject);
@@ -64,23 +64,23 @@ public class EditMapObjectActivity extends AppCompatActivity {
     }
 
 
-    private void showPointEdition(Point point){
+    private void showPointEdition(MyMarker myMarker){
         TextView latitude = (TextView) findViewById(R.id.latitudeTextView);
         TextView longitude = (TextView) findViewById(R.id.longitudeTextView);
-        latitude.setText(getResources().getString(R.string.Lat)+" "+String.valueOf(point.getPosition().getLatitude()));
-        longitude.setText(getResources().getString(R.string.Long)+" "+String.valueOf(point.getPosition().getLongitude()));
+        latitude.setText(getResources().getString(R.string.Lat)+" "+String.valueOf(myMarker.getPosition().getLatitude()));
+        longitude.setText(getResources().getString(R.string.Long)+" "+String.valueOf(myMarker.getPosition().getLongitude()));
 
         TextView author = (TextView) findViewById(R.id.authorTextView);
-        author.setText(getResources().getString(R.string.Author)+" "+point.getAuthor());
+        author.setText(getResources().getString(R.string.Author)+" "+ myMarker.getAuthor());
 
         EditText title = (EditText) findViewById(R.id.title);
         EditText description = (EditText) findViewById(R.id.DescriptionTitle);
 
-        if(point.getTitle()!=null) {
-            title.setText(point.getTitle());
+        if(myMarker.getTitle()!=null) {
+            title.setText(myMarker.getTitle());
         }
-        if(point.getDescription()!=null) {
-            description.setText(point.getDescription());
+        if(myMarker.getDescription()!=null) {
+            description.setText(myMarker.getDescription());
         }
     }
 
@@ -143,10 +143,10 @@ public class EditMapObjectActivity extends AppCompatActivity {
         mMapObjectDatabaseReference = mFirebaseDatabase.getReference("/task/"+task.getKey()+"/mapObjects/");
         Map<String, Object> childUpdates = new HashMap<>();
 
-        if(mapObject instanceof Point){
-            Point pointModified = getPointModified((Point) mapObject);
-            Map<String, Object> pointValues = pointModified.toMap();
-            childUpdates.put(pointModified.getId()+"/Point/", pointValues);
+        if(mapObject instanceof MyMarker){
+            MyMarker myMarkerModified = getPointModified((MyMarker) mapObject);
+            Map<String, Object> pointValues = myMarkerModified.toMap();
+            childUpdates.put(myMarkerModified.getId()+"/MyMarker/", pointValues);
         }else{
             if(mapObject instanceof MyPolyline) {
                 MyPolyline polylineModified = getPolylineModified((MyPolyline) mapObject);
@@ -165,14 +165,14 @@ public class EditMapObjectActivity extends AppCompatActivity {
 
     }
 
-    private Point getPointModified(Point point){
+    private MyMarker getPointModified(MyMarker myMarker){
         EditText title = (EditText) findViewById(R.id.title);
         EditText description = (EditText) findViewById(R.id.DescriptionTitle);
 
-        point.setTitle(title.getText().toString());
-        point.setDescription(description.getText().toString());
+        myMarker.setTitle(title.getText().toString());
+        myMarker.setDescription(description.getText().toString());
 
-        return  point;
+        return myMarker;
     }
 
     private MyPolyline getPolylineModified(MyPolyline polyline){

@@ -45,7 +45,7 @@
     <string name="Length">Length: </string>
     <string name="area">Area: </string>
     <string name="load">Map Loading ...</string>
-    <string name="point">Deleted a point</string>
+    <string name="myMarker">Deleted a myMarker</string>
     <string name="polyline">Deleted a polyline</string>
     <string name="polygon">Deleted a polygon</string>
     <string name="per1">Permission granted!</string>

@@ -1,17 +1,12 @@
 package com.example.iaeste.general;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -34,15 +29,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
-import android.support.v4.app.Fragment;
 
+import com.example.iaeste.general.Model.MyMarker;
 import com.example.iaeste.general.Model.MyPolyline;
 import com.example.iaeste.general.Model.MyLatLng;
 import com.example.iaeste.general.Model.MyPolygon;
-import com.example.iaeste.general.Model.Point;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.MyInfoWindow;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -72,11 +65,8 @@ import com.google.maps.android.SphericalUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MapsActivity extends AppCompatActivity implements LocationListener {
 
@@ -239,9 +229,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("New element", markerChild.toString());
                     //Punto
-                    if (markerChild.getKey().equals("Point")) {
-                        Point newPoint = markerChild.getValue(Point.class);
-                        addPoint(newPoint);
+                    if (markerChild.getKey().equals("MyMarker")) {
+                        MyMarker newMyMarker = markerChild.getValue(MyMarker.class);
+                        addPoint(newMyMarker);
                     }
 
                     //Linea
@@ -263,10 +253,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 for (DataSnapshot markerChild : dataSnapshot.getChildren()) {
                     Log.e("Element modified", markerChild.toString());
                     //Punto
-                    if (markerChild.getKey().equals("Point")) {
-                        Point pointModified = markerChild.getValue(Point.class);
-                        removePoint(pointModified);
-                        addPoint(pointModified);
+                    if (markerChild.getKey().equals("MyMarker")) {
+                        MyMarker myMarkerModified = markerChild.getValue(MyMarker.class);
+                        removePoint(myMarkerModified);
+                        addPoint(myMarkerModified);
                     }
 
                     //Linea
@@ -292,10 +282,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                     Log.e("Element to delete", markerChild.toString());
 
                     //Punto
-                    if (markerChild.getKey().equals("Point")) {
-                        Point pointToRemove = markerChild.getValue(Point.class);
-                        removePoint(pointToRemove);
-                        Toast.makeText(MapsActivity.this, R.string.point, Toast.LENGTH_SHORT).show();
+                    if (markerChild.getKey().equals("MyMarker")) {
+                        MyMarker myMarkerToRemove = markerChild.getValue(MyMarker.class);
+                        removePoint(myMarkerToRemove);
+                        Toast.makeText(MapsActivity.this, R.string.myMarker, Toast.LENGTH_SHORT).show();
                     }
 
                     //Linea
@@ -330,26 +320,26 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         mMapObjectsDatabaseReference.addChildEventListener(mChildEventListener);
     }
 
-    private void addPoint(Point point) {
+    private void addPoint(MyMarker myMarker) {
         Marker newMarker;
-        if (point.getImageId() == null) {
+        if (myMarker.getImageId() == null) {
             newMarker = myMap.addMarker(
                     new MarkerOptions()
-                            .position(new LatLng(point.getPosition().getLatitude(), point.getPosition().getLongitude()))
-                            .title(point.getTitle())
-                            .snippet(point.getAuthor() + "/&" + point.getDescription())
+                            .position(new LatLng(myMarker.getPosition().getLatitude(), myMarker.getPosition().getLongitude()))
+                            .title(myMarker.getTitle())
+                            .snippet(myMarker.getAuthor() + "/&" + myMarker.getDescription())
             );
         } else {
             newMarker = myMap.addMarker(
                     new MarkerOptions()
-                            .position(new LatLng(point.getPosition().getLatitude(), point.getPosition().getLongitude()))
+                            .position(new LatLng(myMarker.getPosition().getLatitude(), myMarker.getPosition().getLongitude()))
                             .icon(bitmapDescriptorFromVector(this, R.drawable.marker_camera))
                             .snippet("image")
             );
         }
-        newMarker.setTag(point.getId());
-        markerHashMap.put(point.getId(), newMarker);
-        task.getPointList().add(point);
+        newMarker.setTag(myMarker.getId());
+        markerHashMap.put(myMarker.getId(), newMarker);
+        task.getMyMarkerList().add(myMarker);
     }
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
@@ -361,11 +351,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private void removePoint(Point point) {
-        Marker markerToRemove = markerHashMap.get(point.getId());
+    private void removePoint(MyMarker myMarker) {
+        Marker markerToRemove = markerHashMap.get(myMarker.getId());
         markerToRemove.remove();
         markerHashMap.remove(markerToRemove);
-        task.getPointList().remove(point);
+        task.getMyMarkerList().remove(myMarker);
     }
 
     private void addPolyline(MyPolyline myPolyline) {
@@ -414,11 +404,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onMapClick(LatLng point) {
                 mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
                 String key = mMapObjectsDatabaseReference.push().getKey();
-                Point newPoint = new Point(key,
+                MyMarker newMyMarker = new MyMarker(key,
                         new MyLatLng(point.latitude, point.longitude));
-                newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
-                newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
-                mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
+                newMyMarker.setUid(mFirebaseAuth.getCurrentUser().getUid());
+                newMyMarker.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+                mMapObjectsDatabaseReference.child("mapObjects").child(key).child("MyMarker").setValue(newMyMarker);
             }
 
         });
@@ -473,13 +463,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public void onMapClick(LatLng point) {
                 mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
                 String key = mMapObjectsDatabaseReference.push().getKey();
-                Point newPoint = new Point(key,
+                MyMarker newMyMarker = new MyMarker(key,
                         new MyLatLng(point.latitude, point.longitude));
-                newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
-                newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
-                newPoint.setImageId(key);
+                newMyMarker.setUid(mFirebaseAuth.getCurrentUser().getUid());
+                newMyMarker.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+                newMyMarker.setImageId(key);
                 imageId = key;
-                mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
+                mMapObjectsDatabaseReference.child("mapObjects").child(key).child("MyMarker").setValue(newMyMarker);
                 addCameraPhoto();
             }
 
@@ -510,13 +500,13 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
         String key = mMapObjectsDatabaseReference.push().getKey();
-        Point newPoint = new Point(key,
+        MyMarker newMyMarker = new MyMarker(key,
                 new MyLatLng(latLng.latitude, latLng.longitude));
-        newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
-        newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
-        newPoint.setImageId(key);
+        newMyMarker.setUid(mFirebaseAuth.getCurrentUser().getUid());
+        newMyMarker.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+        newMyMarker.setImageId(key);
         imageId = key;
-        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
+        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("MyMarker").setValue(newMyMarker);
         addCameraPhoto();
     }
 
@@ -543,11 +533,11 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey());
         String key = mMapObjectsDatabaseReference.push().getKey();
-        Point newPoint = new Point(key,
+        MyMarker newMyMarker = new MyMarker(key,
                 new MyLatLng(latLng.latitude, latLng.longitude));
-        newPoint.setUid(mFirebaseAuth.getCurrentUser().getUid());
-        newPoint.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
-        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("Point").setValue(newPoint);
+        newMyMarker.setUid(mFirebaseAuth.getCurrentUser().getUid());
+        newMyMarker.setAuthor(mFirebaseAuth.getCurrentUser().getDisplayName());
+        mMapObjectsDatabaseReference.child("mapObjects").child(key).child("MyMarker").setValue(newMyMarker);
     }
 
     public void addCameraPhoto () {
@@ -1133,12 +1123,12 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             public boolean onMarkerClick(Marker marker) {
                 if(marker.getSnippet().equals("image")){
                     if(!infoWindowFragment.isAdded()) {
-                        Point point = task.getPointById((String) marker.getTag());
+                        MyMarker myMarker = task.getPointById((String) marker.getTag());
 
                         infoWindowFragment = new InfoWindowFragment();
 
                         Bundle args = new Bundle();
-                        args.putParcelable("PointPicture",point);
+                        args.putParcelable("PointPicture", myMarker);
                         infoWindowFragment.setArguments(args);
 
                         getSupportFragmentManager().beginTransaction()
