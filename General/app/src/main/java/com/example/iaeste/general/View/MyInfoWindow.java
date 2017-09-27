@@ -57,7 +57,7 @@ public class MyInfoWindow implements InfoWindowAdapter {
     @SuppressLint("InflateParams")
     @Override
     public View getInfoContents(final Marker marker) {
-        if(marker.getSnippet().equals("image")) {
+        if( (marker.getSnippet() == null) || marker.getSnippet().equals("image")) {
             return null;
         }else{
             if (popup == null) {

@@ -172,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
                                     startActivity(intent);
                                 }
                             });
-                            Toast.makeText(MainActivity.this, R.string.toast4, Toast.LENGTH_LONG).show();
                         } else {
                             if (user.getRole().equals("group_commander")) {
                                 actualUserRole = "group_commander";
@@ -193,11 +192,9 @@ public class MainActivity extends AppCompatActivity {
                                         startActivity(intent);
                                     }
                                 });
-                                Toast.makeText(MainActivity.this, R.string.toast5, Toast.LENGTH_LONG).show();
                             } else {
                                 if (user.getRole().equals("user")) {
                                     actualUserRole = "user";
-                                    Toast.makeText(MainActivity.this, R.string.toast6, Toast.LENGTH_LONG).show();
                                 }
                             }
                         }

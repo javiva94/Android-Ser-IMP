@@ -34,6 +34,7 @@ import com.example.iaeste.general.Model.MyMarker;
 import com.example.iaeste.general.Model.MyPolyline;
 import com.example.iaeste.general.Model.MyLatLng;
 import com.example.iaeste.general.Model.MyPolygon;
+import com.example.iaeste.general.Model.MyUser;
 import com.example.iaeste.general.Model.Task;
 import com.example.iaeste.general.View.MyInfoWindow;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -58,6 +59,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -88,18 +90,20 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private List<LatLng> listPointsForPolyline = new ArrayList<>();
     private List<LatLng> listPointsForPolygon = new ArrayList<>();
 
+    private HashMap<String, Marker> usersLocationMarkers = new HashMap<>();
+
     private HashMap<String, Marker> markerHashMap = new HashMap<>();
     private HashMap<String, Polyline> polylineHashMap = new HashMap<>();
     private HashMap<String, Polygon> polygonHashMap = new HashMap<>();
     private Polygon auxPolygonToShow;
     private Polyline auxPolylineToShow;
 
-    private Marker myPosition;
-
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mMapObjectsDatabaseReference;
     private ChildEventListener mChildEventListener;
+    private DatabaseReference mUsersDatabaseReference;
+    private ChildEventListener mUserChildPositionListener ;
 
     InfoWindowFragment infoWindowFragment;
 
@@ -107,6 +111,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     private Location myLocation = null;
     private LocationManager locationManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,12 +121,8 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         Intent intent = getIntent(); // gets the previously created intent
         task = (Task) intent.getParcelableExtra("task");
 
-        Toast.makeText(this, "id: " + task.getKey(), Toast.LENGTH_LONG).show();
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
 
         setFloatingButtons();
 
@@ -148,8 +149,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabaseInit();
+
+        userLastKnownPositionInit();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     private void onMyMapReady(final GoogleMap googleMap) {
         // Get Google Map from Fragment.
@@ -194,30 +201,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    private void deletePointFromFirebase(Marker marker) {
-        String key = (String) marker.getTag();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
-        mMapObjectsDatabaseReference.child(key).removeValue();
-    }
-
-    private void deleteLineFromFirebase(Polyline polyline) {
-        String key = (String) polyline.getTag();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
-        mMapObjectsDatabaseReference.child(key).removeValue();
-    }
-
-    private void deletePolygonFromFirebase(Polygon polygon) {
-        String key = (String) polygon.getTag();
-        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
-        mMapObjectsDatabaseReference.child(key).removeValue();
-    }
-
-    private void deleteImageFromFirebase(Marker marker) {
-        String imageId = (String) marker.getTag();
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference imageRef = storage.getReference("/images/" + imageId + ".jpg");
-        imageRef.delete();
-    }
 
     private void firebaseDatabaseInit() {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -320,6 +303,77 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         mMapObjectsDatabaseReference.addChildEventListener(mChildEventListener);
     }
 
+    private void userLastKnownPositionInit(){
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mUsersDatabaseReference = mFirebaseDatabase.getReference("users");
+
+        mUserChildPositionListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                System.out.println(dataSnapshot.toString());
+                if(!dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    MyUser myUser = dataSnapshot.getValue(MyUser.class);
+                    myUser.setUid(dataSnapshot.getKey());
+                    for (DataSnapshot userChild : dataSnapshot.getChildren()) {
+                        if (userChild.getKey().equals("lastKnownLocation")) {
+                            double latitude = (double) userChild.child("latitude").getValue();
+                            double longitude = (double) userChild.child("longitude").getValue();
+                            updateUserLastKnwonLocation(myUser, latitude, longitude);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                System.out.println(dataSnapshot.toString());
+                if(!dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    MyUser myUser = dataSnapshot.getValue(MyUser.class);
+                    myUser.setUid(dataSnapshot.getKey());
+                    for (DataSnapshot userChild : dataSnapshot.getChildren()) {
+                        if (userChild.getKey().equals("lastKnownLocation")) {
+                            double latitude = (double) userChild.child("latitude").getValue();
+                            double longitude = (double) userChild.child("longitude").getValue();
+                            updateUserLastKnwonLocation(myUser, latitude, longitude);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mUsersDatabaseReference.addChildEventListener(mUserChildPositionListener);
+    }
+
+    private void updateUserLastKnwonLocation(MyUser myUser, double latitude, double longitude) {
+        System.out.println(myUser.getDisplayName());
+        LatLng latLng = new LatLng(latitude, longitude);
+        if(usersLocationMarkers.containsKey(myUser.getUid())){
+            Marker marker = usersLocationMarkers.get(myUser.getUid());
+            marker.setPosition(latLng);
+        }else{
+            Marker newMarker = myMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .icon(bitmapDescriptorFromVector(this, R.drawable.ic_person_pin_black_48px))
+                    .title(myUser.getDisplayName())
+            );
+            usersLocationMarkers.put(myUser.getUid(), newMarker);
+        }
+    }
+
     private void addPoint(MyMarker myMarker) {
         Marker newMarker;
         if (myMarker.getImageId() == null) {
@@ -396,6 +450,30 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         task.getPolygonList().remove(polygonToRemove);
     }
 
+    private void deletePointFromFirebase(Marker marker) {
+        String key = (String) marker.getTag();
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
+        mMapObjectsDatabaseReference.child(key).removeValue();
+    }
+
+    private void deleteLineFromFirebase(Polyline polyline) {
+        String key = (String) polyline.getTag();
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
+        mMapObjectsDatabaseReference.child(key).removeValue();
+    }
+
+    private void deletePolygonFromFirebase(Polygon polygon) {
+        String key = (String) polygon.getTag();
+        mMapObjectsDatabaseReference = mFirebaseDatabase.getReference("/task/" + task.getKey() + "/mapObjects/");
+        mMapObjectsDatabaseReference.child(key).removeValue();
+    }
+
+    private void deleteImageFromFirebase(Marker marker) {
+        String imageId = (String) marker.getTag();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference imageRef = storage.getReference("/images/" + imageId + ".jpg");
+        imageRef.delete();
+    }
 
     public void Dot(View view) {
         cancelPreviousIncompleteActions();
@@ -847,7 +925,10 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference mActualUsersDatabaseReference = mFirebaseDatabase.getReference("/users/"+mFirebaseAuth.getCurrentUser().getUid());
+        mActualUsersDatabaseReference.child("lastKnownLocation").child("latitude").setValue(location.getLatitude());
+        mActualUsersDatabaseReference.child("lastKnownLocation").child("longitude").setValue(location.getLongitude());
     }
 
     @Override
@@ -1121,7 +1202,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
         myMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                if(marker.getSnippet().equals("image")){
+                if((marker.getSnippet() != null) && marker.getSnippet().equals("image")){
                     if(!infoWindowFragment.isAdded()) {
                         MyMarker myMarker = task.getPointById((String) marker.getTag());
 
