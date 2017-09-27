@@ -1,8 +1,204 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapsActivityLayout"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.iaeste.general.MapsActivity" />
+    class="com.google.android.gms.maps.SupportMapFragment"
+    tools:context="com.example.iaeste.general.MapsActivity">
+
+
+    <fragment
+        android:id="@+id/mMapView"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintHorizontal_bias="0.0"
+        map:layout_constraintLeft_toLeftOf="parent"
+        map:layout_constraintRight_toRightOf="parent"
+        map:layout_constraintTop_toTopOf="parent"
+        map:layout_constraintVertical_bias="0.0" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:clickable="true"
+        android:onClick="edit"
+        app:srcCompat="@drawable/ic_edit_light"
+        map:layout_constraintBottom_toTopOf="@+id/addObj"
+        map:layout_constraintRight_toRightOf="parent" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/trash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:elevation="5dp"
+        android:onClick="remove"
+        android:visibility="visible"
+        app:pressedTranslationZ="12dp"
+        map:layout_constraintBottom_toTopOf="@+id/edit"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@drawable/ic_delete_light" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/camera1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:elevation="5dp"
+        android:onClick="PictureActualPosition"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:backgroundTint="@color/cardview_light_background"
+        map:layout_constraintRight_toLeftOf="@+id/camera"
+        map:layout_constraintTop_toBottomOf="@+id/marker1"
+        map:srcCompat="@drawable/marker_camera" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/marker1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="110dp"
+        android:elevation="5dp"
+        android:onClick="MarkerActualPosition"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+        map:layout_constraintHorizontal_bias="1.0"
+        map:layout_constraintLeft_toLeftOf="@+id/camera1"
+        map:layout_constraintRight_toLeftOf="@+id/location"
+        map:layout_constraintTop_toTopOf="parent"
+        map:srcCompat="@drawable/ic_add_location_black_24dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:elevation="5dp"
+        android:onClick="Picture"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:layout_constraintBottom_toTopOf="@+id/camera"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@android:drawable/ic_menu_mylocation" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:elevation="5dp"
+        android:onClick="Picture"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:layout_constraintBottom_toTopOf="@+id/addObj_3"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@android:drawable/ic_menu_camera" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addObj_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:elevation="5dp"
+        android:onClick="Polygon"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:layout_constraintBottom_toTopOf="@+id/addObj_2"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@drawable/ic_polygon_light" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addObj_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:elevation="5dp"
+        android:onClick="Multiline"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:layout_constraintBottom_toTopOf="@+id/addObj_1"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@drawable/ic_line_light" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addObj_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:elevation="5dp"
+        android:onClick="Dot"
+        android:visibility="invisible"
+        app:pressedTranslationZ="12dp"
+        map:layout_constraintBottom_toBottomOf="@+id/trash"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@drawable/ic_addmarker_light" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addObj"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:visibility="visible"
+        app:pressedTranslationZ="12dp"
+        map:layout_constraintBottom_toBottomOf="@+id/mMapView"
+        map:layout_constraintRight_toRightOf="parent"
+        map:srcCompat="@drawable/ic_add_icon_light" />
+
+    <Button
+        android:id="@+id/finishButton"
+        style="@style/FirebaseUI.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        map:title="@string/btn2"
+        map:layout_constraintLeft_toLeftOf="parent"
+        map:layout_constraintRight_toRightOf="parent"
+        map:layout_constraintTop_toTopOf="parent" />
+
+
+</android.support.constraint.ConstraintLayout>

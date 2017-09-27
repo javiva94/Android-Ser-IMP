@@ -1,4 +1,70 @@
 <resources>
     <string name="app_name">General</string>
+    <string name="sign_out">Sign Out</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_main">Main Activity</string>
+    <string name="title_activity_admin">Admin Activity</string>
+    <string name="title_activity_addTask">task Activity</string>
+    <string name="title_activity_editMap">Edit Map</string>
+    <string name="title_activity_groupCom">GroupCommander Activity</string>
+    <string name="title_activity_group">Add Group</string>
+    <string name="title_activity_user">Add User</string>
+    <string name="title_activity_editGroup">Edit Group</string>
+    <string name="title_activity_editUser">Edit User</string>
+
+    <string name="menu1">create group</string>
+    <string name="menu2">create user</string>
+    <string name="menu3">Switch view</string>
+    <string name="menu4">None</string>
+    <string name="menu5">Normal</string>
+    <string name="menu6">Terrain</string>
+    <string name="menu7">Satellite</string>
+    <string name="menu8">Hybrid</string>
+    <string name="menu9">Delete</string>
+    <string name="edt1">Group Title</string>
+    <string name="edt2">Title</string>
+    <string name="tlb1">Create</string>
+    <string name="tlb2">Done</string>
+    <string name="tlb3">Task</string>
+    <string name="toast1">Successfully created new user</string>Falied creating new user
+    <string name="toast2">Failed creating new user</string>
+    <string name="toast3">Added new user to DB</string>
+    <string name="toast4">Administrator logged in</string>
+    <string name="toast5">Group commander logged in</string>
+    <string name="toast6">User logged in</string>
+    <string name="toast7">Delete task: </string>
+    <string name="toast8">Signed in!</string>
+    <string name="toast9">Sign in canceled</string>
+    <string name="toast10">Show My Location Error: </string>
+    <string name="toast11">Location not found!</string>
+    <string name="Author">Author: </string>
+    <string name="Long">Longitude: </string>
+    <string name="Lat">Latitude: </string>
+    <string name="Des">Description: </string>
+    <string name="geo">Geometry: </string>
+    <string name="Length">Length: </string>
+    <string name="area">Area: </string>
+    <string name="load">Map Loading ...</string>
+    <string name="myMarker">Deleted a myMarker</string>
+    <string name="polyline">Deleted a polyline</string>
+    <string name="polygon">Deleted a polygon</string>
+    <string name="per1">Permission granted!</string>
+    <string name="per2">Permission denied!</string>
+    <string name="per3">No location provider enabled!</string>
+    <string name="btn1">Add Task</string>
+    <string name="btn2">Finish</string>
+    <string name="txt1">Read</string>
+    <string name="txt2">Write</string>
+    <string name="txt3">Finish Delete</string>
+    <string name="txt4">Finish Polyline</string>
+    <string name="txt5">Finish Polygon</string>
+
+
+    <!--    Permissions    -->
+    <string name="permission_rationale_location" translatable="false">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
+    <string name="location_permission_denied" translatable="false">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
+    <string name="permission_required_toast" translatable="false">Location permission is required for this demo.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
 </resources>

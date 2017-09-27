@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">Генерал</string>
+    <string name="title_activity_main">Основна делатност</string>
+    <string name="title_activity_maps">Мапа</string>
+    <string name="sign_out">Одјава</string>
+    <string name="location_permission_denied" translatable="false"></string>
+    <string name="menu1">креирајте групу</string>
+    <string name="menu2">креирајте корисника</string>
+    <string name="menu3">Пребаците приказ</string>
+    <string name="menu4">ниједан</string>
+    <string name="menu5">нормално</string>
+    <string name="menu6">терен</string>
+    <string name="menu7">сателит</string>
+    <string name="menu8">хибрид</string>
+    <string name="menu9">избрисати</string>
+    <string name="edt1">Наслов групе</string>
+    <string name="tlb1">створити</string>
+    <string name="toast1">Успесно створио нови корисник</string>
+    <string name="toast2">Неуспело прављење новог корисника</string>
+    <string name="tlb2">Готово</string>
+    <string name="Author">Аутор: </string>
+    <string name="Lat">Латитуд: </string>
+    <string name="Long">Дужина: </string>
+    <string name="tlb3">задатак</string>
+    <string name="toast3">Додан нови корисник DB</string>
+    <string name="toast4">Администратор је пријављен</string>
+    <string name="toast5">Пријављени су групи команди</string>
+    <string name="toast6">Корисник је пријављен</string>
+    <string name="toast7">Обриши задатак: </string>
+    <string name="toast8">Уписан!</string>
+    <string name="toast9">Пријавите се отказани</string>
+    <string name="area">Површина: </string>
+    <string name="Length">Дужина: </string>
+    <string name="Des">Опис: </string>
+    <string name="load">Мапа Лоадинг ...</string>
+    <string name="myMarker">Избрисана тачка</string>
+    <string name="polyline">Избрисана полиглина</string>
+    <string name="polygon">Избрисан полигон</string>
+    <string name="per1">Дозвола одобрена!</string>
+    <string name="per2">Дозвола одбијена!</string>
+    <string name="per3">Ниједан провајдер локација није омогућен!</string>
+    <string name="edt2">наслов</string>
+    <string name="btn1">додајте задатак</string>
+    <string name="txt1">Читање</string>
+    <string name="txt2">писање</string>
+    <string name="geo">"Геометрија: "</string>
+    <string name="btn2">завршити</string>
+    <string name="txt3">Заврши Делете</string>
+    <string name="txt4">Заврши Полилине</string>
+    <string name="txt5">Заврши полигон</string>
+    <string name="toast10">"Прикажи моју локацију: "</string>
+    <string name="toast11">Локација није пронађена!</string>
+    <string name="title_activity_addTask">таск Ацтивити</string>
+    <string name="title_activity_admin">Админ Ацтивити</string>
+    <string name="title_activity_editMap">Измени Мапу</string>
+    <string name="title_activity_group">Додај групу</string>
+    <string name="title_activity_groupCom">ГроупЦоммандер Ацтивити</string>
+    <string name="title_activity_user">Адд Усер</string>
+    <string name="title_activity_editGroup">Измени групу</string>
+    <string name="title_activity_editUser">Едит Усер</string>
+
+
+</resources>
