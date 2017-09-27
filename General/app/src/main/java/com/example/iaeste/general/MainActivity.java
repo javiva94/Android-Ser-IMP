@@ -164,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
+                            floatingAddTaskButton.setVisibility(View.VISIBLE);
                             floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -184,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                                 FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
+                                floatingAddTaskButton.setVisibility(View.VISIBLE);
                                 floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -195,6 +197,8 @@ public class MainActivity extends AppCompatActivity {
                             } else {
                                 if (user.getRole().equals("user")) {
                                     actualUserRole = "user";
+                                    FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
+                                    floatingAddTaskButton.setVisibility(View.GONE);
                                 }
                             }
                         }
@@ -212,7 +216,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void firebaseTaskDatabaseInit(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
         mGroupDatabaseReference = mFirebaseDatabase.getReference("groups");
 
         mChildEventTaskListener = new ChildEventListener() {
@@ -223,7 +226,10 @@ public class MainActivity extends AppCompatActivity {
                     for (MyUser myUser : newMyGroup.getMembers()) {
                         if (myUser.getUid().equals(mFirebaseUser.getUid())) {
                             for (Task task : newMyGroup.getTasks()) {
-                                taskViewAdapter.add(task);
+                                if(!contain(taskList, task)) {
+                                    taskList.add(task);
+                                    taskViewAdapter.notifyDataSetChanged();
+                                }
                             }
                         }
                     }
@@ -254,6 +260,18 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
+
+    private boolean contain(List<Task> taskList, Task task) {
+        boolean find = false; int i=0;
+        while(!find && i < taskList.size()){
+            if(taskList.get(i).getKey().equals(task.getKey())){
+                find=true;
+            }
+            i++;
+        }
+        return find;
+    }
+
 
     private void taskListViewInitialization(){
         stubGrid = (ViewStub) findViewById(R.id.stub_grid);
@@ -341,7 +359,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         mUserDatabaseReference.addValueEventListener(mValueEventUserRoleListener);
         mGroupDatabaseReference.addChildEventListener(mChildEventTaskListener);
-        mTaskDatabaseReference.addChildEventListener(mChildEventTaskListener);
     }
 
     @Override
