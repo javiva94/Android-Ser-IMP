@@ -201,7 +201,15 @@ public class MainActivity extends AppCompatActivity {
                                 if (user.getRole().equals("user")) {
                                     actualUserRole = "user";
                                     FloatingActionButton floatingAddTaskButton = (FloatingActionButton) findViewById(R.id.addTaskBtn);
-                                    floatingAddTaskButton.setVisibility(View.GONE);
+                                    floatingAddTaskButton.setVisibility(View.VISIBLE);
+                                    floatingAddTaskButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                                            intent.putExtra("userRole", actualUserRole);
+                                            startActivity(intent);
+                                        }
+                                    });
                                 }
                             }
                         }
