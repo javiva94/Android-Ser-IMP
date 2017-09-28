@@ -24,8 +24,9 @@ public class Task implements Parcelable {
     private String title;
     private String description;
     private String owner_uid;
-    private List<String> readUsersPermission = new ArrayList<String>();
-    private List<String> writeUsersPermission = new ArrayList<String>();
+    private List<MyGroup> groupList;
+  //  private List<String> readUsersPermission = new ArrayList<String>();
+  //  private List<String> writeUsersPermission = new ArrayList<String>();
 
 
     public Task(){
@@ -40,6 +41,7 @@ public class Task implements Parcelable {
         in.readList(myMarkerList, getClass().getClassLoader());
         in.readList(polylineList, getClass().getClassLoader());
         in.readList(polygonList, getClass().getClassLoader());
+        in.readList(groupList, getClass().getClassLoader());
     }
 
     public static final Creator<Task> CREATOR = new Creator<Task>() {
@@ -64,8 +66,9 @@ public class Task implements Parcelable {
         result.put("myMarkerList", myMarkerList);
         result.put("polylineList", polylineList);
         result.put("polygonList", polygonList);
-        result.put("readPermission", readUsersPermission);
-        result.put("writePermission", writeUsersPermission);
+        result.put("groupList", groupList);
+       // result.put("readPermission", readUsersPermission);
+       // result.put("writePermission", writeUsersPermission);
 
         return result;
     }
@@ -126,7 +129,7 @@ public class Task implements Parcelable {
         this.polygonList = polygonList;
     }
 
-    public List<String> getReadUsersPermission() {
+ /*   public List<String> getReadUsersPermission() {
         return readUsersPermission;
     }
 
@@ -140,6 +143,15 @@ public class Task implements Parcelable {
 
     public void setWriteUsersPermission(List<String> writeUsersPermission) {
         this.writeUsersPermission = writeUsersPermission;
+    }
+    */
+
+    public List<MyGroup> getGroupList() {
+        return groupList;
+    }
+
+    public void setGroupList(List<MyGroup> groupList) {
+        this.groupList = groupList;
     }
 
     @Override
@@ -156,6 +168,7 @@ public class Task implements Parcelable {
         dest.writeList(myMarkerList);
         dest.writeList(polylineList);
         dest.writeList(polygonList);
+        dest.writeList(groupList);
 
     }
 

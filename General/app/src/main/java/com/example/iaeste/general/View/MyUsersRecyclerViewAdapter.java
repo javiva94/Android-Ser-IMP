@@ -74,6 +74,7 @@ public class MyUsersRecyclerViewAdapter extends RecyclerView.Adapter<MyUsersRecy
                 DatabaseReference mUserDatabaseReference = FirebaseDatabase.getInstance().getReference("users");
                 mUserDatabaseReference.child((String) mValues.get(position).getUid()).removeValue();
                 //ELIMINAR USUARIO DE AUTH!!!!
+                //HAY QUE ELIMINAR LA USUARIO DE LA TABLA GRUPOS
                 mValues.remove(position);
                 notifyItemRemoved(position);
                 //this line below gives you the animation and also updates the

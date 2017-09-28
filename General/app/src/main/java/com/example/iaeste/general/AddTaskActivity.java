@@ -1,6 +1,7 @@
 package com.example.iaeste.general;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -119,9 +120,6 @@ public class AddTaskActivity extends AppCompatActivity {
             }
         }*/
 
-        Intent intent = new Intent(AddTaskActivity.this , MapsActivity.class);
-        intent.putExtra("task", newTask);
-        startActivity(intent);
         finish();
     }
 

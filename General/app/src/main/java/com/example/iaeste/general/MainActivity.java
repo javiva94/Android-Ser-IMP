@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private GridView gridView;
     private TaskViewAdapter taskViewAdapter;
     private List<Task> taskList;
+    private HashMap<Task, List<MyUser>> userListTask;
     private int currentViewMode;
 
     static final int VIEW_MODE_LISTVIEW = 0;
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         taskList = new ArrayList<Task>();
+        userListTask = new HashMap<Task, List<MyUser>>();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.tlb3);
@@ -221,14 +224,17 @@ public class MainActivity extends AppCompatActivity {
         mChildEventTaskListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                MyGroup newMyGroup = dataSnapshot.getValue(MyGroup.class);
-                if (newMyGroup.getMembers() != null) {
-                    for (MyUser myUser : newMyGroup.getMembers()) {
-                        if (myUser.getUid().equals(mFirebaseUser.getUid())) {
-                            for (Task task : newMyGroup.getTasks()) {
-                                if(!contain(taskList, task)) {
-                                    taskList.add(task);
-                                    taskViewAdapter.notifyDataSetChanged();
+                if (mFirebaseUser != null) {
+                    MyGroup newMyGroup = dataSnapshot.getValue(MyGroup.class);
+                    if (newMyGroup.getMembers() != null) {
+                        for (MyUser myUser : newMyGroup.getMembers()) {
+                            if (myUser.getUid().equals(mFirebaseUser.getUid())) {
+                                for (Task task : newMyGroup.getTasks()) {
+                                    userListTask.put(task, newMyGroup.getMembers());
+                                    if (!contain(taskList, task)) {
+                                        taskList.add(task);
+                                        taskViewAdapter.notifyDataSetChanged();
+                                    }
                                 }
                             }
                         }
@@ -246,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
                 Task newTaskToRemove = dataSnapshot.getValue(Task.class);
                 taskList.remove(newTaskToRemove);
                 taskViewAdapter.remove(newTaskToRemove);
+                taskViewAdapter.notifyDataSetChanged();
 
             }
 
@@ -271,7 +278,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return find;
     }
-
 
     private void taskListViewInitialization(){
         stubGrid = (ViewStub) findViewById(R.id.stub_grid);
@@ -304,6 +310,8 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, MapsActivity.class);
             Task task = taskViewAdapter.getItem(position);
             intent.putExtra("task", task);
+            List<MyUser> userList = userListTask.get(task);
+            intent.putParcelableArrayListExtra("userListTask", (ArrayList<? extends Parcelable>) userList);
             startActivity(intent);
         }
     };
@@ -335,6 +343,15 @@ public class MainActivity extends AppCompatActivity {
         Task taskToRemove = taskViewAdapter.getItem(position);
         mTaskDatabaseReference = mFirebaseDatabase.getReference("task");
         mTaskDatabaseReference.child(taskToRemove.getKey()).removeValue();
+
+        //HAY QUE ELIMINAR LA TAREA DE LA TABLA GRUPOS
+/*
+        List<MyGroup> groupList = taskToRemove.getGroupList();
+
+        for(MyGroup myGroup : groupList){
+            myGroup.getTasks().remove(taskToRemove);
+            mGroupDatabaseReference.child(myGroup.getId()).child("tasks").setValue(myGroup.getTasks());
+        }*/
     }
 
     @Override

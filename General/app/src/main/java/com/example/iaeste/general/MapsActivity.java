@@ -87,6 +87,7 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private static final int CAMERA_PIC_REQUEST = 1337;
 
     private Task task;
+    private List<MyUser> userListTask;
     private List<LatLng> listPointsForPolyline = new ArrayList<>();
     private List<LatLng> listPointsForPolygon = new ArrayList<>();
 
@@ -112,7 +113,6 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
     private Location myLocation = null;
     private LocationManager locationManager;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,6 +120,9 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
 
         Intent intent = getIntent(); // gets the previously created intent
         task = (Task) intent.getParcelableExtra("task");
+
+        userListTask = new ArrayList<>();
+        userListTask = intent.getParcelableArrayListExtra("userListTask");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -313,12 +316,14 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
                 System.out.println(dataSnapshot.toString());
                 if(!dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     MyUser myUser = dataSnapshot.getValue(MyUser.class);
-                    myUser.setUid(dataSnapshot.getKey());
-                    for (DataSnapshot userChild : dataSnapshot.getChildren()) {
-                        if (userChild.getKey().equals("lastKnownLocation")) {
-                            double latitude = (double) userChild.child("latitude").getValue();
-                            double longitude = (double) userChild.child("longitude").getValue();
-                            updateUserLastKnwonLocation(myUser, latitude, longitude);
+                    if(contains(userListTask, myUser)){
+                        myUser.setUid(dataSnapshot.getKey());
+                        for (DataSnapshot userChild : dataSnapshot.getChildren()) {
+                            if (userChild.getKey().equals("lastKnownLocation")) {
+                                double latitude = (double) userChild.child("latitude").getValue();
+                                double longitude = (double) userChild.child("longitude").getValue();
+                                updateUserLastKnwonLocation(myUser, latitude, longitude);
+                            }
                         }
                     }
                 }
@@ -356,6 +361,17 @@ public class MapsActivity extends AppCompatActivity implements LocationListener 
             }
         };
         mUsersDatabaseReference.addChildEventListener(mUserChildPositionListener);
+    }
+
+    private boolean contains(List<MyUser> userListTask, MyUser myUser) {
+        boolean find = false; int i=0;
+        while(i<userListTask.size() && !find){
+            if(userListTask.get(i).getUid().equals(myUser.getUid())){
+                find=true;
+            }
+            i++;
+        }
+        return find;
     }
 
     private void updateUserLastKnwonLocation(MyUser myUser, double latitude, double longitude) {
